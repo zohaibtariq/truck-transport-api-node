@@ -22,21 +22,34 @@ const paginate = (schema) => {
   schema.statics.paginate = async function (filter, options) {
     let sort = '';
     if (options.sortBy) {
+      console.log('OPTONS SORTBY');
+      console.log(options.sortBy);
       const sortingCriteria = [];
       options.sortBy.split(',').forEach((sortOption) => {
+        console.log('each sortOption');
+        console.log(sortOption);
         const [key, order] = sortOption.split(':');
+        console.log('each key');
+        console.log(key);
+        console.log('each order');
+        console.log(order);
         sortingCriteria.push((order === 'desc' ? '-' : '') + key);
+        console.log('each sortingCriteria');
+        console.log(sortingCriteria);
       });
       sort = sortingCriteria.join(' ');
     } else {
-      sort = 'createdAt';
+      sort = '-createdAt';
     }
-
+    console.log('sort');
+    console.log(sort);
     const limit = options.limit && parseInt(options.limit, 10) > 0 ? parseInt(options.limit, 10) : 10;
     const page = options.page && parseInt(options.page, 10) > 0 ? parseInt(options.page, 10) : 1;
     const skip = (page - 1) * limit;
 
     const countPromise = this.countDocuments(filter).exec();
+    // console.log('CUSTOM FLITER LOG')
+    // console.log({ ...filter })
     let docsPromise = this.find(filter).sort(sort).skip(skip).limit(limit);
 
     if (options.populate) {

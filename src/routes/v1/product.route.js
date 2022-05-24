@@ -1,37 +1,36 @@
 const express = require('express');
 // const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
-const userValidation = require('../../validations/user.validation');
-const userController = require('../../controllers/user.controller');
+const productValidation = require('../../validations/product.validation');
+const productController = require('../../controllers/product.controller');
 
 const router = express.Router();
 
-router.post('/unique/email', userController.isEmailsUnique);
-router.post('/import/users', userController.importUsers);
-router.post('/export/users', userController.exportUsers);
-router.post('/', /*auth('manageUsers'),*/ validate(userValidation.createUser), userController.createUser);
-router.get('/' /*,auth('getUsers'), validate(userValidation.getUsers)*/, userController.getUsers);
-
-router.get('/:userId',/*auth('getUsers'),*/ validate(userValidation.getUser), userController.getUser)
-router.post('/:userId',/*auth('manageUsers'),*/ validate(userValidation.updateUser), userController.updateUser)
-router.delete('/:userId', /*auth('manageUsers'),*/ validate(userValidation.deleteUser), userController.deleteUser);
+router.post('/import/profiles', productController.importProfiles);
+router.post('/export/profiles', productController.exportProfiles);
+router.post('/export/profile/:profileId', productController.exportProfile);
+router.get('/', /*auth('productListing'),*/ productController.getProducts);
+router.post('/create', /*auth('productCreate'),*/ validate(productValidation.createProduct), productController.createProduct);
+router.get('/:productId', /*auth('productDetail'),*/ productController.getProduct);
+router.post('/:productId'/*auth('manageUsers')*/, validate(productValidation.createProduct), productController.updateProduct);
+router.delete('/:productId'/*auth('manageUsers')*/, /*validate(productValidation.deleteProduct),*/ productController.deleteProduct);
 
 module.exports = router;
 
 /**
  * @swagger
  * tags:
- *   name: Users
- *   description: User management and retrieval
+ *   name: Products
+ *   description: Product management and retrieval
  */
 
 /**
  * @swagger
- * /users:
+ * /products:
  *   post:
- *     summary: Create a user
- *     description: Only admins can create other users.
- *     tags: [Users]
+ *     summary: Create a product
+ *     description: Only admins can create product.
+ *     tags: [Products]
  *     security:
  *       - bearerAuth: []
  *     requestBody:

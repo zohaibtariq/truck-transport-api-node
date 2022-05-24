@@ -1,37 +1,36 @@
 const express = require('express');
 // const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
-const userValidation = require('../../validations/user.validation');
-const userController = require('../../controllers/user.controller');
+const driverValidation = require('../../validations/driver.validation');
+const driverController = require('../../controllers/driver.controller');
 
 const router = express.Router();
 
-router.post('/unique/email', userController.isEmailsUnique);
-router.post('/import/users', userController.importUsers);
-router.post('/export/users', userController.exportUsers);
-router.post('/', /*auth('manageUsers'),*/ validate(userValidation.createUser), userController.createUser);
-router.get('/' /*,auth('getUsers'), validate(userValidation.getUsers)*/, userController.getUsers);
-
-router.get('/:userId',/*auth('getUsers'),*/ validate(userValidation.getUser), userController.getUser)
-router.post('/:userId',/*auth('manageUsers'),*/ validate(userValidation.updateUser), userController.updateUser)
-router.delete('/:userId', /*auth('manageUsers'),*/ validate(userValidation.deleteUser), userController.deleteUser);
+router.post('/import/drivers', driverController.importDrivers);
+router.post('/export/drivers', driverController.exportDrivers);
+router.get('/', /*auth('driverListing'),*/ driverController.getDrivers);
+router.get('/:driverId', /*auth('driverDetail'),*/ driverController.getDriver);
+router.post('/create', /*auth('driverCreate'),*/ validate(driverValidation.createDriver), driverController.createDriver);
+router.post('/:driverId'/*auth('manageUsers')*/, validate(driverValidation.createDriver), driverController.updateDriver);
+router.delete('/:driverId'/*auth('manageUsers')*/, /*validate(driverValidation.deleteDriver),*/ driverController.deleteDriver);
+router.post('/:driverId/upload', driverController.uploadDriverImage);
 
 module.exports = router;
 
 /**
  * @swagger
  * tags:
- *   name: Users
- *   description: User management and retrieval
+ *   name: Drivers
+ *   description: Driver management and retrieval
  */
 
 /**
  * @swagger
- * /users:
+ * /drivers:
  *   post:
- *     summary: Create a user
- *     description: Only admins can create other users.
- *     tags: [Users]
+ *     summary: Create a driver
+ *     description: Only admins can create driver.
+ *     tags: [Drivers]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
