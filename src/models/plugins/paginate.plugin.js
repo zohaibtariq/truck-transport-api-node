@@ -20,29 +20,31 @@ const paginate = (schema) => {
    * @returns {Promise<QueryResult>}
    */
   schema.statics.paginate = async function (filter, options) {
+    // console.log('inside paginate');
+    // console.log(options);
     let sort = '';
     if (options.sortBy) {
-      console.log('OPTONS SORTBY');
-      console.log(options.sortBy);
+      // console.log('OPTONS SORTBY');
+      // console.log(options.sortBy);
       const sortingCriteria = [];
       options.sortBy.split(',').forEach((sortOption) => {
-        console.log('each sortOption');
-        console.log(sortOption);
+        // console.log('each sortOption');
+        // console.log(sortOption);
         const [key, order] = sortOption.split(':');
-        console.log('each key');
-        console.log(key);
-        console.log('each order');
-        console.log(order);
+        // console.log('each key');
+        // console.log(key);
+        // console.log('each order');
+        // console.log(order);
         sortingCriteria.push((order === 'desc' ? '-' : '') + key);
-        console.log('each sortingCriteria');
-        console.log(sortingCriteria);
+        // console.log('each sortingCriteria');
+        // console.log(sortingCriteria);
       });
       sort = sortingCriteria.join(' ');
     } else {
       sort = '-createdAt';
     }
-    console.log('sort');
-    console.log(sort);
+    // console.log('sort');
+    // console.log(sort);
     const limit = options.limit && parseInt(options.limit, 10) > 0 ? parseInt(options.limit, 10) : 10;
     const page = options.page && parseInt(options.page, 10) > 0 ? parseInt(options.page, 10) : 1;
     const skip = (page - 1) * limit;
@@ -53,7 +55,11 @@ const paginate = (schema) => {
     let docsPromise = this.find(filter).sort(sort).skip(skip).limit(limit);
 
     if (options.populate) {
+      // console.log('OPTIONS populate');
+      // console.log(options.populate);
       options.populate.split(',').forEach((populateOption) => {
+        // console.log('OPTIONS populate each');
+        // console.log(populateOption);
         docsPromise = docsPromise.populate(
           populateOption
             .split('.')
@@ -66,6 +72,8 @@ const paginate = (schema) => {
     docsPromise = docsPromise.exec();
 
     return Promise.all([countPromise, docsPromise]).then((values) => {
+      // console.log('::: VALUES :::')
+      // console.log(values)
       const [totalResults, results] = values;
       const totalPages = Math.ceil(totalResults / limit);
       const result = {
@@ -75,6 +83,8 @@ const paginate = (schema) => {
         totalPages,
         totalResults,
       };
+      // console.log('::: RESULT :::')
+      // console.log({...result})
       return Promise.resolve(result);
     });
   };

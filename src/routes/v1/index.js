@@ -1,8 +1,11 @@
 const express = require('express');
 const authRoute = require('./auth.route');
 const userRoute = require('./user.route');
+const goodRoute = require('./good.route');
+const chargeRoute = require('./charge.route');
 const productRoute = require('./product.route');
 const driverRoute = require('./driver.route');
+const loadRoute = require('./load.route');
 const docsRoute = require('./docs.route');
 const config = require('../../config/config');
 
@@ -18,12 +21,24 @@ const defaultRoutes = [
     route: userRoute,
   },
   {
+    path: '/goods',
+    route: goodRoute,
+  },
+  {
+    path: '/charges',
+    route: chargeRoute,
+  },
+  {
     path: '/products',
     route: productRoute,
   },
   {
     path: '/drivers',
     route: driverRoute,
+  },
+  {
+    path: '/loads',
+    route: loadRoute,
   },
 ];
 

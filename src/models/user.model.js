@@ -3,9 +3,11 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const { toJSON, paginate } = require('./plugins');
 const { roles } = require('../config/roles');
+// const Schema = mongoose.Schema;
 
 const userSchema = mongoose.Schema(
   {
+    // _id: Schema.Types.ObjectId,
     name: {
       type: String,
       required: true,

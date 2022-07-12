@@ -1,6 +1,8 @@
 const httpStatus = require('http-status');
 const { Driver, Product} = require('../models');
 const ApiError = require('../utils/ApiError');
+const fs = require('fs')
+const path = require('path');
 
 /**
  * Create a driver
@@ -70,10 +72,18 @@ const updateDriverById = async (driverId, updateBody) => {
  * @returns {Promise<Driver>}
  */
 const updateDriverImageById = async (driverId, updateBody) => {
-  // console.log('updateDriverImageById')
   const driver = await getDriverById(driverId);
   if (!driver) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Driver not found');
+  }
+  if(updateBody?.image && updateBody.image !== null && updateBody.image !== undefined && updateBody.image !== '' && updateBody.image != driver.image) {
+    const fileFullPath = path.join(__dirname, '../../uploads/'+driver.image);
+    fs.unlink(fileFullPath, (err) => {
+      if (err) {
+        console.error(err)
+        return
+      }
+    })
   }
   // console.log(updateBody)
   Object.assign(driver, updateBody);
@@ -95,7 +105,13 @@ const deleteDriverById = async (driverId) => {
   if (!driver) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Driver not found');
   }
-  // console.log(driver);
+  const fileFullPath = path.join(__dirname, '../../uploads/'+driver.image);
+  fs.unlink(fileFullPath, (err) => {
+    if (err) {
+      console.error(err)
+      return
+    }
+  })
   await driver.remove();
   return driver;
 };

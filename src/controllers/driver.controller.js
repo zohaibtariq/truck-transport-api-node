@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { driverService, productService} = require('../services');
+const { driverService, codeService,} = require('../services');
 const logger = require('../config/logger');
 const path = require('path');
 const multer = require('multer')
@@ -11,8 +11,18 @@ const downloadResource = require("../utils/download");
 const {Driver} = require("../models");
 
 const createDriver = catchAsync(async (req, res) => {
-  const driver = await driverService.createDriver(req.body);
-  res.status(httpStatus.CREATED).send(driver);
+  // const driver = await driverService.createDriver(req.body);
+  // res.status(httpStatus.CREATED).send(driver);
+  let newUniqueGeneratedCode = await codeService.createCode('drivers');
+  req.body.code = newUniqueGeneratedCode;
+  await driverService.createDriver(req.body).then(success => {
+    res.status(httpStatus.CREATED).send(success);
+  }).catch(error => {
+    if(error?.errors?.code?.properties?.value && error?.errors?.code?.properties?.path)
+      res.status(httpStatus.UNPROCESSABLE_ENTITY).send({message: `value ${error.errors.code.properties.value} of ${error.errors.code.properties.path} must be unique`});
+    else
+      res.status(httpStatus.UNPROCESSABLE_ENTITY).send({message: `error in creating driver.`});
+  })
 });
 
 const getDrivers = catchAsync(async (req, res) => {
@@ -106,8 +116,8 @@ const uploadDriverImage = catchAsync(async (req, res) => {
 
 const importDrivers = catchAsync(async (req, res) => {
   let drivers = req.body;
-  console.log('DRIVERS');
-  console.log(drivers);
+  // console.log('DRIVERS');
+  // console.log(drivers);
   let data = await Driver.insertMany(drivers);
   res.status(httpStatus.OK).send({count: data.length, results: data});
 });
@@ -207,8 +217,8 @@ const exportDrivers = catchAsync(async (req, res) => {
   //   newData = _.omit(newData, ['location', 'contactPersons']);
   //   return newData;
   // })
-  console.log('F Data')
-  console.log(data)
+  // console.log('F Data')
+  // console.log(data)
   let fileName = 'drivers-'+(new Date().toTimeString())+'.csv';
   return downloadResource(res, fileName, fields, data);
 });

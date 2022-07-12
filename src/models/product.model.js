@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
-
+const uniqueValidator = require("mongoose-unique-validator");
 const LocationSchema = mongoose.Schema({
   id: {
     type: String,
@@ -123,6 +123,15 @@ const productSchema = mongoose.Schema(
       ContactPersonSchema
     ],
     location: LocationSchema,
+    code: {
+      type: String,
+      default: '',
+      required: true,
+      trim: true,
+      unique: true,
+      index: true,
+      uniqueCaseInsensitive: true,
+    },
     isCustomer: {
       type: Boolean,
       default: false,
@@ -201,7 +210,7 @@ const productSchema = mongoose.Schema(
 // add plugin that converts mongoose to json
 productSchema.plugin(toJSON);
 productSchema.plugin(paginate);
-
+productSchema.plugin(uniqueValidator);
 productSchema.pre('save', async function (next) {
   next();
 });

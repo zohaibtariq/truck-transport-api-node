@@ -1,36 +1,33 @@
 const express = require('express');
-// const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
-const driverValidation = require('../../validations/driver.validation');
-const driverController = require('../../controllers/driver.controller');
+const { goodController } = require('../../controllers');
+const { goodValidation } = require('../../validations');
 
 const router = express.Router();
 
-router.post('/import/drivers', driverController.importDrivers);
-router.post('/export/drivers', driverController.exportDrivers);
-router.get('/', /*auth('driverListing'),*/ driverController.getDrivers);
-router.get('/:driverId', /*auth('driverDetail'),*/ driverController.getDriver);
-router.post('/create', /*auth('driverCreate'),*/ validate(driverValidation.createDriver), driverController.createDriver);
-router.post('/:driverId'/*auth('manageUsers')*/, validate(driverValidation.updateDriver), driverController.updateDriver);
-router.delete('/:driverId'/*auth('manageUsers')*/, /*validate(driverValidation.deleteDriver),*/ driverController.deleteDriver);
-router.post('/:driverId/upload', driverController.uploadDriverImage);
+router.post('/', /*auth('manageGoods'),*/ validate(goodValidation.createGood), goodController.createGood);
+router.get('/' /*,auth('getGoods'), validate(goodValidation.getGoods)*/, goodController.getGoods);
+
+router.get('/:goodId',/*auth('getGoods'),*/ validate(goodValidation.getGood), goodController.getGood)
+router.post('/:goodId',/*auth('manageGoods'),*/ validate(goodValidation.updateGood), goodController.updateGood)
+router.delete('/:goodId', /*auth('manageGoods'),*/ validate(goodValidation.deleteGood), goodController.deleteGood);
 
 module.exports = router;
 
 /**
  * @swagger
  * tags:
- *   name: Drivers
- *   description: Driver management and retrieval
+ *   name: Goods
+ *   description: Good management and retrieval
  */
 
 /**
  * @swagger
- * /drivers:
+ * /goods:
  *   post:
- *     summary: Create a driver
- *     description: Only admins can create driver.
- *     tags: [Drivers]
+ *     summary: Create a good
+ *     description: Only admins can create other goods.
+ *     tags: [Goods]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -58,19 +55,19 @@ module.exports = router;
  *                 description: At least one number and one letter
  *               role:
  *                  type: string
- *                  enum: [user, admin]
+ *                  enum: [good, admin]
  *             example:
  *               name: fake name
  *               email: fake@example.com
  *               password: password1
- *               role: user
+ *               role: good
  *     responses:
  *       "201":
  *         description: Created
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/User'
+ *                $ref: '#/components/schemas/Good'
  *       "400":
  *         $ref: '#/components/responses/DuplicateEmail'
  *       "401":
@@ -79,9 +76,9 @@ module.exports = router;
  *         $ref: '#/components/responses/Forbidden'
  *
  *   get:
- *     summary: Get all users
- *     description: Only admins can retrieve all users.
- *     tags: [Users]
+ *     summary: Get all goods
+ *     description: Only admins can retrieve all goods.
+ *     tags: [Goods]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -89,12 +86,12 @@ module.exports = router;
  *         name: name
  *         schema:
  *           type: string
- *         description: User name
+ *         description: Good name
  *       - in: query
  *         name: role
  *         schema:
  *           type: string
- *         description: User role
+ *         description: Good role
  *       - in: query
  *         name: sortBy
  *         schema:
@@ -106,7 +103,7 @@ module.exports = router;
  *           type: integer
  *           minimum: 1
  *         default: 10
- *         description: Maximum number of users
+ *         description: Maximum number of goods
  *       - in: query
  *         name: page
  *         schema:
@@ -125,7 +122,7 @@ module.exports = router;
  *                 results:
  *                   type: array
  *                   items:
- *                     $ref: '#/components/schemas/User'
+ *                     $ref: '#/components/schemas/Good'
  *                 page:
  *                   type: integer
  *                   example: 1
@@ -146,11 +143,11 @@ module.exports = router;
 
 /**
  * @swagger
- * /users/{id}:
+ * /goods/{id}:
  *   get:
- *     summary: Get a user
- *     description: Logged in users can fetch only their own user information. Only admins can fetch other users.
- *     tags: [Users]
+ *     summary: Get a good
+ *     description: Logged in goods can fetch only their own good information. Only admins can fetch other goods.
+ *     tags: [Goods]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -159,14 +156,14 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: User id
+ *         description: Good id
  *     responses:
  *       "200":
  *         description: OK
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/User'
+ *                $ref: '#/components/schemas/Good'
  *       "401":
  *         $ref: '#/components/responses/Unauthorized'
  *       "403":
@@ -175,9 +172,9 @@ module.exports = router;
  *         $ref: '#/components/responses/NotFound'
  *
  *   patch:
- *     summary: Update a user
- *     description: Logged in users can only update their own information. Only admins can update other users.
- *     tags: [Users]
+ *     summary: Update a good
+ *     description: Logged in goods can only update their own information. Only admins can update other goods.
+ *     tags: [Goods]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -186,7 +183,7 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: User id
+ *         description: Good id
  *     requestBody:
  *       required: true
  *       content:
@@ -215,7 +212,7 @@ module.exports = router;
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/User'
+ *                $ref: '#/components/schemas/Good'
  *       "400":
  *         $ref: '#/components/responses/DuplicateEmail'
  *       "401":
@@ -226,9 +223,9 @@ module.exports = router;
  *         $ref: '#/components/responses/NotFound'
  *
  *   delete:
- *     summary: Delete a user
- *     description: Logged in users can delete only themselves. Only admins can delete other users.
- *     tags: [Users]
+ *     summary: Delete a good
+ *     description: Logged in goods can delete only themselves. Only admins can delete other goods.
+ *     tags: [Goods]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -237,7 +234,7 @@ module.exports = router;
  *         required: true
  *         schema:
  *           type: string
- *         description: User id
+ *         description: Good id
  *     responses:
  *       "200":
  *         description: No content

@@ -1,36 +1,36 @@
 const express = require('express');
 // const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
-const driverValidation = require('../../validations/driver.validation');
-const driverController = require('../../controllers/driver.controller');
+const loadValidation = require('../../validations/load.validation');
+const loadController = require('../../controllers/load.controller');
 
 const router = express.Router();
 
-router.post('/import/drivers', driverController.importDrivers);
-router.post('/export/drivers', driverController.exportDrivers);
-router.get('/', /*auth('driverListing'),*/ driverController.getDrivers);
-router.get('/:driverId', /*auth('driverDetail'),*/ driverController.getDriver);
-router.post('/create', /*auth('driverCreate'),*/ validate(driverValidation.createDriver), driverController.createDriver);
-router.post('/:driverId'/*auth('manageUsers')*/, validate(driverValidation.updateDriver), driverController.updateDriver);
-router.delete('/:driverId'/*auth('manageUsers')*/, /*validate(driverValidation.deleteDriver),*/ driverController.deleteDriver);
-router.post('/:driverId/upload', driverController.uploadDriverImage);
+router.post('/import/loads', loadController.importLoads);
+router.post('/export/loads', loadController.exportLoads);
+router.post('/export/load/:loadId', loadController.exportLoad);
+router.get('/', /*auth('loadListing'),*/ loadController.getLoads);
+router.post('/create', /*auth('loadCreate'),*/ validate(loadValidation.createLoad), loadController.createLoad);
+router.get('/:loadId', /*auth('loadDetail'),*/ loadController.getLoad);
+router.post('/:loadId'/*auth('manageUsers')*/, validate(loadValidation.updateLoad), loadController.updateLoad);
+router.delete('/:loadId'/*auth('manageUsers')*/, /*validate(loadValidation.deleteLoad),*/ loadController.deleteLoad);
 
 module.exports = router;
 
 /**
  * @swagger
  * tags:
- *   name: Drivers
- *   description: Driver management and retrieval
+ *   name: Loads
+ *   description: Load management and retrieval
  */
 
 /**
  * @swagger
- * /drivers:
+ * /loads:
  *   post:
- *     summary: Create a driver
- *     description: Only admins can create driver.
- *     tags: [Drivers]
+ *     summary: Create a load
+ *     description: Only admins can create load.
+ *     tags: [Loads]
  *     security:
  *       - bearerAuth: []
  *     requestBody:

@@ -5,7 +5,6 @@ const catchAsync = require('../utils/catchAsync');
 const { userService } = require('../services');
 const _ = require("lodash");
 const downloadResource = require("../utils/download");
-const moment = require('moment');
 const bcrypt = require('bcryptjs');
 const User = require("../../src/models/user.model");
 const password = 'aA!45678';
@@ -65,8 +64,8 @@ const importUsers = catchAsync(async (req, res) => {
 });
 
 const isEmailsUnique = catchAsync(async (req, res) => {
-  console.log('isEmailsUnique')
-  console.log(req.body, typeof req.body)
+  // console.log('isEmailsUnique')
+  // console.log(req.body, typeof req.body)
   let users = await userService.uniqueEmails({ email: { $in: req.body } });
   res.status(httpStatus.OK).send({count: users.length, results: users});
 });

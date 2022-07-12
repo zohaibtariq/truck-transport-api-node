@@ -2,118 +2,81 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { productService, codeService, driverService} = require('../services');
+const { loadService, codeService } = require('../services');
 const logger = require('../config/logger');
 var _ = require('lodash');
 const downloadResource = require('../utils/download');
-const User = require("../../src/models/user.model");
-const {Product} = require("../models");
+const {Load} = require("../models");
 
-const createProduct = catchAsync(async (req, res) => {
-  // const product = await productService.createProduct(req.body);
-  // res.status(httpStatus.CREATED).send(product);
-  let newUniqueGeneratedCode = await codeService.createCode('profiles');
+const createLoad = catchAsync(async (req, res) => {
+  let newUniqueGeneratedCode = await codeService.createCode('loads');
   req.body.code = newUniqueGeneratedCode;
-  await productService.createProduct(req.body).then(success => {
+  await loadService.createLoad(req.body).then(success => {
     res.status(httpStatus.CREATED).send(success);
   }).catch(error => {
     if(error?.errors?.code?.properties?.value && error?.errors?.code?.properties?.path)
       res.status(httpStatus.UNPROCESSABLE_ENTITY).send({message: `value ${error.errors.code.properties.value} of ${error.errors.code.properties.path} must be unique`});
     else
-      res.status(httpStatus.UNPROCESSABLE_ENTITY).send({message: `error in creating profile.`});
+      res.status(httpStatus.UNPROCESSABLE_ENTITY).send({message: `error in creating load.`});
   })
 });
 
-const getProducts = catchAsync(async (req, res) => {
-  // console.log('QUERY FILTER');
-  // console.log(req.query);
-  // const filter = pick(req.query, ['name', 'role']);
+const getLoads = catchAsync(async (req, res) => {
   let filter = pick(req.query, [
-      'isCustomer','isBillTo','isShipper','isConsignee','isBroker','isForwarder','isTerminal', 'active',
-    'location_id', 'location_name', 'location_address1', 'location_phone', 'location_fax', 'location_zip', 'location_state', 'location_country',
+    'status',
+    'search',
   ]);
-
-  // console.log('UNTOUCHED FILTERS');
-  // console.log({ ...filter });
-
-  // if(filter['location_id'])
-  //   delete Object.assign(filter, {['location.id']: filter['location_id'] })['location_id'];
-  //
-  // if(filter['location_name'])
-  //   delete Object.assign(filter, {['location.name']: filter['location_name'] })['location_name'];
-  //
-  // if(filter['location_address1'])
-  //   delete Object.assign(filter, {['location.address1']: filter['location_address1'] })['location_address1'];
-  //
-  // if(filter['location_phone'])
-  //   delete Object.assign(filter, {['location.phone']: filter['location_phone'] })['location_phone'];
-  //
-  // if(filter['location_fax'])
-  //   delete Object.assign(filter, {['location.fax']: filter['location_fax'] })['location_fax'];
-  //
-  // if(filter['location_zip'])
-  //   delete Object.assign(filter, {['location.zip']: filter['location_zip'] })['location_zip'];
-
-  if(filter['location_state'])
-    delete Object.assign(filter, {['location.state']: filter['location_state'] })['location_state'];
-
-  if(filter['location_country'])
-    delete Object.assign(filter, {['location.country']: filter['location_country'] })['location_country'];
-
-  if(filter['location_id'] || filter['location_name'] || filter['location_address1'] || filter['location_phone'] || filter['location_fax'] || filter['location_zip'] || filter['email']){
-    var searchMe = { $regex: new RegExp(filter['location_phone']), $options: 'i'};
-    // console.log(searchMe)
+  if(filter['search']){
+    var searchMe = { $regex: new RegExp(filter['search']), $options: 'i'};
     Object.assign(filter, {
       '$or': [
-        {'email': searchMe},
-        {'location.id': searchMe},
-        {'location.name': searchMe},
-        {'location.address1': searchMe},
-        {'location.phone': searchMe},
-        {'location.fax': searchMe},
-        {'location.zip': searchMe},
+        {'proCode': searchMe},
+        {'poHash': searchMe},
+        {'shipperRef': searchMe},
+        {'bolHash': searchMe},
+        {'code': searchMe},
       ]})
-    filter = _.omit(filter, ['location_id', 'location_name','location_address1','location_phone', 'location_fax','location_zip']);
+    filter = _.omit(filter, ['search']);
   }
-
-  // console.log('REQ FILTER');
-  // console.log({ ...filter });
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
-
   logger.debug({ ...filter });
   logger.debug({ ...options });
-  const result = await productService.queryProducts(filter, options);
+  // options.populate = 'customer,origin,destination,driver,goods.good';
+  options.populate = 'customer,origin,destination';
+  const result = await loadService.queryLoads(filter, options);
+  // console.log('::: result ::: ')
+  // console.log({...result})
   res.send(result);
 });
 
-const getProduct = catchAsync(async (req, res) => {
-  const product = await productService.getProductById(req.params.productId);
-  if (!product) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Product not found');
+const getLoad = catchAsync(async (req, res) => {
+  const load = await loadService.getLoadById(req.params.loadId);
+  if (!load) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Load not found');
   }
-  res.send(product);
+  res.send(load);
 });
 
-const updateProduct = catchAsync(async (req, res) => {
-  const product = await productService.updateProductById(req.params.productId, req.body);
-  res.send(product);
+const updateLoad = catchAsync(async (req, res) => {
+  const load = await loadService.updateLoadById(req.params.loadId, req.body);
+  res.send(load);
 });
 
-const deleteProduct = catchAsync(async (req, res) => {
-  await productService.deleteProductById(req.params.productId);
+const deleteLoad = catchAsync(async (req, res) => {
+  await loadService.deleteLoadById(req.params.loadId);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
-const importProfiles = catchAsync(async (req, res) => {
-  let profiles = req.body;
+const importLoads = catchAsync(async (req, res) => {
+  let loads = req.body;
   // console.log('PROFILES');
-  // console.log(profiles);
-  // let data = await Product.insertMany(profiles.map((profile) => (profiles)));
-  let data = await Product.insertMany(profiles);
+  // console.log(loads);
+  // let data = await Load.insertMany(loads.map((load) => (loads)));
+  let data = await Load.insertMany(loads);
   res.status(httpStatus.OK).send({count: data.length, results: data});
 });
 
-const exportProfiles = catchAsync(async (req, res) => {
+const exportLoads = catchAsync(async (req, res) => {
   let filter = pick(req.query, [
     'isCustomer','isBillTo','isShipper','isConsignee','isBroker','isForwarder','isTerminal'
   ]);
@@ -235,7 +198,7 @@ const exportProfiles = catchAsync(async (req, res) => {
       value: 'location_name'
     },
   ];
-  let data = await productService.queryAllProducts(filter);
+  let data = await loadService.queryAllLoads(filter);
   data = data.map((d) => {
     let newData = {...d}
     newData['location_id'] = newData['location']['id'];
@@ -258,11 +221,11 @@ const exportProfiles = catchAsync(async (req, res) => {
   })
   // console.log('F Data')
   // console.log(data)
-  let fileName = 'profile-'+(new Date().toTimeString())+'.csv';
+  let fileName = 'load-'+(new Date().toTimeString())+'.csv';
   return downloadResource(res, fileName, fields, data);
 });
 
-const exportProfile = catchAsync(async (req, res) => {
+const exportLoad = catchAsync(async (req, res) => {
   let filter = pick(req.query, [
     'isCustomer','isBillTo','isShipper','isConsignee','isBroker','isForwarder','isTerminal'
   ]);
@@ -288,8 +251,8 @@ const exportProfile = catchAsync(async (req, res) => {
       value: 'email'
     },
   ];
-  const profile = await productService.getProductById(req.params.profileId);
-  let data = profile.contactPersons;
+  const load = await loadService.getLoadById(req.params.loadId);
+  let data = load.contactPersons;
   // data = data.map((d) => {
   //   let newData = {...d}
   //   newData['location_id'] = newData['location']['id'];
@@ -311,17 +274,17 @@ const exportProfile = catchAsync(async (req, res) => {
   // })
   // console.log('F Data')
   // console.log(data)
-  let fileName = 'profile-'+(new Date().toTimeString())+'.csv';
+  let fileName = 'load-'+(new Date().toTimeString())+'.csv';
   return downloadResource(res, fileName, fields, data);
 });
 
 module.exports = {
-  createProduct,
-  getProducts,
-  getProduct,
-  updateProduct,
-  deleteProduct,
-  importProfiles,
-  exportProfiles,
-  exportProfile
+  createLoad,
+  getLoads,
+  getLoad,
+  updateLoad,
+  deleteLoad,
+  importLoads,
+  exportLoads,
+  exportLoad
 };

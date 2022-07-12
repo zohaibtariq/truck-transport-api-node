@@ -1,15 +1,68 @@
 const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
+const uniqueValidator = require("mongoose-unique-validator");
+const Joi = require("joi");
+// const Schema = mongoose.Schema;
+const CertificationSchema = mongoose.Schema({
+  drivingSchool: String,
+  city: String,
+  state: String,
+  contact: String,
+  phone: String,
+  startDate: Object,
+  graduationDate: Object,
+  rank: String,
+  recruiter: String,
+  referredBy: String,
+  comments: String,
+});
 
 const driverSchema = mongoose.Schema(
   {
+    // _id: Schema.Types.ObjectId,
+    equipmentExperienceEndorsements: {
+      flatbed: Boolean,
+      van: Boolean,
+      refrigerated: Boolean,
+      dropDeck: Boolean,
+      towawayVehicles: Boolean,
+      passengerVehicles: Boolean,
+      dblTriple: Boolean,
+      tanker: Boolean,
+      hazMat: Boolean,
+      hazMatTanker: Boolean,
+      airBrake: Boolean,
+      endorsementsRadio: String,
+    },
+    expirationLogSettings: {
+      lastDrugTest: Object,
+      nextDrugTest: Object,
+      lastAlcohalTest: Object,
+      nextAlcohalTest: Object,
+      physExamExp: Object,
+      oORegExp: Object,
+      oOTractorExp: Object,
+      oOTrailerExp: Object,
+      oOInusrExp: Object,
+      otherInusrExp: Object,
+      mvaExp: Object,
+      arcPrcExp: Object,
+      hazMatTraining: Object,
+      annualReview: Object,
+      milesDriven: String,
+      yrsExp: String,
+    },
+    certifications: [
+      CertificationSchema
+    ],
     code: {
       type: String,
-      required: true,
-      // unique: true,
-      trim: true,
-      lowercase: true,
       default: '',
+      required: true,
+      trim: true,
+      unique: true,
+      index: true,
+      uniqueCaseInsensitive: true,
     },
     active: {
       type: Boolean,
@@ -22,6 +75,11 @@ const driverSchema = mongoose.Schema(
       trim: true,
       lowercase: true,
       default: '',
+    },
+    ratePerMile: {
+      type: Number,
+      required: true,
+      default: 0,
     },
     last_name: {
       type: String,
@@ -109,7 +167,12 @@ const driverSchema = mongoose.Schema(
       trim: true,
       default: '',
     },
-    userId:{
+    // inviteAcceptedByDriver: {
+    //   type: Boolean,
+    //   default: false,
+    //   required: true,
+    // },
+    dispatcher:{ // previously userId
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'User',
       required: false,
@@ -129,6 +192,7 @@ const driverSchema = mongoose.Schema(
 // add plugin that converts mongoose to json
 driverSchema.plugin(toJSON);
 driverSchema.plugin(paginate);
+driverSchema.plugin(uniqueValidator);
 
 driverSchema.pre('save', async function (next) {
   next();
