@@ -5,3 +5,4 @@ module.exports.productController = require('./product.controller');
 module.exports.userController = require('./user.controller');
 module.exports.goodController = require('./good.controller');
 module.exports.chargeController = require('./charge.controller');
+module.exports.countryController = require('./country.controller');

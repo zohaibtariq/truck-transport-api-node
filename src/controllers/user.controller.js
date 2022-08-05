@@ -18,6 +18,7 @@ const createUser = catchAsync(async (req, res) => {
 
 const getUsers = catchAsync(async (req, res) => {
   // console.log(':::getUsers:::');
+  // console.log(req.user.id); // this is user id who is performing all the work
   let filter = pick(req.query, ['name', 'role', 'email', /*'gender',*/ 'active']);
   // console.log('UNTOUCHED FILTERS');
   // console.log({ ...filter });

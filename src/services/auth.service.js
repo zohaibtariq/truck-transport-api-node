@@ -1,6 +1,7 @@
 const httpStatus = require('http-status');
 const tokenService = require('./token.service');
 const userService = require('./user.service');
+const driverService = require('./driver.service');
 const Token = require('../models/token.model');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
@@ -90,10 +91,25 @@ const verifyEmail = async (verifyEmailToken) => {
   }
 };
 
+/**
+ * Login driver with email and password
+ * @param {string} email
+ * @param {string} password
+ * @returns {Promise<User>}
+ */
+const loginDriverWithEmailAndPassword = async (email, password) => {
+  const driver = await driverService.getDriverByEmail(email);
+  if (!driver || !(await driver.isPasswordMatch(password))) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Driver: Incorrect email or password');
+  }
+  return driver;
+};
+
 module.exports = {
   loginUserWithEmailAndPassword,
   logout,
   refreshAuth,
   resetPassword,
   verifyEmail,
+  loginDriverWithEmailAndPassword
 };

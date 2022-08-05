@@ -32,7 +32,19 @@ const queryProducts = async (filter, options) => {
  * @returns {Promise<Product>}
  */
 const getProductById = async (id) => {
-  return Product.findById(id);
+  // return Product.findById(id).populate({ path: 'locationCountry', model: 'Country' });
+  // return Product.findById(id).populate('locationCountry');
+  return Product.findById(id).populate([
+    // {
+    //   path: 'countryObj',
+    //   path: 'location.country',
+    //   model: 'model_name',
+    //   select: 'field_name, field_name',
+    // }
+    {path: "location.country"},
+    {path: "location.state"},
+    {path: "location.city"},
+  ]);
 };
 //
 // /**

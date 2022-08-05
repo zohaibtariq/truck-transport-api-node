@@ -1,16 +1,16 @@
 const express = require('express');
+const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const { chargeController } = require('../../controllers');
 const { chargeValidation } = require('../../validations');
 
 const router = express.Router();
 
-router.post('/', /*auth('manageCharges'),*/ validate(chargeValidation.createCharge), chargeController.createCharge);
-router.get('/' /*,auth('getCharges'), validate(chargeValidation.getCharges)*/, chargeController.getCharges);
-
-router.get('/:chargeId',/*auth('getCharges'),*/ validate(chargeValidation.getCharge), chargeController.getCharge)
-router.post('/:chargeId',/*auth('manageCharges'),*/ validate(chargeValidation.updateCharge), chargeController.updateCharge)
-router.delete('/:chargeId', /*auth('manageCharges'),*/ validate(chargeValidation.deleteCharge), chargeController.deleteCharge);
+router.post('/', auth('createCharge'), validate(chargeValidation.createCharge), chargeController.createCharge);
+router.get('/' , auth('getCharges'), chargeController.getCharges);
+router.get('/:chargeId', auth('getCharge'), validate(chargeValidation.chargeQueryParam), chargeController.getCharge)
+router.post('/:chargeId', auth('updateCharge'), validate(chargeValidation.updateCharge), chargeController.updateCharge)
+router.delete('/:chargeId', auth('deleteCharge'), validate(chargeValidation.chargeQueryParam), chargeController.deleteCharge);
 
 module.exports = router;
 

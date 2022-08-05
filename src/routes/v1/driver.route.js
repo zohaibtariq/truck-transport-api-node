@@ -1,19 +1,25 @@
 const express = require('express');
-// const auth = require('../../middlewares/auth');
+const auth = require('../../middlewares/auth');
+// const driverAuth = require('../../middlewares/driverAuth');
+const driverOrUser = require('../../middlewares/driverOrUser');
 const validate = require('../../middlewares/validate');
 const driverValidation = require('../../validations/driver.validation');
 const driverController = require('../../controllers/driver.controller');
+const authValidation = require("../../validations/auth.validation");
 
 const router = express.Router();
 
-router.post('/import/drivers', driverController.importDrivers);
-router.post('/export/drivers', driverController.exportDrivers);
-router.get('/', /*auth('driverListing'),*/ driverController.getDrivers);
-router.get('/:driverId', /*auth('driverDetail'),*/ driverController.getDriver);
-router.post('/create', /*auth('driverCreate'),*/ validate(driverValidation.createDriver), driverController.createDriver);
-router.post('/:driverId'/*auth('manageUsers')*/, validate(driverValidation.updateDriver), driverController.updateDriver);
-router.delete('/:driverId'/*auth('manageUsers')*/, /*validate(driverValidation.deleteDriver),*/ driverController.deleteDriver);
-router.post('/:driverId/upload', driverController.uploadDriverImage);
+router.post('/login', validate(authValidation.login), driverController.login);
+router.post('/import/drivers', auth('importDrivers'), driverController.importDrivers);
+router.post('/export/drivers', auth('exportDrivers'), driverController.exportDrivers);
+router.get('/', auth('getDrivers'), driverController.getDrivers);
+// router.get('/:driverId', auth('getDriver'), validate(driverValidation.driverQueryParam), driverController.getDriver);
+// router.get('/:driverId', driverAuth(), validate(driverValidation.driverQueryParam), driverController.getDriver);
+router.get('/:driverId', driverOrUser('getDriver'), validate(driverValidation.driverQueryParam), driverController.getDriver);
+router.post('/create', auth('createDriver'), validate(driverValidation.createDriver), driverController.createDriver);
+router.post('/:driverId', auth('updateDriver'), validate(driverValidation.updateDriver), driverController.updateDriver);
+router.delete('/:driverId', auth('deleteDriver'), validate(driverValidation.driverQueryParam), driverController.deleteDriver);
+router.post('/:driverId/upload', auth('uploadDriverImage'), driverController.uploadDriverImage);
 
 module.exports = router;
 

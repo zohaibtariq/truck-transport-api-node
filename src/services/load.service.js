@@ -10,6 +10,10 @@ const _ = require('lodash');
  * @returns {Promise<Load>}
  */
 const createLoad = async (loadBody) => {
+  const loadCount = await Load.count();
+  loadBody.code = 40000 + parseInt(loadCount);
+  // console.log('LOAD CODE');
+  // console.log(loadCount, loadBody.code);
    return Load.create(loadBody);
 };
 
@@ -35,7 +39,7 @@ const queryLoads = async (filter, options) => {
  * @returns {Promise<Load>}
  */
 const getLoadById = async (id) => {
-  return Load.findById(id).populate(['customer', 'origin', 'destination', 'driver', 'goods.good', 'charges.type'/*, 'invitationSentToDrivers.id'*/]);
+  return Load.findById(id).populate(['customer', 'origin', 'destination', 'lastInvitedDriver', 'goods.good', 'charges.type'/*, 'invitationSentToDrivers.id'*/]);
 };
 
 /**
@@ -49,8 +53,40 @@ const updateLoadById = async (loadId, updateBody) => {
   if (!load) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Load not found');
   }
-  if(updateBody.invitationSentToDrivers && updateBody.invitationSentToDrivers.length > 0){
-    updateBody.invitationSentToDrivers = load.invitationSentToDrivers.concat(updateBody.invitationSentToDrivers);
+  if(updateBody.invitationSentToDrivers && updateBody.invitationSentToDrivers.length > 0) {
+    if(!load.invitationSentToDrivers.some(each => each.id.toString() === updateBody.invitationSentToDrivers[0].id)){
+      updateBody.invitationSentToDrivers = load.invitationSentToDrivers.concat(updateBody.invitationSentToDrivers);
+    }else{
+      updateBody.invitationSentToDrivers = load.invitationSentToDrivers
+    }
+  }
+  if(updateBody.driverInterests && updateBody.driverInterests.length > 0) {
+    if(!load.driverInterests.some(each => each.id.toString() === updateBody.driverInterests[0].id)){
+      updateBody.driverInterests = load.driverInterests.concat(updateBody.driverInterests);
+    }else{
+      updateBody.driverInterests = load.driverInterests
+    }
+  }
+  Object.assign(load, updateBody);
+  await load.save();
+  return load;
+};
+
+/**
+ * Accept driver invite
+ * @param {ObjectId} loadId
+ * @param {Object} updateBody
+ * @returns {Promise<Load>}
+ */
+const updateLoadForDriverInvite = async (loadId, updateBody) => {
+  const load = await getLoadById(loadId)
+  if (!load) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Load not found')
+  }
+  // console.log('last invited driver')
+  // console.log(load.lastInvitedDriver.id)
+  if(updateBody.inviteAcceptedByDriver !== load.lastInvitedDriver.id) {
+    throw new ApiError(httpStatus.FORBIDDEN, 'This invite is expired')
   }
   Object.assign(load, updateBody);
   await load.save();
@@ -81,5 +117,6 @@ module.exports = {
   getLoadById,
   updateLoadById,
   deleteLoadById,
-  queryAllLoads
+  queryAllLoads,
+  updateLoadForDriverInvite
 };

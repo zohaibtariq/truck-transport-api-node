@@ -17,12 +17,6 @@ const getCharges = {
   }),
 };
 
-const getCharge = {
-  params: Joi.object().keys({
-    chargeId: Joi.string().custom(objectId),
-  }),
-};
-
 const updateCharge = {
   params: Joi.object().keys({
     chargeId: Joi.required().custom(objectId),
@@ -35,7 +29,7 @@ const updateCharge = {
     .min(1),
 };
 
-const deleteCharge = {
+const chargeQueryParam = {
   params: Joi.object().keys({
     chargeId: Joi.string().custom(objectId),
   }),
@@ -44,7 +38,6 @@ const deleteCharge = {
 module.exports = {
   createCharge,
   getCharges,
-  getCharge,
+  chargeQueryParam,
   updateCharge,
-  deleteCharge,
 };

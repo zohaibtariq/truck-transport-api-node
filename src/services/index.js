@@ -8,3 +8,4 @@ module.exports.loadService = require('./load.service');
 module.exports.codeService = require('./code.service');
 module.exports.goodService = require('./good.service');
 module.exports.chargeService = require('./charge.service');
+module.exports.countryService = require('./country.service');

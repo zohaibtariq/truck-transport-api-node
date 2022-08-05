@@ -15,6 +15,12 @@ const invitationSentToDrivers = Schema({
     ref: "Driver",
   }
 });
+const driverInterests = Schema({
+  id: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: "Driver",
+  }
+});
 const goods = Schema({
   id: {
     type: mongoose.SchemaTypes.ObjectId,
@@ -68,6 +74,9 @@ const loadSchema = Schema(
     invitationSentToDrivers: [
       invitationSentToDrivers
     ],
+    driverInterests: [
+      driverInterests
+    ],
     code: {
       type: String,
       default: '',
@@ -84,6 +93,12 @@ const loadSchema = Schema(
       trim: true,
     },
     ratePerMile: {
+      type: Number,
+      default: 0,
+      required: true,
+      trim: true,
+    },
+    driverRatePerMile: {
       type: Number,
       default: 0,
       required: true,
@@ -141,10 +156,6 @@ const loadSchema = Schema(
       type: Boolean,
       default: false,
     },
-    inviteAcceptedByDriver: {
-      type: Boolean,
-      default: false,
-    },
     onTheWayToDelivery: {
       type: Boolean,
       default: false,
@@ -153,7 +164,19 @@ const loadSchema = Schema(
       type: Boolean,
       default: false,
     },
-    driver: { // this will map to drivers
+    inviteAcceptedByDriverTime: {
+      type: Date,
+      required: false,
+    },
+    isInviteAcceptedByDriver: {
+      type: Boolean,
+      default: false,
+    },
+    inviteAcceptedByDriver: { // this will map to drivers
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: "Driver",
+    },
+    lastInvitedDriver: { // this will map to drivers
       type: mongoose.SchemaTypes.ObjectId,
       ref: "Driver",
     },

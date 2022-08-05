@@ -1,10 +1,11 @@
 const Joi = require('joi');
+const {objectId} = require("./custom.validation");
 Joi.objectId = require('joi-objectid')(Joi)
 
 const createLoad = {
   body: Joi.object().keys({
     invitationSentToDrivers: Joi.array().items(Joi.object().keys({
-      id: Joi.string().required()
+      id: Joi.string().custom(objectId).required()
     })),
     bolHash: Joi.string().required(),
     shipperRef: Joi.string().required(),
@@ -16,29 +17,30 @@ const createLoad = {
     destination: Joi.optional(),
     notes: Joi.string().optional(),
     invitationSentToDriver: Joi.boolean().optional(),
-    inviteAcceptedByDriver: Joi.boolean().optional(),
     onTheWayToDelivery: Joi.boolean().optional(),
     deliveredToCustomer: Joi.boolean().optional(),
-    driver: Joi.optional(),
+    inviteAcceptedByDriver: Joi.string().custom(objectId).optional(),
+    lastInvitedDriver: Joi.string().custom(objectId).optional(),
+    isInviteAcceptedByDriver: Joi.boolean().optional(),
   }),
 };
 
 const updateLoad = {
   body: Joi.object().keys({
     invitationSentToDrivers: Joi.array().items(Joi.object().keys({
-      id: Joi.string().required()
+      id: Joi.string().custom(objectId).required()
     })),
     goods: Joi.array().items(Joi.object().keys({
       make: Joi.string().required(),
       model: Joi.string().required(),
       year: Joi.number().required(),
       value: Joi.number().required(),
-      quantity: Joi.number().integer().required(),
-      pieces: Joi.number().integer().required(),
-      userQuantity: Joi.number().integer().required(),
-      weight: Joi.number().integer().required(),
-      tonnage: Joi.number().integer().required(),
-      grWeight: Joi.number().integer().required(),
+      quantity: Joi.number().required(),
+      pieces: Joi.number().required(),
+      userQuantity: Joi.number().required(),
+      weight: Joi.number().required(),
+      tonnage: Joi.number().required(),
+      grWeight: Joi.number().required(),
       palletes: Joi.number().required(),
       frClass: Joi.number().required(),
       notes: Joi.string().required(),
@@ -47,7 +49,7 @@ const updateLoad = {
     charges: Joi.array().items(Joi.object().keys({
       type: Joi.string().required(),
       rate: Joi.number().required(),
-      quantity: Joi.number().integer().required(),
+      quantity: Joi.number().required(),
       payableToDriver: Joi.boolean().optional(),
       billableToCustomer: Joi.boolean().optional(),
       notes: Joi.string().required()
@@ -66,14 +68,26 @@ const updateLoad = {
     destination: Joi.optional(),
     notes: Joi.string().optional(),
     invitationSentToDriver: Joi.boolean().optional(),
-    inviteAcceptedByDriver: Joi.boolean().optional(),
     onTheWayToDelivery: Joi.boolean().optional(),
     deliveredToCustomer: Joi.boolean().optional(),
-    driver: Joi.optional(),
+    lastInvitedDriver: Joi.optional(),
+    driverRatePerMile: Joi.number().optional(),
+    isInviteAcceptedByDriver: Joi.boolean().optional(),
+    inviteAcceptedByDriver: Joi.string().custom(objectId).optional(),
+    driverInterests: Joi.array().items(Joi.object().keys({
+      id: Joi.string().custom(objectId).required()
+    })),
+  }),
+};
+
+const loadQueryParam = {
+  params: Joi.object().keys({
+    loadId: Joi.string().custom(objectId),
   }),
 };
 
 module.exports = {
   createLoad,
-  updateLoad
+  updateLoad,
+  loadQueryParam,
 };

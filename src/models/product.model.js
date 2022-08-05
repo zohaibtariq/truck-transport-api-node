@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
 const uniqueValidator = require("mongoose-unique-validator");
+const Joi = require("joi");
 const LocationSchema = mongoose.Schema({
   id: {
     type: String,
@@ -44,26 +45,20 @@ const LocationSchema = mongoose.Schema({
     lowercase: true,
     default: '',
   },
+  country: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'Country',
+    required: true
+  },
   state: {
-    type: String,
-    required: true,
-    trim: true,
-    lowercase: true,
-    default: '',
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'State',
+    required: true
   },
   city: {
-    type: String,
-    required: true,
-    trim: true,
-    lowercase: true,
-    default: '',
-  },
-  country: {
-    type: String,
-    required: true,
-    trim: true,
-    lowercase: true,
-    default: '',
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'City',
+    required: true
   },
   phone: {
     type: String,
@@ -207,6 +202,16 @@ const productSchema = mongoose.Schema(
   }
 );
 
+// productSchema.virtual('countryObj', {
+//   ref: 'Country',
+//   localField: 'location.country',
+//   foreignField: 'isoCode'
+// });
+
+// productSchema.pre('find', function () {
+//   this.populate('countryObj');
+// });
+
 // add plugin that converts mongoose to json
 productSchema.plugin(toJSON);
 productSchema.plugin(paginate);
@@ -214,6 +219,9 @@ productSchema.plugin(uniqueValidator);
 productSchema.pre('save', async function (next) {
   next();
 });
+
+productSchema.set('toObject', { virtuals: true })
+productSchema.set('toJSON', { virtuals: true })
 
 /**
  * @typedef Product

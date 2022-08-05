@@ -1,36 +1,30 @@
 const express = require('express');
 const auth = require('../../middlewares/auth');
-const validate = require('../../middlewares/validate');
-const productValidation = require('../../validations/product.validation');
-const productController = require('../../controllers/product.controller');
+const {countryController} = require("../../controllers");
 
 const router = express.Router();
 
-router.post('/import/profiles', auth('importProfiles'), productController.importProfiles);
-router.post('/export/profiles', auth('exportProfiles'), productController.exportProfiles);
-router.post('/export/profile/:profileId', auth('exportProfile'), validate(productValidation.validateProfileIdQueryParam), productController.exportProfile);
-router.get('/', auth('getProducts'), productController.getProducts);
-router.post('/create', auth('createProduct'), validate(productValidation.createProduct), productController.createProduct);
-router.get('/:productId', auth('getProduct'), validate(productValidation.productQueryParam), productController.getProduct);
-router.post('/:productId', auth('updateProduct'), validate(productValidation.createProduct), productController.updateProduct);
-router.delete('/:productId', auth('deleteProduct'), validate(productValidation.productQueryParam), productController.deleteProduct);
+router.post('/', auth('country'), countryController.createCountries);
+router.get('/', auth('getAllCountries'), countryController.getAllCountries);
+router.get('/:countryIsoCode/states', auth('getAllStates'), countryController.getRelatedStates);
+router.get('/:countryIsoCode/:stateIsoCode/cities', auth('getAllCities'), countryController.getRelatedCities);
 
 module.exports = router;
 
 /**
  * @swagger
  * tags:
- *   name: Products
- *   description: Product management and retrieval
+ *   name: Users
+ *   description: User management and retrieval
  */
 
 /**
  * @swagger
- * /products:
+ * /users:
  *   post:
- *     summary: Create a product
- *     description: Only admins can create product.
- *     tags: [Products]
+ *     summary: Create a user
+ *     description: Only admins can create other users.
+ *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     requestBody:

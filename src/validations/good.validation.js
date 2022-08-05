@@ -17,12 +17,6 @@ const getGoods = {
   }),
 };
 
-const getGood = {
-  params: Joi.object().keys({
-    goodId: Joi.string().custom(objectId),
-  }),
-};
-
 const updateGood = {
   params: Joi.object().keys({
     goodId: Joi.required().custom(objectId),
@@ -35,7 +29,7 @@ const updateGood = {
     .min(1),
 };
 
-const deleteGood = {
+const goodQueryParam = {
   params: Joi.object().keys({
     goodId: Joi.string().custom(objectId),
   }),
@@ -44,7 +38,6 @@ const deleteGood = {
 module.exports = {
   createGood,
   getGoods,
-  getGood,
   updateGood,
-  deleteGood,
+  goodQueryParam,
 };

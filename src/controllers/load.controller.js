@@ -9,8 +9,8 @@ const downloadResource = require('../utils/download');
 const {Load} = require("../models");
 
 const createLoad = catchAsync(async (req, res) => {
-  let newUniqueGeneratedCode = await codeService.createCode('loads');
-  req.body.code = newUniqueGeneratedCode;
+  // let newUniqueGeneratedCode = await codeService.createCode('loads');
+  // req.body.code = newUniqueGeneratedCode;
   await loadService.createLoad(req.body).then(success => {
     res.status(httpStatus.CREATED).send(success);
   }).catch(error => {
@@ -278,6 +278,57 @@ const exportLoad = catchAsync(async (req, res) => {
   return downloadResource(res, fileName, fields, data);
 });
 
+const loadInviteAcceptedByDriver = catchAsync(async (req, res) => {
+  let statusCode = httpStatus.NO_CONTENT
+  let bodyToUpdate = {};
+  if(req.driver !== undefined) {
+    let driverId = req.driver.id
+    // console.log('driverId');
+    // console.log(driverId);
+    // console.log('loadId');
+    // console.log(req.params.loadId);
+    bodyToUpdate = {
+      "inviteAcceptedByDriverTime": new Date(),
+      // "inviteAcceptedByDriverTime": +new Date,
+      // "inviteAcceptedByDriverTime": new ISODate(),
+      "inviteAcceptedByDriver": driverId,
+      "isInviteAcceptedByDriver": true,
+      // "driverInterests": [
+      //   {"id": driverId}
+      // ]
+    };
+    // console.log('loadInviteAcceptedByDriver');
+    // console.log(bodyToUpdate);
+    const load = await loadService.updateLoadForDriverInvite(req.params.loadId, bodyToUpdate);
+    statusCode = httpStatus.OK
+  }
+  res.status(statusCode).send(bodyToUpdate);
+});
+
+const loadDriverInterests = catchAsync(async (req, res) => {
+  let statusCode = httpStatus.NO_CONTENT
+  let bodyToUpdate = {};
+  let responseBody = {};
+  if(req.driver !== undefined) {
+    let driverId = req.driver.id
+    // console.log('driverId');
+    // console.log(driverId);
+    // console.log('loadId');
+    // console.log(req.params.loadId);
+    bodyToUpdate = {
+      "driverInterests": [
+        {"id": driverId}
+      ]
+    };
+    responseBody = {...bodyToUpdate}
+    // console.log('driverInterests');
+    // console.log(bodyToUpdate);
+    const load = await loadService.updateLoadById(req.params.loadId, bodyToUpdate);
+    statusCode = httpStatus.OK
+  }
+  res.status(statusCode).send(responseBody);
+});
+
 module.exports = {
   createLoad,
   getLoads,
@@ -286,5 +337,7 @@ module.exports = {
   deleteLoad,
   importLoads,
   exportLoads,
-  exportLoad
+  exportLoad,
+  loadInviteAcceptedByDriver,
+  loadDriverInterests
 };

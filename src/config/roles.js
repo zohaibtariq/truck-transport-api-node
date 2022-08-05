@@ -1,11 +1,11 @@
+const permissions = require("./permissions");
 const allRoles = {
-  user: ['productCreate', 'productListing', 'productDetail'],
-  admin: ['getUsers', 'manageUsers'],
+  user: permissions,
+  admin: permissions,
+  superadmin: [...permissions, 'country'],
 };
-
 const roles = Object.keys(allRoles);
 const roleRights = new Map(Object.entries(allRoles));
-
 module.exports = {
   roles,
   roleRights,

@@ -3,7 +3,7 @@ const moment = require('moment');
 const httpStatus = require('http-status');
 const config = require('../config/config');
 const userService = require('./user.service');
-const { Token } = require('../models');
+const { Token, DriverToken } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
 
@@ -46,6 +46,26 @@ const saveToken = async (token, userId, expires, type, blacklisted = false) => {
 };
 
 /**
+ * Save a driver token
+ * @param {string} token
+ * @param {ObjectId} userId
+ * @param {Moment} expires
+ * @param {string} type
+ * @param {boolean} [blacklisted]
+ * @returns {Promise<Token>}
+ */
+const saveDriverToken = async (token, driverId, expires, type, blacklisted = false) => {
+  const tokenDoc = await DriverToken.create({
+    token,
+    driver: driverId,
+    expires: expires.toDate(),
+    type,
+    blacklisted,
+  });
+  return tokenDoc;
+};
+
+/**
  * Verify token and return token doc (or throw an error if it is not valid)
  * @param {string} token
  * @param {string} type
@@ -56,6 +76,21 @@ const verifyToken = async (token, type) => {
   const tokenDoc = await Token.findOne({ token, type, user: payload.sub, blacklisted: false });
   if (!tokenDoc) {
     throw new Error('Token not found');
+  }
+  return tokenDoc;
+};
+
+/**
+ * Verify token and return token doc (or throw an error if it is not valid)
+ * @param {string} token
+ * @param {string} type
+ * @returns {Promise<Token>}
+ */
+const verifyDriverToken = async (token, type) => {
+  const payload = jwt.verify(token, config.jwt.secret);
+  const tokenDoc = await DriverToken.findOne({ token, type, user: payload.sub, blacklisted: false });
+  if (!tokenDoc) {
+    throw new Error('Driver Token not found');
   }
   return tokenDoc;
 };
@@ -72,6 +107,31 @@ const generateAuthTokens = async (user) => {
   const refreshTokenExpires = moment().add(config.jwt.refreshExpirationDays, 'days');
   const refreshToken = generateToken(user.id, refreshTokenExpires, tokenTypes.REFRESH);
   await saveToken(refreshToken, user.id, refreshTokenExpires, tokenTypes.REFRESH);
+
+  return {
+    access: {
+      token: accessToken,
+      expires: accessTokenExpires.toDate(),
+    },
+    refresh: {
+      token: refreshToken,
+      expires: refreshTokenExpires.toDate(),
+    },
+  };
+};
+
+/**
+ * Generate driver auth tokens
+ * @param {Driver} driver
+ * @returns {Promise<Object>}
+ */
+const generateDriverAuthTokens = async (driver) => {
+  const accessTokenExpires = moment().add(config.jwt.accessExpirationMinutes, 'minutes');
+  const accessToken = generateToken(driver.id, accessTokenExpires, tokenTypes.ACCESS);
+
+  const refreshTokenExpires = moment().add(config.jwt.refreshExpirationDays, 'days');
+  const refreshToken = generateToken(driver.id, refreshTokenExpires, tokenTypes.REFRESH);
+  await saveDriverToken(refreshToken, driver.id, refreshTokenExpires, tokenTypes.REFRESH);
 
   return {
     access: {
@@ -120,4 +180,6 @@ module.exports = {
   generateAuthTokens,
   generateResetPasswordToken,
   generateVerifyEmailToken,
+  generateDriverAuthTokens,
+  verifyDriverToken
 };

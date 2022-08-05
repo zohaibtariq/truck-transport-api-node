@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Driver, Product} = require('../models');
+const { Driver, User} = require('../models');
 const ApiError = require('../utils/ApiError');
 const fs = require('fs')
 const path = require('path');
@@ -10,6 +10,13 @@ const path = require('path');
  * @returns {Promise<Driver>}
  */
 const createDriver = async (driverBody) => {
+  // console.log('createDriver')
+  // console.log(driverBody)
+  if (await Driver.isEmailTaken(driverBody.email)) {
+    // console.log('throw new error')
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+  }
+  // console.log('driver created call')
   return Driver.create(driverBody);
 };
 
@@ -34,17 +41,17 @@ const queryDrivers = async (filter, options) => {
  * @returns {Promise<Driver>}
  */
 const getDriverById = async (id) => {
-  return Driver.findById(id);
+  return Driver.findById(id).populate(['country', 'state', 'city', 'certifications.country', 'certifications.state', 'certifications.city']);
 };
-//
-// /**
-//  * Get driver by email
-//  * @param {string} email
-//  * @returns {Promise<Driver>}
-//  */
-// const getDriverByEmail = async (email) => {
-//   return Driver.findOne({ email });
-// };
+
+/**
+ * Get driver by email
+ * @param {string} email
+ * @returns {Promise<Driver>}
+ */
+const getDriverByEmail = async (email) => {
+  return Driver.findOne({ email });
+};
 
 /**
  * Update driver by id
@@ -57,9 +64,9 @@ const updateDriverById = async (driverId, updateBody) => {
   if (!driver) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Driver not found');
   }
-  // if (updateBody.email && (await Driver.isEmailTaken(updateBody.email, driverId))) {
-  //   throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
-  // }
+  if (updateBody.email && (await Driver.isEmailTaken(updateBody.email, driverId))) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+  }
   Object.assign(driver, updateBody);
   await driver.save();
   return driver;
@@ -124,7 +131,7 @@ module.exports = {
   createDriver,
   queryDrivers,
   getDriverById,
-  // getDriverByEmail,
+  getDriverByEmail,
   updateDriverById,
   deleteDriverById,
   updateDriverImageById,

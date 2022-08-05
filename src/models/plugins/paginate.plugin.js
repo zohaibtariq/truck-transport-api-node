@@ -55,14 +55,18 @@ const paginate = (schema) => {
     let docsPromise = this.find(filter).sort(sort).skip(skip).limit(limit);
 
     if (options.populate) {
-      // console.log('OPTIONS populate');
-      // console.log(options.populate);
+      console.log('OPTIONS populate');
+      console.log(options.populate);
       options.populate.split(',').forEach((populateOption) => {
-        // console.log('OPTIONS populate each');
-        // console.log(populateOption);
+        console.log('OPTIONS populate each');
+        console.log(populateOption);
+        console.log(populateOption
+          .split(':')
+          .reverse()
+          .reduce((a, b) => ({ path: b, populate: a })))
         docsPromise = docsPromise.populate(
           populateOption
-            .split('.')
+            .split(':')
             .reverse()
             .reduce((a, b) => ({ path: b, populate: a }))
         );

@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { driverService, codeService,} = require('../services');
+const { driverService, codeService, userService, authService, tokenService,} = require('../services');
 const logger = require('../config/logger');
 const path = require('path');
 const multer = require('multer')
@@ -15,14 +15,19 @@ const createDriver = catchAsync(async (req, res) => {
   // res.status(httpStatus.CREATED).send(driver);
   let newUniqueGeneratedCode = await codeService.createCode('drivers');
   req.body.code = newUniqueGeneratedCode;
-  await driverService.createDriver(req.body).then(success => {
-    res.status(httpStatus.CREATED).send(success);
-  }).catch(error => {
-    if(error?.errors?.code?.properties?.value && error?.errors?.code?.properties?.path)
-      res.status(httpStatus.UNPROCESSABLE_ENTITY).send({message: `value ${error.errors.code.properties.value} of ${error.errors.code.properties.path} must be unique`});
-    else
-      res.status(httpStatus.UNPROCESSABLE_ENTITY).send({message: `error in creating driver.`});
-  })
+  // await driverService.createDriver(req.body).then(success => {
+  //   res.status(httpStatus.CREATED).send(success);
+  // }).catch(error => {
+  // console.log("error");
+  // console.log(error);
+  //   if(error?.errors?.code?.properties?.value && error?.errors?.code?.properties?.path)
+  //     res.status(httpStatus.UNPROCESSABLE_ENTITY).send({message: `value ${error.errors.code.properties.value} of ${error.errors.code.properties.path} must be unique`});
+  //   else
+  //     res.status(httpStatus.UNPROCESSABLE_ENTITY).send({...error});
+  //     // res.status(httpStatus.UNPROCESSABLE_ENTITY).send({message: `error in creating driver.`});
+  // })
+  const driver = await driverService.createDriver(req.body);
+  res.status(httpStatus.CREATED).send(driver);
 });
 
 const getDrivers = catchAsync(async (req, res) => {
@@ -57,6 +62,7 @@ const getDrivers = catchAsync(async (req, res) => {
   }
   // console.log('DRIVER REQ FILTER FINAL');
   // console.log({ ...filter });
+  options.populate = "country,state,city"
   const result = await driverService.queryDrivers(filter, options);
   res.send(result);
 });
@@ -223,6 +229,13 @@ const exportDrivers = catchAsync(async (req, res) => {
   return downloadResource(res, fileName, fields, data);
 });
 
+const login = catchAsync(async (req, res) => {
+  const { email, password } = req.body;
+  const driver = await authService.loginDriverWithEmailAndPassword(email, password);
+  const tokens = await tokenService.generateDriverAuthTokens(driver);
+  res.send({ driver, tokens });
+});
+
 module.exports = {
   createDriver,
   getDrivers,
@@ -231,5 +244,6 @@ module.exports = {
   deleteDriver,
   uploadDriverImage,
   importDrivers,
-  exportDrivers
+  exportDrivers,
+  login
 };

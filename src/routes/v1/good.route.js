@@ -1,16 +1,16 @@
 const express = require('express');
+const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const { goodController } = require('../../controllers');
 const { goodValidation } = require('../../validations');
 
 const router = express.Router();
 
-router.post('/', /*auth('manageGoods'),*/ validate(goodValidation.createGood), goodController.createGood);
-router.get('/' /*,auth('getGoods'), validate(goodValidation.getGoods)*/, goodController.getGoods);
-
-router.get('/:goodId',/*auth('getGoods'),*/ validate(goodValidation.getGood), goodController.getGood)
-router.post('/:goodId',/*auth('manageGoods'),*/ validate(goodValidation.updateGood), goodController.updateGood)
-router.delete('/:goodId', /*auth('manageGoods'),*/ validate(goodValidation.deleteGood), goodController.deleteGood);
+router.post('/', auth('createGood'), validate(goodValidation.createGood), goodController.createGood);
+router.get('/' , auth('getGoods'), goodController.getGoods);
+router.get('/:goodId',auth('getGood'), validate(goodValidation.goodQueryParam), goodController.getGood)
+router.post('/:goodId',auth('updateGood'), validate(goodValidation.updateGood), goodController.updateGood)
+router.delete('/:goodId', auth('deleteGood'), validate(goodValidation.goodQueryParam), goodController.deleteGood);
 
 module.exports = router;
 

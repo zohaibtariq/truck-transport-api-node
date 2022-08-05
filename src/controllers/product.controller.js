@@ -82,6 +82,7 @@ const getProducts = catchAsync(async (req, res) => {
 
   logger.debug({ ...filter });
   logger.debug({ ...options });
+  options.populate = "location.country,location.state,location.city"
   const result = await productService.queryProducts(filter, options);
   res.send(result);
 });

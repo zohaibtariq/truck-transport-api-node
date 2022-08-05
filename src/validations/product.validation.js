@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const {objectId} = require("./custom.validation");
 
 const createProduct = {
   body: Joi.object().keys({
@@ -16,9 +17,35 @@ const createProduct = {
       address1: Joi.string().required(),
       address2: String,
       zip: Joi.string().required(),
-      state: Joi.string().required(),
-      city: Joi.string().required(),
-      country: Joi.string().required(),
+      country: Joi.string().custom(objectId).required(),
+      state: Joi.string().custom(objectId).required(),
+      city: Joi.string().custom(objectId).required(),
+      // country: Joi.object().required().keys({
+      //   countryId: Joi.string().required(),
+      //   currency: Joi.string().required(),
+      //   flag: Joi.string().required(),
+      //   isoCode: Joi.string().required(),
+      //   latitude: Joi.string().required(),
+      //   longitude: Joi.string().required(),
+      //   name: Joi.string().required(),
+      //   phonecode: Joi.string().required(),
+      // }),
+      // state: Joi.object().required().keys({
+      //   countryCode: Joi.string().required(),
+      //   isoCode: Joi.string().required(),
+      //   latitude: Joi.string().required(),
+      //   longitude: Joi.string().required(),
+      //   name: Joi.string().required(),
+      //   stateId: Joi.string().required(),
+      // }),
+      // city: Joi.object().required().keys({
+      //   cityId: Joi.string().required(),
+      //   countryCode: Joi.string().required(),
+      //   latitude: Joi.string().required(),
+      //   longitude: Joi.string().required(),
+      //   name: Joi.string().required(),
+      //   stateCode: Joi.string().required(),
+      // }),
       phone: Joi.string().required(),
       fax: String,
       // contact: Joi.string(),
@@ -45,6 +72,20 @@ const createProduct = {
   }),
 };
 
+const productQueryParam = {
+  params: Joi.object().keys({
+    productId: Joi.string().custom(objectId),
+  }),
+};
+
+const validateProfileIdQueryParam = {
+  params: Joi.object().keys({
+    profileId: Joi.string().custom(objectId),
+  }),
+};
+
 module.exports = {
   createProduct,
+  productQueryParam,
+  validateProfileIdQueryParam
 };

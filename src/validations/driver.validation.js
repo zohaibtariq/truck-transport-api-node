@@ -1,4 +1,6 @@
 const Joi = require('joi');
+Joi.objectId = require('joi-objectid')(Joi)
+const { password, objectId } = require('./custom.validation');
 
 const createDriver = {
   body: Joi.object().keys({
@@ -36,8 +38,9 @@ const createDriver = {
     }),
     certifications: Joi.array().items(Joi.object().keys({
       drivingSchool: Joi.string(),
-      city: Joi.string(),
-      state: Joi.string(),
+      country: Joi.string().custom(objectId).optional(),
+      state: Joi.string().custom(objectId).optional(),
+      city: Joi.string().custom(objectId).optional(),
       contact: Joi.string(),
       phone: Joi.string(),
       startDate: Joi.string(),
@@ -47,7 +50,6 @@ const createDriver = {
       referredBy: Joi.string(),
       comments: Joi.string(),
     })),
-    // active: Joi.boolean().optional(),
     active: Joi.boolean().required(),
     first_name: Joi.string().required(),
     last_name: Joi.string().required(),
@@ -57,14 +59,15 @@ const createDriver = {
     image: String,
     address: Joi.string().required(),
     zip: Joi.string().required(),
-    state: Joi.string().required(),
-    city: Joi.string().required(),
-    country: Joi.string().required(),
+    country: Joi.string().custom(objectId).required(),
+    state: Joi.string().custom(objectId).required(),
+    city: Joi.string().custom(objectId).required(),
     phone: Joi.string().required(),
     mobile: Joi.string().required(),
     external_id: String,
     dispatcher: String,
-    email: String,
+    email: Joi.string().required().email(),
+    password: Joi.string().required().custom(password),
     ratePerMile: Joi.number().required(),
   }),
 };
@@ -105,8 +108,9 @@ const updateDriver = {
     }),
     certifications: Joi.array().items(Joi.object().keys({
       drivingSchool: Joi.string(),
-      city: Joi.string(),
-      state: Joi.string(),
+      country: Joi.string().custom(objectId).optional(),
+      state: Joi.string().custom(objectId).optional(),
+      city: Joi.string().custom(objectId).optional(),
       contact: Joi.string(),
       phone: Joi.string(),
       startDate: Joi.object(),
@@ -116,7 +120,6 @@ const updateDriver = {
       referredBy: Joi.string(),
       comments: Joi.string(),
     })),
-    // active: Joi.boolean().optional(),
     active: Joi.boolean().optional(),
     first_name: Joi.string().optional(),
     last_name: Joi.string().optional(),
@@ -126,20 +129,27 @@ const updateDriver = {
     image: String,
     address: Joi.string().optional(),
     zip: Joi.string().optional(),
-    state: Joi.string().optional(),
-    city: Joi.string().optional(),
-    country: Joi.string().optional(),
+    country: Joi.string().custom(objectId).optional(),
+    state: Joi.string().custom(objectId).optional(),
+    city: Joi.string().custom(objectId).optional(),
     phone: Joi.string().optional(),
     mobile: Joi.string().optional(),
     external_id: Joi.string().optional(),
     dispatcher: Joi.string().optional(),
-    email: String,
+    email: Joi.string().optional().email(),
+    password: Joi.string().optional().custom(password),
     ratePerMile: Joi.number().optional(),
-    // inviteAcceptedByDriver: Joi.boolean().optional(),
+  }),
+};
+
+const driverQueryParam = {
+  params: Joi.object().keys({
+    driverId: Joi.string().custom(objectId),
   }),
 };
 
 module.exports = {
   createDriver,
+  driverQueryParam,
   updateDriver
 };

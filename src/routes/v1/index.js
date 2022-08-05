@@ -6,6 +6,7 @@ const chargeRoute = require('./charge.route');
 const productRoute = require('./product.route');
 const driverRoute = require('./driver.route');
 const loadRoute = require('./load.route');
+const countryRoute = require('./country.route');
 const docsRoute = require('./docs.route');
 const config = require('../../config/config');
 
@@ -39,6 +40,10 @@ const defaultRoutes = [
   {
     path: '/loads',
     route: loadRoute,
+  },
+  {
+    path: '/countries',
+    route: countryRoute,
   },
 ];
 
