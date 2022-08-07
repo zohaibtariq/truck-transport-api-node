@@ -7,10 +7,13 @@ const logger = require('../config/logger');
 var _ = require('lodash');
 const downloadResource = require('../utils/download');
 const {Load} = require("../models");
-
+const {
+  onlyCountryNameProjectionString,
+  onlyStateNameProjectionString,
+  onlyCityNameProjectionString,
+  onlyProfileAddressLocationProjectionString
+} = require('../config/countryStateCityProjections');
 const createLoad = catchAsync(async (req, res) => {
-  // let newUniqueGeneratedCode = await codeService.createCode('loads');
-  // req.body.code = newUniqueGeneratedCode;
   await loadService.createLoad(req.body).then(success => {
     res.status(httpStatus.CREATED).send(success);
   }).catch(error => {
@@ -23,7 +26,6 @@ const createLoad = catchAsync(async (req, res) => {
 
 const getLoads = catchAsync(async (req, res) => {
   let filter = pick(req.query, [
-    'status',
     'search',
   ]);
   if(filter['search']){
@@ -43,7 +45,50 @@ const getLoads = catchAsync(async (req, res) => {
   logger.debug({ ...options });
   // options.populate = 'customer,origin,destination,driver,goods.good';
   options.populate = 'customer,origin,destination';
-  const result = await loadService.queryLoads(filter, options);
+  let project = {}
+  if(req.driver){
+    // driver is not allowed to see customer details and many other fields as well
+    options.populate = [
+      {
+        path: 'origin',
+        select: onlyProfileAddressLocationProjectionString,
+        populate: [
+          { path: 'location.country', select: onlyCountryNameProjectionString },
+          { path: 'location.state', select: onlyStateNameProjectionString },
+          { path: 'location.city', select: onlyCityNameProjectionString },
+        ]
+      },
+      {
+        path: 'destination',
+        select: onlyProfileAddressLocationProjectionString,
+        populate: [
+          { path: 'location.country', select: onlyCountryNameProjectionString },
+          { path: 'location.state', select: onlyStateNameProjectionString },
+          { path: 'location.city', select: onlyCityNameProjectionString },
+        ]
+      },
+    ];
+    filter.status = 'tender' // driver can see only tendered loads
+    project = {
+      paidAmount: 0,
+      balanceAmount: 0,
+      ratePerMile: 0,
+      status: 0,
+      invitationSentToDriver: 0,
+      onTheWayToDelivery: 0,
+      deliveredToCustomer: 0,
+      isInviteAcceptedByDriver: 0,
+      customer: 0,
+      goods: 0,
+      charges: 0,
+      invitationSentToDrivers: 0,
+      driverInterests: 0,
+      createdAtDateTime: 0,
+      updatedAtDateTime: 0,
+      lastInvitedDriver: 0,
+    };
+  }
+  const result = await loadService.queryLoads(filter, options, project);
   // console.log('::: result ::: ')
   // console.log({...result})
   res.send(result);
@@ -293,6 +338,7 @@ const loadInviteAcceptedByDriver = catchAsync(async (req, res) => {
       // "inviteAcceptedByDriverTime": new ISODate(),
       "inviteAcceptedByDriver": driverId,
       "isInviteAcceptedByDriver": true,
+      "status": "assigned",
       // "driverInterests": [
       //   {"id": driverId}
       // ]

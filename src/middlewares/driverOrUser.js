@@ -39,14 +39,6 @@ const driverVerifyCallback = (req, resolve, reject) => async (err, driver, info)
   resolve();
 };
 
-/*
-const promise1 = Promise.reject(0);
-const promise2 = new Promise((resolve) => setTimeout(resolve, 100, 'quick'));
-const promise3 = new Promise((resolve) => setTimeout(resolve, 500, 'slow'));
-const promises = [promise1, promise2, promise3];
-Promise.any(promises).then((value) => console.log(value));
-*/
-
 const driverOrUser = (...requiredRights) => async (req, res, next) => {
   const userPromise = new Promise((resolve, reject) => {
     passport.authenticate('jwt', { session: false }, userVerifyCallback(req, resolve, reject, requiredRights))(req, res, next);

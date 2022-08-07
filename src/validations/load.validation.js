@@ -15,7 +15,7 @@ const createLoad = {
     customer: Joi.objectId().required(),
     origin: Joi.objectId().required(),
     destination: Joi.optional(),
-    notes: Joi.string().optional(),
+    notes: Joi.string().allow(null, '').optional(),
     invitationSentToDriver: Joi.boolean().optional(),
     onTheWayToDelivery: Joi.boolean().optional(),
     deliveredToCustomer: Joi.boolean().optional(),
@@ -43,7 +43,7 @@ const updateLoad = {
       grWeight: Joi.number().required(),
       palletes: Joi.number().required(),
       frClass: Joi.number().required(),
-      notes: Joi.string().required(),
+      notes: Joi.string().allow(null, '').required(),
       good: Joi.objectId().required(),
     })),
     charges: Joi.array().items(Joi.object().keys({
@@ -52,7 +52,7 @@ const updateLoad = {
       quantity: Joi.number().required(),
       payableToDriver: Joi.boolean().optional(),
       billableToCustomer: Joi.boolean().optional(),
-      notes: Joi.string().required()
+      notes: Joi.string().allow(null, '').required()
     })),
     distanceMiles: Joi.number().optional(),
     ratePerMile: Joi.number().optional(),
@@ -66,7 +66,7 @@ const updateLoad = {
     customer: Joi.string().optional(),
     origin: Joi.string().optional(),
     destination: Joi.optional(),
-    notes: Joi.string().optional(),
+    notes: Joi.string().allow(null, '').optional(),
     invitationSentToDriver: Joi.boolean().optional(),
     onTheWayToDelivery: Joi.boolean().optional(),
     deliveredToCustomer: Joi.boolean().optional(),

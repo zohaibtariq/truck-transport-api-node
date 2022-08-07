@@ -17,7 +17,7 @@ router.get('/', auth('getDrivers'), driverController.getDrivers);
 // router.get('/:driverId', driverAuth(), validate(driverValidation.driverQueryParam), driverController.getDriver);
 router.get('/:driverId', driverOrUser('getDriver'), validate(driverValidation.driverQueryParam), driverController.getDriver);
 router.post('/create', auth('createDriver'), validate(driverValidation.createDriver), driverController.createDriver);
-router.post('/:driverId', auth('updateDriver'), validate(driverValidation.updateDriver), driverController.updateDriver);
+router.post('/:driverId', driverOrUser('updateDriver'), validate(driverValidation.updateDriver), driverController.updateDriver);
 router.delete('/:driverId', auth('deleteDriver'), validate(driverValidation.driverQueryParam), driverController.deleteDriver);
 router.post('/:driverId/upload', auth('uploadDriverImage'), driverController.uploadDriverImage);
 

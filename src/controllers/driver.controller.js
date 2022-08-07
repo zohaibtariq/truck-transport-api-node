@@ -76,7 +76,12 @@ const getDriver = catchAsync(async (req, res) => {
 });
 
 const updateDriver = catchAsync(async (req, res) => {
-  const driver = await driverService.updateDriverById(req.params.driverId, req.body);
+  let driverRequestBody = {};
+  if(req.user)
+    driverRequestBody = req.body
+  else if(req.driver)
+    driverRequestBody = pick(req.body, ['first_name', 'last_name']); // in case of driver update add allowed keys for update here.
+  const driver = await driverService.updateDriverById(req.params.driverId, driverRequestBody);
   res.send(driver);
 });
 

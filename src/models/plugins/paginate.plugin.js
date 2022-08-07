@@ -19,7 +19,7 @@ const paginate = (schema) => {
    * @param {number} [options.page] - Current page (default = 1)
    * @returns {Promise<QueryResult>}
    */
-  schema.statics.paginate = async function (filter, options) {
+  schema.statics.paginate = async function (filter, options, project = {}) {
     // console.log('inside paginate');
     // console.log(options);
     let sort = '';
@@ -52,25 +52,33 @@ const paginate = (schema) => {
     const countPromise = this.countDocuments(filter).exec();
     // console.log('CUSTOM FLITER LOG')
     // console.log({ ...filter })
-    let docsPromise = this.find(filter).sort(sort).skip(skip).limit(limit);
-
+    let docsPromise = this.find(filter, project).sort(sort).skip(skip).limit(limit);
+    // if(project !== null)
+    //   docsPromise = docsPromise.project(project)
     if (options.populate) {
-      console.log('OPTIONS populate');
-      console.log(options.populate);
-      options.populate.split(',').forEach((populateOption) => {
-        console.log('OPTIONS populate each');
-        console.log(populateOption);
-        console.log(populateOption
-          .split(':')
-          .reverse()
-          .reduce((a, b) => ({ path: b, populate: a })))
-        docsPromise = docsPromise.populate(
-          populateOption
-            .split(':')
-            .reverse()
-            .reduce((a, b) => ({ path: b, populate: a }))
-        );
-      });
+      // console.log('OPTIONS populate');
+      // console.log(typeof options.populate);
+      // console.log(options.populate);
+      let populates;
+      if(typeof options.populate === 'object') {
+        docsPromise = docsPromise.populate(options.populate)
+      }
+      else{
+        options.populate.split(',').forEach((populateOption) => {
+          // console.log('OPTIONS populate each');
+          // console.log(populateOption);
+          // console.log(populateOption
+          //   .split(':')
+          //   .reverse()
+          //   .reduce((a, b) => ({ path: b, populate: a })))
+          docsPromise = docsPromise.populate(
+            populateOption
+              .split(':')
+              .reverse()
+              .reduce((a, b) => ({ path: b, populate: a }))
+          );
+        });
+      }
     }
 
     docsPromise = docsPromise.exec();
