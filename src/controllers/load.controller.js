@@ -46,49 +46,6 @@ const getLoads = catchAsync(async (req, res) => {
   logger.debug({ ...options });
   // options.populate = 'customer,origin,destination,driver,goods.good';
   options.populate = 'customer,origin,destination';
-  let project = {}
-  if(req.driver){
-    // driver is not allowed to see customer details and many other fields as well
-    options.populate = [
-      {
-        path: 'origin',
-        select: onlyProfileAddressLocationProjectionString,
-        populate: [
-          { path: 'location.country', select: onlyCountryNameProjectionString },
-          { path: 'location.state', select: onlyStateNameProjectionString },
-          { path: 'location.city', select: onlyCityNameProjectionString },
-        ]
-      },
-      {
-        path: 'destination',
-        select: onlyProfileAddressLocationProjectionString,
-        populate: [
-          { path: 'location.country', select: onlyCountryNameProjectionString },
-          { path: 'location.state', select: onlyStateNameProjectionString },
-          { path: 'location.city', select: onlyCityNameProjectionString },
-        ]
-      },
-    ];
-    filter.status = 'tender' // driver can see only tendered loads
-    project = {
-      paidAmount: 0,
-      balanceAmount: 0,
-      ratePerMile: 0,
-      status: 0,
-      invitationSentToDriver: 0,
-      onTheWayToDelivery: 0,
-      deliveredToCustomer: 0,
-      isInviteAcceptedByDriver: 0,
-      customer: 0,
-      goods: 0,
-      charges: 0,
-      invitationSentToDrivers: 0,
-      driverInterests: 0,
-      createdAtDateTime: 0,
-      updatedAtDateTime: 0,
-      lastInvitedDriver: 0,
-    };
-  }
   const result = await loadService.queryLoads(filter, options, project);
   // console.log('::: result ::: ')
   // console.log({...result})
@@ -376,6 +333,53 @@ const loadDriverInterests = catchAsync(async (req, res) => {
   res.status(statusCode).send(responseBody);
 });
 
+const getTenderedLoads = catchAsync(async (req, res) => {
+  let filter = {};
+  const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  // driver is not allowed to see customer details and many other fields as well
+  options.populate = [
+  {
+    path: 'origin',
+    select: onlyProfileAddressLocationProjectionString,
+    populate: [
+      { path: 'location.country', select: onlyCountryNameProjectionString },
+      { path: 'location.state', select: onlyStateNameProjectionString },
+      { path: 'location.city', select: onlyCityNameProjectionString },
+    ]
+  },
+  {
+    path: 'destination',
+    select: onlyProfileAddressLocationProjectionString,
+    populate: [
+      { path: 'location.country', select: onlyCountryNameProjectionString },
+      { path: 'location.state', select: onlyStateNameProjectionString },
+      { path: 'location.city', select: onlyCityNameProjectionString },
+    ]
+  },
+  ];
+  filter.status = 'tender' // driver can see only tendered loads
+  let project = {
+  paidAmount: 0,
+  balanceAmount: 0,
+  ratePerMile: 0,
+  status: 0,
+  invitationSentToDriver: 0,
+  onTheWayToDelivery: 0,
+  deliveredToCustomer: 0,
+  isInviteAcceptedByDriver: 0,
+  customer: 0,
+  goods: 0,
+  charges: 0,
+  invitationSentToDrivers: 0,
+  driverInterests: 0,
+  createdAtDateTime: 0,
+  updatedAtDateTime: 0,
+  lastInvitedDriver: 0,
+  };
+  const tenderedLoads = await loadService.queryLoads(filter, options, project);
+  res.send(tenderedLoads);
+});
+
 module.exports = {
   createLoad,
   getLoads,
@@ -386,5 +390,6 @@ module.exports = {
   exportLoads,
   exportLoad,
   loadInviteAcceptedByDriver,
-  loadDriverInterests
+  loadDriverInterests,
+  getTenderedLoads
 };

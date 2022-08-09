@@ -11,12 +11,12 @@ const router = express.Router();
 router.post('/import/loads', auth('importLoads'), loadController.importLoads);
 router.post('/export/loads', auth('exportLoads'), loadController.exportLoads);
 router.post('/export/load/:loadId', auth('exportLoad'), validate(loadValidation.loadQueryParam), loadController.exportLoad);
-router.get('/', driverOrUser('getLoads'), loadController.getLoads);
+router.get('/', auth('getLoads'), loadController.getLoads);
 router.post('/create', auth('createLoad'), validate(loadValidation.createLoad), loadController.createLoad);
+router.get('/tendered', driverAuth('getLoads'), loadController.getTenderedLoads);
 router.get('/:loadId', auth('getLoad'), validate(loadValidation.loadQueryParam), loadController.getLoad);
-router.post('/:loadId', auth('updateLoad'), validate(loadValidation.updateLoad), loadController.updateLoad);
+router.post('/:loadId', driverOrUser('updateLoad'), validate(loadValidation.updateLoad), loadController.updateLoad);
 router.delete('/:loadId', auth('deleteLoad'), validate(loadValidation.loadQueryParam), loadController.deleteLoad);
-
 router.post(
   '/:loadId/invite',
   driverAuth(),
