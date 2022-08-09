@@ -1,7 +1,8 @@
 # Dependencies
 node_modules
 uploads
-
+yarn.lock
+package-lock.json
 # yarn error logs
 yarn-error.log
 

@@ -10,7 +10,7 @@ const _ = require('lodash');
  * @returns {Promise<Load>}
  */
 const createLoad = async (loadBody) => {
-  const loadCount = await Load.count();
+  const loadCount = await Load.countDocuments();
   loadBody.code = 40000 + parseInt(loadCount);
   // console.log('LOAD CODE');
   // console.log(loadCount, loadBody.code);

@@ -3,6 +3,7 @@ const moment = require('moment');
 const httpStatus = require('http-status');
 const config = require('../config/config');
 const userService = require('./user.service');
+const driverService = require('./driver.service');
 const { Token, DriverToken } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
@@ -88,7 +89,7 @@ const verifyToken = async (token, type) => {
  */
 const verifyDriverToken = async (token, type) => {
   const payload = jwt.verify(token, config.jwt.secret);
-  const tokenDoc = await DriverToken.findOne({ token, type, user: payload.sub, blacklisted: false });
+  const tokenDoc = await DriverToken.findOne({ token, type, driver: payload.sub, blacklisted: false });
   if (!tokenDoc) {
     throw new Error('Driver Token not found');
   }
@@ -162,6 +163,22 @@ const generateResetPasswordToken = async (email) => {
 };
 
 /**
+ * Generate reset password token
+ * @param {string} email
+ * @returns {Promise<string>}
+ */
+const generateDriverResetPasswordToken = async (email) => {
+  const driver = await driverService.getDriverByEmail(email);
+  if (!driver) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No driver found with this email');
+  }
+  const expires = moment().add(config.jwt.resetPasswordExpirationMinutes, 'minutes');
+  const resetPasswordToken = generateToken(driver.id, expires, tokenTypes.RESET_PASSWORD);
+  await saveDriverToken(resetPasswordToken, driver.id, expires, tokenTypes.RESET_PASSWORD);
+  return resetPasswordToken;
+};
+
+/**
  * Generate verify email token
  * @param {User} user
  * @returns {Promise<string>}
@@ -173,6 +190,18 @@ const generateVerifyEmailToken = async (user) => {
   return verifyEmailToken;
 };
 
+/**
+ * Generate verify email token
+ * @param {User} user
+ * @returns {Promise<string>}
+ */
+const generateDriverVerifyEmailToken = async (driver) => {
+  const expires = moment().add(config.jwt.verifyEmailExpirationMinutes, 'minutes');
+  const verifyEmailToken = generateToken(driver.id, expires, tokenTypes.VERIFY_EMAIL);
+  await saveDriverToken(verifyEmailToken, driver.id, expires, tokenTypes.VERIFY_EMAIL);
+  return verifyEmailToken;
+};
+
 module.exports = {
   generateToken,
   saveToken,
@@ -181,5 +210,7 @@ module.exports = {
   generateResetPasswordToken,
   generateVerifyEmailToken,
   generateDriverAuthTokens,
-  verifyDriverToken
+  verifyDriverToken,
+  generateDriverResetPasswordToken,
+  generateDriverVerifyEmailToken,
 };

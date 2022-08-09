@@ -26,6 +26,7 @@ const createLoad = catchAsync(async (req, res) => {
 
 const getLoads = catchAsync(async (req, res) => {
   let filter = pick(req.query, [
+    'status',
     'search',
   ]);
   if(filter['search']){

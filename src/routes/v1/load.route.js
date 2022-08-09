@@ -3,8 +3,8 @@ const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const loadValidation = require('../../validations/load.validation');
 const loadController = require('../../controllers/load.controller');
-const driverAuth = require("../../middlewares/driverAuth");
-const driverOrUser = require("../../middlewares/driverOrUser");
+const driverAuth = require('../../middlewares/driverAuth');
+const driverOrUser = require('../../middlewares/driverOrUser');
 
 const router = express.Router();
 
@@ -17,7 +17,12 @@ router.get('/:loadId', auth('getLoad'), validate(loadValidation.loadQueryParam),
 router.post('/:loadId', auth('updateLoad'), validate(loadValidation.updateLoad), loadController.updateLoad);
 router.delete('/:loadId', auth('deleteLoad'), validate(loadValidation.loadQueryParam), loadController.deleteLoad);
 
-router.post('/:loadId/invite', driverAuth(), validate(loadValidation.loadQueryParam), loadController.loadInviteAcceptedByDriver);
+router.post(
+  '/:loadId/invite',
+  driverAuth(),
+  validate(loadValidation.loadQueryParam),
+  loadController.loadInviteAcceptedByDriver
+);
 router.post('/:loadId/interest', driverAuth(), validate(loadValidation.loadQueryParam), loadController.loadDriverInterests);
 
 module.exports = router;

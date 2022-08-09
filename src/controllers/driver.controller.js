@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { driverService, codeService, userService, authService, tokenService,} = require('../services');
+const { driverService, codeService, userService, authService, tokenService, emailService,} = require('../services');
 const logger = require('../config/logger');
 const path = require('path');
 const multer = require('multer')
@@ -241,6 +241,33 @@ const login = catchAsync(async (req, res) => {
   res.send({ driver, tokens });
 });
 
+const logout = catchAsync(async (req, res) => {
+  await authService.logoutDriver(req.body.refreshToken);
+  res.status(httpStatus.NO_CONTENT).send();
+});
+
+const forgotPassword = catchAsync(async (req, res) => {
+  const resetPasswordToken = await tokenService.generateDriverResetPasswordToken(req.body.email);
+  await emailService.sendDriverResetPasswordEmail(req.body.email, resetPasswordToken);
+  res.status(httpStatus.NO_CONTENT).send();
+});
+
+const resetPassword = catchAsync(async (req, res) => {
+  await authService.resetDriverPassword(req.query.token, req.body.password);
+  res.status(httpStatus.NO_CONTENT).send();
+});
+
+const sendVerificationEmail = catchAsync(async (req, res) => {
+  const verifyEmailToken = await tokenService.generateDriverVerifyEmailToken(req.driver);
+  await emailService.sendDriverVerificationEmail(req.driver.email, verifyEmailToken);
+  res.status(httpStatus.NO_CONTENT).send();
+});
+
+const verifyEmail = catchAsync(async (req, res) => {
+  await authService.verifyDriverEmail(req.query.token);
+  res.status(httpStatus.NO_CONTENT).send();
+});
+
 module.exports = {
   createDriver,
   getDrivers,
@@ -250,5 +277,10 @@ module.exports = {
   uploadDriverImage,
   importDrivers,
   exportDrivers,
-  login
+  login,
+  logout,
+  forgotPassword,
+  resetPassword,
+  sendVerificationEmail,
+  verifyEmail,
 };

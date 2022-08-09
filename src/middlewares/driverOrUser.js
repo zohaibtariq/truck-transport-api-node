@@ -39,21 +39,29 @@ const driverVerifyCallback = (req, resolve, reject) => async (err, driver, info)
   resolve();
 };
 
-const driverOrUser = (...requiredRights) => async (req, res, next) => {
-  const userPromise = new Promise((resolve, reject) => {
-    passport.authenticate('jwt', { session: false }, userVerifyCallback(req, resolve, reject, requiredRights))(req, res, next);
-  })
+const driverOrUser =
+  (...requiredRights) =>
+  async (req, res, next) => {
+    const userPromise = new Promise((resolve, reject) => {
+      passport.authenticate('jwt', { session: false }, userVerifyCallback(req, resolve, reject, requiredRights))(
+        req,
+        res,
+        next
+      );
+    });
     // .then(() => next())
     // .catch((err) => next(err));
-  const driverPromise = new Promise((resolve, reject) => {
-    passport.authenticate('jwtDriver', { session: false }, driverVerifyCallback(req, resolve, reject))(req, res, next);
-  })
+    // .catch((err) => console.log('jwt', err));
+    const driverPromise = new Promise((resolve, reject) => {
+      passport.authenticate('jwtDriver', { session: false }, driverVerifyCallback(req, resolve, reject))(req, res, next);
+    });
     // .then(() => next())
     // .catch((err) => next(err));
-  const promises = [userPromise, driverPromise];
-  return Promise.any(promises)
-    .then(() => next())
-    .catch((err) => next(err));
-};
+    // .catch((err) => console.log('jwtDriver', err));
+    const promises = [userPromise, driverPromise];
+    return Promise.any(promises)
+      .then(() => next())
+      .catch((err) => next(err));
+  };
 
 module.exports = driverOrUser;
