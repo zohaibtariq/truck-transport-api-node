@@ -1,19 +1,19 @@
 const httpStatus = require('http-status');
+const path = require('path');
+const multer = require('multer');
+const _ = require('lodash');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { driverService, codeService, userService, authService, tokenService, emailService,} = require('../services');
+const { driverService, codeService, userService, authService, tokenService, emailService } = require('../services');
 const logger = require('../config/logger');
-const path = require('path');
-const multer = require('multer')
-const _ = require("lodash");
-const downloadResource = require("../utils/download");
-const {Driver} = require("../models");
+const downloadResource = require('../utils/download');
+const { Driver } = require('../models');
 
 const createDriver = catchAsync(async (req, res) => {
   // const driver = await driverService.createDriver(req.body);
   // res.status(httpStatus.CREATED).send(driver);
-  let newUniqueGeneratedCode = await codeService.createCode('drivers');
+  const newUniqueGeneratedCode = await codeService.createCode('drivers');
   req.body.code = newUniqueGeneratedCode;
   // await driverService.createDriver(req.body).then(success => {
   //   res.status(httpStatus.CREATED).send(success);
@@ -39,30 +39,31 @@ const getDrivers = catchAsync(async (req, res) => {
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   logger.debug({ ...filter });
   logger.debug({ ...options });
-  if(filter['search']){
-    var searchMe = { $regex: new RegExp(filter['search']), $options: 'i'};
+  if (filter.search) {
+    const searchMe = { $regex: new RegExp(filter.search), $options: 'i' };
     // console.log("Search Me")
     // console.log(searchMe)
     Object.assign(filter, {
-      '$or': [
-        {'code': searchMe},
-        {'first_name': searchMe},
-        {'last_name': searchMe},
-        {'address': searchMe},
-        {'zip': searchMe},
-        {'city': searchMe},
-        {'phone': searchMe},
-        {'mobile': searchMe},
-        {'ssn': searchMe},
-        {'tax_id': searchMe},
-        {'external_id': searchMe},
-        {'email': searchMe},
-      ]})
+      $or: [
+        { code: searchMe },
+        { first_name: searchMe },
+        { last_name: searchMe },
+        { address: searchMe },
+        { zip: searchMe },
+        { city: searchMe },
+        { phone: searchMe },
+        { mobile: searchMe },
+        { ssn: searchMe },
+        { tax_id: searchMe },
+        { external_id: searchMe },
+        { email: searchMe },
+      ],
+    });
     filter = _.omit(filter, ['search']);
   }
   // console.log('DRIVER REQ FILTER FINAL');
   // console.log({ ...filter });
-  options.populate = "country,state,city"
+  options.populate = 'country,state,city';
   const result = await driverService.queryDrivers(filter, options);
   res.send(result);
 });
@@ -75,13 +76,29 @@ const getDriver = catchAsync(async (req, res) => {
   res.send(driver);
 });
 
+const getOneDriver = catchAsync(async (req, res) => {
+  const driver = await driverService.getDriverById(req.driver._id);
+  if (!driver) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Driver not found');
+  }
+  res.send(driver);
+});
+
 const updateDriver = catchAsync(async (req, res) => {
-  let driverRequestBody = {};
-  if(req.user)
-    driverRequestBody = req.body
-  else if(req.driver)
-    driverRequestBody = pick(req.body, ['first_name', 'last_name']); // in case of driver update add allowed keys for update here.
-  const driver = await driverService.updateDriverById(req.params.driverId, driverRequestBody);
+  const driver = await driverService.updateDriverById(req.params.driverId, req.body);
+  res.send(driver);
+});
+
+const updateDriverFromApp = catchAsync(async (req, res) => {
+  const driverRequestBody = pick(req.body, ['first_name', 'last_name', 'phone', 'gender']); // in case of driver update add allowed keys for update here.
+  // console.log(req.driver._id);
+  const driver = await driverService.updateDriverById(req.driver._id, driverRequestBody);
+  res.send(driver);
+});
+
+const changeDriverPassword = catchAsync(async (req, res) => {
+  const driverRequestBody = pick(req.body, ['old_password', 'password']);
+  const driver = await driverService.updateDriverPasswordById(req.driver._id, driverRequestBody);
   res.send(driver);
 });
 
@@ -93,122 +110,122 @@ const deleteDriver = catchAsync(async (req, res) => {
 });
 
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads");
+  destination(req, file, cb) {
+    cb(null, 'uploads');
   },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname)); //Appending extension
+  filename(req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname)); // Appending extension
   },
 });
-const upload = multer({ storage: storage }).single('file');
+const upload = multer({ storage }).single('file');
 const uploadDriverImage = catchAsync(async (req, res) => {
   // console.log('IN uploadDriver');
   upload(req, res, async (err) => {
     // console.log('UPLOADING SINGLE FILE');
     if (err) {
-      // console.log('UPLOAD ERROR')
-      // console.log(err)
+      // console.log('UPLOAD ERROR');
+      // console.log(err);
     }
-    // console.log('AFTER UPLOAD')
-    // console.log(req.file)
-    // console.log(req.file.filename)
-    // console.log(req.params.driverId)
-    const driver = await driverService.updateDriverImageById(req.params.driverId, {
-      image: req.file.filename
+    // console.log('AFTER UPLOAD');
+    // console.log(req.file);
+    // console.log(req.file.filename);
+    // console.log(req.driver._id);
+    const driver = await driverService.updateDriverImageById(req.driver._id, {
+      image: req.file.filename,
     });
-    // console.log('D RETURN')
-    // console.log(driver)
+    // console.log('D RETURN');
+    // console.log(driver);
     res.send(driver);
     // res.json({
     //   path:req.file
     // })
-  })
+  });
 });
 
 const importDrivers = catchAsync(async (req, res) => {
-  let drivers = req.body;
+  const drivers = req.body;
   // console.log('DRIVERS');
   // console.log(drivers);
-  let data = await Driver.insertMany(drivers);
-  res.status(httpStatus.OK).send({count: data.length, results: data});
+  const data = await Driver.insertMany(drivers);
+  res.status(httpStatus.OK).send({ count: data.length, results: data });
 });
 
 const exportDrivers = catchAsync(async (req, res) => {
   const fields = [
     {
       label: 'Email',
-      value: 'email'
+      value: 'email',
     },
     {
       label: 'Code',
-      value: 'code'
+      value: 'code',
     },
     {
       label: 'Active',
-      value: 'active'
+      value: 'active',
     },
     {
       label: 'First Name',
-      value: 'first_name'
+      value: 'first_name',
     },
     {
       label: 'Last Name',
-      value: 'last_name'
+      value: 'last_name',
     },
     {
       label: 'Gender',
-      value: 'gender'
+      value: 'gender',
     },
     {
       label: 'Address',
-      value: 'address'
+      value: 'address',
     },
     {
       label: 'Zip',
-      value: 'zip'
+      value: 'zip',
     },
     {
       label: 'State',
-      value: 'state'
+      value: 'state',
     },
     {
       label: 'City',
-      value: 'city'
+      value: 'city',
     },
     {
       label: 'Country',
-      value: 'country'
+      value: 'country',
     },
     {
       label: 'Phone',
-      value: 'phone'
+      value: 'phone',
     },
     {
       label: 'Mobile',
-      value: 'mobile'
+      value: 'mobile',
     },
     {
       label: 'SSN',
-      value: 'ssn'
+      value: 'ssn',
     },
     {
       label: 'Tax Id',
-      value: 'tax_id'
+      value: 'tax_id',
     },
     {
       label: 'External Id',
-      value: 'external_id'
+      value: 'external_id',
     },
     {
       label: 'Updated At',
-      value: 'updatedAt'
+      value: 'updatedAt',
     },
     {
       label: 'Created At',
-      value: 'createdAt'
+      value: 'createdAt',
     },
   ];
-  let data = await driverService.queryAllDrivers({});
+  const data = await driverService.queryAllDrivers({});
   // data = data.map((d) => {
   //   let newData = {...d}
   //   newData['location_id'] = newData['location']['id'];
@@ -230,7 +247,7 @@ const exportDrivers = catchAsync(async (req, res) => {
   // })
   // console.log('F Data')
   // console.log(data)
-  let fileName = 'drivers-'+(new Date().toTimeString())+'.csv';
+  const fileName = `drivers-${new Date().toTimeString()}.csv`;
   return downloadResource(res, fileName, fields, data);
 });
 
@@ -247,13 +264,14 @@ const logout = catchAsync(async (req, res) => {
 });
 
 const forgotPassword = catchAsync(async (req, res) => {
-  const resetPasswordToken = await tokenService.generateDriverResetPasswordToken(req.body.email);
-  await emailService.sendDriverResetPasswordEmail(req.body.email, resetPasswordToken);
-  res.status(httpStatus.NO_CONTENT).send();
+  const otp = Math.floor(1000 + Math.random() * 9000).toString();
+  const resetPasswordToken = await tokenService.generateDriverResetPasswordToken(req.body.email, otp);
+  await emailService.sendDriverResetPasswordEmail(req.body.email, resetPasswordToken, otp);
+  res.status(httpStatus.OK).send({ token: resetPasswordToken });
 });
 
 const resetPassword = catchAsync(async (req, res) => {
-  await authService.resetDriverPassword(req.query.token, req.body.password);
+  await authService.resetDriverPassword(req.query.token, req.body.password, req.body.otp);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
@@ -283,4 +301,7 @@ module.exports = {
   resetPassword,
   sendVerificationEmail,
   verifyEmail,
+  updateDriverFromApp,
+  changeDriverPassword,
+  getOneDriver,
 };

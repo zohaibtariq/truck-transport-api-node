@@ -1,5 +1,5 @@
 const Joi = require('joi');
-Joi.objectId = require('joi-objectid')(Joi)
+Joi.objectId = require('joi-objectid')(Joi);
 const { password, objectId } = require('./custom.validation');
 
 const createDriver = {
@@ -18,7 +18,7 @@ const createDriver = {
       airBrake: Joi.boolean(),
       endorsementsRadio: Joi.string(),
     }),
-    expirationLogSettings:Joi.object().keys({
+    expirationLogSettings: Joi.object().keys({
       lastDrugTest: Joi.object(),
       nextDrugTest: Joi.object(),
       lastAlcohalTest: Joi.object(),
@@ -36,20 +36,22 @@ const createDriver = {
       milesDriven: Joi.string(),
       yrsExp: Joi.string(),
     }),
-    certifications: Joi.array().items(Joi.object().keys({
-      drivingSchool: Joi.string(),
-      country: Joi.string().custom(objectId).optional(),
-      state: Joi.string().custom(objectId).optional(),
-      city: Joi.string().custom(objectId).optional(),
-      contact: Joi.string(),
-      phone: Joi.string(),
-      startDate: Joi.string(),
-      graduationDate: Joi.string(),
-      rank: Joi.string(),
-      recruiter: Joi.string(),
-      referredBy: Joi.string(),
-      comments: Joi.string(),
-    })),
+    certifications: Joi.array().items(
+      Joi.object().keys({
+        drivingSchool: Joi.string(),
+        country: Joi.string().custom(objectId).optional(),
+        state: Joi.string().custom(objectId).optional(),
+        city: Joi.string().custom(objectId).optional(),
+        contact: Joi.string(),
+        phone: Joi.string(),
+        startDate: Joi.string(),
+        graduationDate: Joi.string(),
+        rank: Joi.string(),
+        recruiter: Joi.string(),
+        referredBy: Joi.string(),
+        comments: Joi.string(),
+      })
+    ),
     active: Joi.boolean().required(),
     first_name: Joi.string().required(),
     last_name: Joi.string().required(),
@@ -88,7 +90,7 @@ const updateDriver = {
       airBrake: Joi.boolean(),
       endorsementsRadio: Joi.string(),
     }),
-    expirationLogSettings:Joi.object().keys({
+    expirationLogSettings: Joi.object().keys({
       lastDrugTest: Joi.object(),
       nextDrugTest: Joi.object(),
       lastAlcohalTest: Joi.object(),
@@ -106,20 +108,22 @@ const updateDriver = {
       milesDriven: Joi.string(),
       yrsExp: Joi.string(),
     }),
-    certifications: Joi.array().items(Joi.object().keys({
-      drivingSchool: Joi.string(),
-      country: Joi.string().custom(objectId).optional(),
-      state: Joi.string().custom(objectId).optional(),
-      city: Joi.string().custom(objectId).optional(),
-      contact: Joi.string(),
-      phone: Joi.string(),
-      startDate: Joi.object(),
-      graduationDate: Joi.object(),
-      rank: Joi.string(),
-      recruiter: Joi.string(),
-      referredBy: Joi.string(),
-      comments: Joi.string(),
-    })),
+    certifications: Joi.array().items(
+      Joi.object().keys({
+        drivingSchool: Joi.string(),
+        country: Joi.string().custom(objectId).optional(),
+        state: Joi.string().custom(objectId).optional(),
+        city: Joi.string().custom(objectId).optional(),
+        contact: Joi.string(),
+        phone: Joi.string(),
+        startDate: Joi.object(),
+        graduationDate: Joi.object(),
+        rank: Joi.string(),
+        recruiter: Joi.string(),
+        referredBy: Joi.string(),
+        comments: Joi.string(),
+      })
+    ),
     active: Joi.boolean().optional(),
     first_name: Joi.string().optional(),
     last_name: Joi.string().optional(),
@@ -142,6 +146,13 @@ const updateDriver = {
   }),
 };
 
+const changeDriverPassword = {
+  body: Joi.object().keys({
+    old_password: Joi.string().required().custom(password),
+    password: Joi.string().required().custom(password),
+  }),
+};
+
 const driverQueryParam = {
   params: Joi.object().keys({
     driverId: Joi.string().custom(objectId),
@@ -151,5 +162,6 @@ const driverQueryParam = {
 module.exports = {
   createDriver,
   driverQueryParam,
-  updateDriver
+  updateDriver,
+  changeDriverPassword,
 };

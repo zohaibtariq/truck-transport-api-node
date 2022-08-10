@@ -61,7 +61,10 @@ const driverOrUser =
     const promises = [userPromise, driverPromise];
     return Promise.any(promises)
       .then(() => next())
-      .catch((err) => next(err));
+      .catch((err) => {
+        console.log('JWT driverOrUser both promises failed');
+        console.log(err);
+        return next(err);
+      });
   };
-
 module.exports = driverOrUser;

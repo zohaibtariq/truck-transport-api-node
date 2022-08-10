@@ -92,15 +92,18 @@ const resetPassword = async (resetPasswordToken, newPassword) => {
  * @param {string} newPassword
  * @returns {Promise}
  */
-const resetDriverPassword = async (resetPasswordToken, newPassword) => {
+const resetDriverPassword = async (resetPasswordToken, newPassword, otp = '') => {
   try {
-    const resetPasswordTokenDoc = await tokenService.verifyDriverToken(resetPasswordToken, tokenTypes.RESET_PASSWORD);
+    const resetPasswordTokenDoc = await tokenService.verifyDriverToken(resetPasswordToken, tokenTypes.OTP, otp);
+    // console.log('resetDriverPassword')
+    // console.log(resetPasswordTokenDoc)
+    // return false;
     const driver = await driverService.getDriverById(resetPasswordTokenDoc.driver);
     if (!driver) {
       throw new Error();
     }
     await driverService.updateDriverById(driver.id, { password: newPassword });
-    await DriverToken.deleteMany({ driver: driver.id, type: tokenTypes.RESET_PASSWORD });
+    await DriverToken.deleteMany({ driver: driver.id, type: tokenTypes.OTP });
   } catch (error) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Driver Password reset failed');
   }

@@ -55,14 +55,18 @@ const saveToken = async (token, userId, expires, type, blacklisted = false) => {
  * @param {boolean} [blacklisted]
  * @returns {Promise<Token>}
  */
-const saveDriverToken = async (token, driverId, expires, type, blacklisted = false) => {
-  const tokenDoc = await DriverToken.create({
+const saveDriverToken = async (token, driverId, expires, type, blacklisted = false, otp = '') => {
+  let create = {
     token,
     driver: driverId,
     expires: expires.toDate(),
     type,
     blacklisted,
-  });
+    otp,
+  };
+  console.log('CREATE')
+  console.log(create)
+  const tokenDoc = await DriverToken.create(create);
   return tokenDoc;
 };
 
@@ -87,9 +91,14 @@ const verifyToken = async (token, type) => {
  * @param {string} type
  * @returns {Promise<Token>}
  */
-const verifyDriverToken = async (token, type) => {
+const verifyDriverToken = async (token, type, otp = '') => {
   const payload = jwt.verify(token, config.jwt.secret);
-  const tokenDoc = await DriverToken.findOne({ token, type, driver: payload.sub, blacklisted: false });
+  console.log('verifyDriverToken')
+  console.log(payload)
+  console.log(token)
+  console.log(type)
+  console.log(otp)
+  const tokenDoc = await DriverToken.findOne({ token, type, otp, driver: payload.sub, blacklisted: false });
   if (!tokenDoc) {
     throw new Error('Driver Token not found');
   }
@@ -167,14 +176,16 @@ const generateResetPasswordToken = async (email) => {
  * @param {string} email
  * @returns {Promise<string>}
  */
-const generateDriverResetPasswordToken = async (email) => {
+const generateDriverResetPasswordToken = async (email, otp = '') => {
   const driver = await driverService.getDriverByEmail(email);
   if (!driver) {
     throw new ApiError(httpStatus.NOT_FOUND, 'No driver found with this email');
   }
   const expires = moment().add(config.jwt.resetPasswordExpirationMinutes, 'minutes');
-  const resetPasswordToken = generateToken(driver.id, expires, tokenTypes.RESET_PASSWORD);
-  await saveDriverToken(resetPasswordToken, driver.id, expires, tokenTypes.RESET_PASSWORD);
+  // const resetPasswordToken = generateToken(driver.id, expires, tokenTypes.RESET_PASSWORD);
+  // await saveDriverToken(resetPasswordToken, driver.id, expires, tokenTypes.RESET_PASSWORD);
+  const resetPasswordToken = generateToken(driver.id, expires, tokenTypes.OTP);
+  await saveDriverToken(resetPasswordToken, driver.id, expires, tokenTypes.OTP, false, otp);
   return resetPasswordToken;
 };
 

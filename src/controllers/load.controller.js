@@ -46,7 +46,7 @@ const getLoads = catchAsync(async (req, res) => {
   logger.debug({ ...options });
   // options.populate = 'customer,origin,destination,driver,goods.good';
   options.populate = 'customer,origin,destination';
-  const result = await loadService.queryLoads(filter, options, project);
+  const result = await loadService.queryLoads(filter, options);
   // console.log('::: result ::: ')
   // console.log({...result})
   res.send(result);
@@ -62,6 +62,12 @@ const getLoad = catchAsync(async (req, res) => {
 
 const updateLoad = catchAsync(async (req, res) => {
   const load = await loadService.updateLoadById(req.params.loadId, req.body);
+  res.send(load);
+});
+
+const updateLoadByDriver = catchAsync(async (req, res) => {
+  const loadBodyForUpdateByDriver = pick(req.body, ['onTheWayToDelivery', 'deliveredToCustomer']); // in case of driver update add allowed keys for update here.
+  const load = await loadService.updateDriverLoadById(req, loadBodyForUpdateByDriver);
   res.send(load);
 });
 
@@ -327,7 +333,7 @@ const loadDriverInterests = catchAsync(async (req, res) => {
     responseBody = {...bodyToUpdate}
     // console.log('driverInterests');
     // console.log(bodyToUpdate);
-    const load = await loadService.updateLoadById(req.params.loadId, bodyToUpdate);
+    const load = await loadService.updateTenderedLoadById(req.params.loadId, bodyToUpdate);
     statusCode = httpStatus.OK
   }
   res.status(statusCode).send(responseBody);
@@ -380,6 +386,21 @@ const getTenderedLoads = catchAsync(async (req, res) => {
   res.send(tenderedLoads);
 });
 
+const getLoadCounts = catchAsync(async (req, res) => {
+  const driverId = req.driver._id;
+  const filter = {inviteAcceptedByDriver: driverId}
+  // TODO:: convert all these heavy queries to oe aggregated group query
+  // const pending   = await loadService.queryLoadCountWithFilters({...filter, status: 'pending'});
+  // const tender    = await loadService.queryLoadCountWithFilters({...filter, status: 'tender'});
+  // const assigned  = await loadService.queryLoadCountWithFilters({...filter, status: 'assigned'});
+  // const active    = await loadService.queryLoadCountWithFilters({...filter, status: 'active'});
+  // const enroute   = await loadService.queryLoadCountWithFilters({...filter, status: 'enroute'});
+  // const completed = await loadService.queryLoadCountWithFilters({...filter, status: 'completed'});
+  // const cancelled = await loadService.queryLoadCountWithFilters({...filter, status: 'cancelled'});
+  // res.status(httpStatus.OK).send({pending, tender, assigned, active, enroute, completed, cancelled});
+  res.status(httpStatus.OK).send(await loadService.queryLoadCountWithFilters(filter));
+});
+
 module.exports = {
   createLoad,
   getLoads,
@@ -391,5 +412,7 @@ module.exports = {
   exportLoad,
   loadInviteAcceptedByDriver,
   loadDriverInterests,
-  getTenderedLoads
+  getTenderedLoads,
+  updateLoadByDriver,
+  getLoadCounts,
 };

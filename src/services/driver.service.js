@@ -73,6 +73,31 @@ const updateDriverById = async (driverId, updateBody) => {
 };
 
 /**
+ * Update driver password by id
+ * @param {ObjectId} driverId
+ * @param {Object} updateBody
+ * @returns {Promise<Driver>}
+ */
+const updateDriverPasswordById = async (driverId, updateBody) => {
+  const driver = await getDriverById(driverId);
+  if (!driver) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Driver not found');
+  }else if(!(await driver.isPasswordMatch(updateBody.old_password))){
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Driver old password is wrong');
+  }else if(updateBody.old_password === updateBody.password){
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Driver old password must not be same as new password.');
+  }
+  // console.log(updateBody.old_password)
+  // console.log(typeof updateBody.old_password)
+  // console.log(updateBody.password)
+  // console.log(typeof updateBody.password)
+  // return false;
+  Object.assign(driver, {password: updateBody.password});
+  await driver.save();
+  return driver;
+};
+
+/**
  * Update driver image by id
  * @param {ObjectId} driverId
  * @param {Object} updateBody
@@ -135,5 +160,6 @@ module.exports = {
   updateDriverById,
   deleteDriverById,
   updateDriverImageById,
-  queryAllDrivers
+  queryAllDrivers,
+  updateDriverPasswordById
 };

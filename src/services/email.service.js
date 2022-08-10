@@ -45,13 +45,16 @@ If you did not request any password resets, then ignore this email.`;
  * @param {string} token
  * @returns {Promise}
  */
-const sendDriverResetPasswordEmail = async (to, token) => {
+const sendDriverResetPasswordEmail = async (to, token, otp = '') => {
   const subject = 'Reset password';
   // replace this url with the link to the reset password page of your front-end app
-  const resetPasswordUrl = `${config.adminUrl}auth/reset-password?token=${token}`;
+  // const resetPasswordUrl = `${config.adminUrl}auth/reset-password?token=${token}`;
+  // const text = `Dear driver,
+  // To reset your password, click on this link: <a href="${resetPasswordUrl}">RESET PASSWORD</a>
+  // If you did not request any password resets, then ignore this email.`;
   const text = `Dear driver,
-To reset your password, click on this link: <a href="${resetPasswordUrl}">RESET PASSWORD</a>
-If you did not request any password resets, then ignore this email.`;
+  OTP is: ${otp}
+  If you did not request any password resets, then ignore this email.`;
   await sendEmail(to, subject, text);
 };
 

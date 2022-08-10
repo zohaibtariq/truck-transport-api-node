@@ -4,26 +4,30 @@ const validate = require('../../middlewares/validate');
 const loadValidation = require('../../validations/load.validation');
 const loadController = require('../../controllers/load.controller');
 const driverAuth = require('../../middlewares/driverAuth');
-const driverOrUser = require('../../middlewares/driverOrUser');
+// const driverOrUser = require('../../middlewares/driverOrUser');
 
 const router = express.Router();
+
+/*
+ APP API'S START
+*/
+router.get('/counts', driverAuth('getLoads'), loadController.getLoadCounts);
+router.get('/tendered', driverAuth('getLoads'), loadController.getTenderedLoads);
+router.post('/drivers/:loadId', driverAuth(), validate(loadValidation.updateLoadByDriver), loadController.updateLoadByDriver);
+router.post('/:loadId/accept-invite-by-driver', driverAuth(), validate(loadValidation.loadQueryParam), loadController.loadInviteAcceptedByDriver);
+router.post('/:loadId/interest', driverAuth(), validate(loadValidation.loadQueryParam), loadController.loadDriverInterests);
+/*
+ APP API'S END
+*/
 
 router.post('/import/loads', auth('importLoads'), loadController.importLoads);
 router.post('/export/loads', auth('exportLoads'), loadController.exportLoads);
 router.post('/export/load/:loadId', auth('exportLoad'), validate(loadValidation.loadQueryParam), loadController.exportLoad);
 router.get('/', auth('getLoads'), loadController.getLoads);
 router.post('/create', auth('createLoad'), validate(loadValidation.createLoad), loadController.createLoad);
-router.get('/tendered', driverAuth('getLoads'), loadController.getTenderedLoads);
+router.post('/:loadId', auth('updateLoad'), validate(loadValidation.updateLoad), loadController.updateLoad);
 router.get('/:loadId', auth('getLoad'), validate(loadValidation.loadQueryParam), loadController.getLoad);
-router.post('/:loadId', driverOrUser('updateLoad'), validate(loadValidation.updateLoad), loadController.updateLoad);
 router.delete('/:loadId', auth('deleteLoad'), validate(loadValidation.loadQueryParam), loadController.deleteLoad);
-router.post(
-  '/:loadId/invite',
-  driverAuth(),
-  validate(loadValidation.loadQueryParam),
-  loadController.loadInviteAcceptedByDriver
-);
-router.post('/:loadId/interest', driverAuth(), validate(loadValidation.loadQueryParam), loadController.loadDriverInterests);
 
 module.exports = router;
 

@@ -26,10 +26,22 @@ const createLoad = async (loadBody) => {
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryLoads = async (filter, options, project = null) => {
+const queryLoads = async (filter, options, project = {}) => {
   const loads = await Load.paginate(filter, options, project);
   // console.log('::: LOADS ::: ')
   // console.log({...loads})
+  return loads;
+};
+
+/**
+ * Query for load count with filter
+ * @param {Object} filter - Mongo filter
+ * @returns {Promise<QueryResult>}
+ */
+const queryLoadCount = async (match) => {
+  const loads = await Load.aggregate([
+
+  ]);
   return loads;
 };
 
@@ -72,10 +84,15 @@ const getLoadById = async (id) => {
  * @param {Object} updateBody
  * @returns {Promise<Load>}
  */
-const updateLoadById = async (loadId, updateBody) => {
+const updateLoadById = async (loadId, updateBody, checkTenderedStatus = false) => {
   const load = await getLoadById(loadId);
   if (!load) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Load not found');
+  }
+  if(checkTenderedStatus === true){ // if call through driver invite api this load must be in tendered state...
+    if(load.status !== 'tender') {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Load is not tendered load');
+    }
   }
   if(updateBody.invitationSentToDrivers && updateBody.invitationSentToDrivers.length > 0) {
     if(!load.invitationSentToDrivers.some(each => each.id.toString() === updateBody.invitationSentToDrivers[0].id)){
@@ -91,6 +108,48 @@ const updateLoadById = async (loadId, updateBody) => {
       updateBody.driverInterests = load.driverInterests
     }
   }
+  Object.assign(load, updateBody);
+  await load.save();
+  return load;
+};
+
+/**
+ * Update tendered load by id
+ * @param {ObjectId} loadId
+ * @param {Object} updateBody
+ * @returns {Promise<Load>}
+ */
+const updateTenderedLoadById = async (loadId, updateBody) => {
+  return await updateLoadById(loadId, updateBody, true);
+};
+
+/**
+ * Update driver's load by id
+ * @param {ObjectId} loadId
+ * @param {Object} updateBody
+ * @returns {Promise<Load>}
+ */
+const updateDriverLoadById = async (req, updateBody) => {
+  const loadId = req.params.loadId
+  const load = await getLoadById(loadId);
+  if (!load) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Load not found');
+  }
+  // console.log('GET LOAD BY ID');
+  // console.log(load);
+  // console.log('REQ DRIVER');
+  // console.log(req.driver);
+  // console.log(load?.inviteAcceptedByDriver.toString())
+  // console.log(typeof load?.inviteAcceptedByDriver.toString())
+  // console.log(req.driver._id.toString())
+  // console.log(typeof req.driver._id.toString())
+  // need to check is this load assigned to that same driver or not
+  if(load?.inviteAcceptedByDriver.toString() !== req.driver._id.toString()){
+    throw new ApiError(httpStatus.NOT_FOUND, 'Load is not assigned to that driver.');
+  }
+  // console.log('Body to update')
+  // console.log(updateBody)
+  // return false;
   Object.assign(load, updateBody);
   await load.save();
   return load;
@@ -146,5 +205,8 @@ module.exports = {
   updateLoadById,
   deleteLoadById,
   queryAllLoads,
-  updateLoadForDriverInvite
+  updateLoadForDriverInvite,
+  updateTenderedLoadById,
+  updateDriverLoadById,
+  queryLoadCount
 };
