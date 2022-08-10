@@ -7,6 +7,7 @@ const logger = require('../config/logger');
 var _ = require('lodash');
 const downloadResource = require('../utils/download');
 const {Load} = require("../models");
+const { loadStatuses } = require('../config/loads');
 const {
   onlyCountryNameProjectionString,
   onlyStateNameProjectionString,
@@ -389,16 +390,20 @@ const getTenderedLoads = catchAsync(async (req, res) => {
 const getLoadCounts = catchAsync(async (req, res) => {
   const driverId = req.driver._id;
   const filter = {inviteAcceptedByDriver: driverId}
-  // TODO:: convert all these heavy queries to oe aggregated group query
-  // const pending   = await loadService.queryLoadCountWithFilters({...filter, status: 'pending'});
-  // const tender    = await loadService.queryLoadCountWithFilters({...filter, status: 'tender'});
-  // const assigned  = await loadService.queryLoadCountWithFilters({...filter, status: 'assigned'});
-  // const active    = await loadService.queryLoadCountWithFilters({...filter, status: 'active'});
-  // const enroute   = await loadService.queryLoadCountWithFilters({...filter, status: 'enroute'});
-  // const completed = await loadService.queryLoadCountWithFilters({...filter, status: 'completed'});
-  // const cancelled = await loadService.queryLoadCountWithFilters({...filter, status: 'cancelled'});
-  // res.status(httpStatus.OK).send({pending, tender, assigned, active, enroute, completed, cancelled});
-  res.status(httpStatus.OK).send(await loadService.queryLoadCountWithFilters(filter));
+  const countsArray = [];
+  const loadCountsFromDb = await loadService.queryLoadCount(filter);
+  loadStatuses.forEach((status) => {
+    let eachCountStatus = {
+      status, count:0
+    };
+    let matchedResult = _.find(loadCountsFromDb, function(dbCount) { return dbCount._id === status; });
+    console.log("matchedResult");
+    console.log(matchedResult);
+    if(matchedResult !== undefined)
+      eachCountStatus.count = matchedResult.count
+    countsArray.push(eachCountStatus)
+  });
+  res.status(httpStatus.OK).send(countsArray);
 });
 
 module.exports = {

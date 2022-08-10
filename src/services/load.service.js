@@ -40,7 +40,10 @@ const queryLoads = async (filter, options, project = {}) => {
  */
 const queryLoadCount = async (match) => {
   const loads = await Load.aggregate([
-
+    {
+      "$match": match
+    },
+    { "$group": { _id: "$status", count: { $sum: 1 } } }
   ]);
   return loads;
 };
