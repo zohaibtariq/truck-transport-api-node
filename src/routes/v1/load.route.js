@@ -13,6 +13,7 @@ const router = express.Router();
 */
 router.get('/counts', driverAuth('getLoads'), loadController.getLoadCounts);
 router.get('/tendered', driverAuth('getLoads'), loadController.getTenderedLoads);
+router.get('/drivers/:status', driverAuth(), loadController.getLoadsByStatusForDriver);
 router.post('/drivers/:loadId', driverAuth(), validate(loadValidation.updateLoadByDriver), loadController.updateLoadByDriver);
 router.post('/:loadId/accept-invite-by-driver', driverAuth(), validate(loadValidation.loadQueryParam), loadController.loadInviteAcceptedByDriver);
 router.post('/:loadId/interest', driverAuth(), validate(loadValidation.loadQueryParam), loadController.loadDriverInterests);

@@ -387,6 +387,58 @@ const getTenderedLoads = catchAsync(async (req, res) => {
   res.send(tenderedLoads);
 });
 
+const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
+  let filter = {};
+  const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  // driver is not allowed to see customer details and many other fields as well
+  options.populate = [
+  {
+    path: 'origin',
+    select: onlyProfileAddressLocationProjectionString,
+    populate: [
+      { path: 'location.country', select: onlyCountryNameProjectionString },
+      { path: 'location.state', select: onlyStateNameProjectionString },
+      { path: 'location.city', select: onlyCityNameProjectionString },
+    ]
+  },
+  {
+    path: 'destination',
+    select: onlyProfileAddressLocationProjectionString,
+    populate: [
+      { path: 'location.country', select: onlyCountryNameProjectionString },
+      { path: 'location.state', select: onlyStateNameProjectionString },
+      { path: 'location.city', select: onlyCityNameProjectionString },
+    ]
+  },
+  ];
+  filter.status = '' // driver can see only his loads
+  if(req.params.status)
+    filter.status = req.params.status;
+  filter.inviteAcceptedByDriver = req.driver._id;
+  console.log('FILTER')
+  console.log(filter)
+  let project = {
+    paidAmount: 0,
+    balanceAmount: 0,
+    ratePerMile: 0,
+    status: 0,
+    invitationSentToDriver: 0,
+    onTheWayToDelivery: 0,
+    deliveredToCustomer: 0,
+    isInviteAcceptedByDriver: 0,
+    customer: 0,
+    goods: 0,
+    charges: 0,
+    invitationSentToDrivers: 0,
+    driverInterests: 0,
+    createdAtDateTime: 0,
+    updatedAtDateTime: 0,
+    lastInvitedDriver: 0,
+  };
+  const loads = await loadService.queryLoads(filter, options, project);
+  res.send(loads);
+});
+
 const getLoadCounts = catchAsync(async (req, res) => {
   const driverId = req.driver._id;
   const filter = {inviteAcceptedByDriver: driverId}
@@ -420,4 +472,5 @@ module.exports = {
   getTenderedLoads,
   updateLoadByDriver,
   getLoadCounts,
+  getLoadsByStatusForDriver
 };
