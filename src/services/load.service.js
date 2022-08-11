@@ -154,6 +154,9 @@ const updateDriverLoadById = async (req, updateBody) => {
   // console.log(updateBody)
   // return false;
   Object.assign(load, updateBody);
+  if(load.onTheWayToDelivery === true && load.deliveredToCustomer === false){ // TODO:: move it to a generic place and also maintain other load status at same place
+    load.status = 'enroute'
+  }
   await load.save();
   return load;
 };

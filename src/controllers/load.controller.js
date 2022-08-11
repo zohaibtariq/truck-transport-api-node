@@ -415,8 +415,8 @@ const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
   if(req.params.status)
     filter.status = req.params.status;
   filter.inviteAcceptedByDriver = req.driver._id;
-  console.log('FILTER')
-  console.log(filter)
+  // console.log('FILTER')
+  // console.log(filter)
   let project = {
     paidAmount: 0,
     balanceAmount: 0,
