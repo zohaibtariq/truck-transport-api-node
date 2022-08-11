@@ -61,6 +61,18 @@ const getLoad = catchAsync(async (req, res) => {
   res.send(load);
 });
 
+const getLoadByDriver = catchAsync(async (req, res) => {
+  const load = await loadService.getLoadById(req.params.loadId);
+  // console.log(load)
+  // console.log(typeof load.inviteAcceptedByDriver)
+  // console.log(req.driver._id)
+  // console.log(typeof req.driver._id)
+  if (!load || req.driver._id.toString() !== load?.inviteAcceptedByDriver?.toString()) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Load not found');
+  }
+  res.send(load);
+});
+
 const updateLoad = catchAsync(async (req, res) => {
   const load = await loadService.updateLoadById(req.params.loadId, req.body);
   res.send(load);
@@ -472,5 +484,6 @@ module.exports = {
   getTenderedLoads,
   updateLoadByDriver,
   getLoadCounts,
-  getLoadsByStatusForDriver
+  getLoadsByStatusForDriver,
+  getLoadByDriver
 };

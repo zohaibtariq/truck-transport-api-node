@@ -3,6 +3,11 @@ const { Driver, User} = require('../models');
 const ApiError = require('../utils/ApiError');
 const fs = require('fs')
 const path = require('path');
+const {
+  onlyCountryNameProjectionString,
+  onlyStateNameProjectionString,
+  onlyCityNameProjectionString,
+} = require('../config/countryStateCityProjections');
 
 /**
  * Create a driver
@@ -41,7 +46,15 @@ const queryDrivers = async (filter, options) => {
  * @returns {Promise<Driver>}
  */
 const getDriverById = async (id) => {
-  return Driver.findById(id).populate(['country', 'state', 'city', 'certifications.country', 'certifications.state', 'certifications.city']);
+  return Driver.findById(id).populate([
+    // 'country', 'state', 'city', 'certifications.country', 'certifications.state', 'certifications.city'
+    { path: 'country', select: onlyCountryNameProjectionString },
+    { path: 'state', select: onlyStateNameProjectionString },
+    { path: 'city', select: onlyCityNameProjectionString },
+    { path: 'certifications.country', select: onlyCountryNameProjectionString },
+    { path: 'certifications.state', select: onlyStateNameProjectionString },
+    { path: 'certifications.city', select: onlyCityNameProjectionString },
+  ]);
 };
 
 /**

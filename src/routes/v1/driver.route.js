@@ -20,8 +20,8 @@ router.post('/send-verification-email', driverAuth(), driverController.sendVerif
 router.post('/verify-email', validate(authValidation.verifyEmail), driverController.verifyEmail);
 router.get('/driver', driverAuth(), driverController.getOneDriver);
 router.post('/update', driverAuth(), validate(driverValidation.updateDriver), driverController.updateDriverFromApp);
-router.post('/change-password', driverAuth(''), validate(driverValidation.changeDriverPassword), driverController.changeDriverPassword);
-router.post('/upload', driverAuth('uploadDriverImage'), driverController.uploadDriverImage);
+router.post('/change-password', driverAuth(), validate(driverValidation.changeDriverPassword), driverController.changeDriverPassword);
+router.post('/upload', driverAuth(), driverController.uploadDriverImage);
 /*
  APP API'S END
 */

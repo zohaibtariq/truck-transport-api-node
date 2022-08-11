@@ -1,8 +1,12 @@
 const httpStatus = require('http-status');
 const { Load } = require('../models');
 const ApiError = require('../utils/ApiError');
-const generateUniqueId = require("../utils/uniqueId");
 const _ = require('lodash');
+const {
+  onlyCountryNameProjectionString,
+  onlyStateNameProjectionString,
+  onlyCityNameProjectionString,
+} = require('../config/countryStateCityProjections');
 
 /**
  * Create a load
@@ -54,31 +58,31 @@ const queryLoadCount = async (match) => {
  * @returns {Promise<Load>}
  */
 const getLoadById = async (id) => {
-  return Load.findById(id).populate([
+  $populate = [
     'goods.good',
     'charges.type',
-    { path: 'customer', select: 'location.name' },
     {
       path: 'origin',
       select: 'location.address1 location.country location.state location.city location.zip location.phone location.fax email',
       populate: [
-        { path: 'location.country', select: 'name' },
-        { path: 'location.state', select: 'name' },
-        { path: 'location.city', select: 'name' },
+        { path: 'location.country', select: onlyCountryNameProjectionString },
+        { path: 'location.state', select: onlyStateNameProjectionString },
+        { path: 'location.city', select: onlyCityNameProjectionString },
       ]
     },
     {
       path: 'destination',
       select: 'location.address1 location.country location.state location.city location.zip location.phone location.fax email',
       populate: [
-        { path: 'location.country', select: 'name' },
-        { path: 'location.state', select: 'name' },
-        { path: 'location.city', select: 'name' },
+        { path: 'location.country', select: onlyCountryNameProjectionString },
+        { path: 'location.state', select: onlyStateNameProjectionString },
+        { path: 'location.city', select: onlyCityNameProjectionString },
       ]
     },
     { path: 'lastInvitedDriver', select: 'image first_name last_name mobile phone active' },
     { path: 'driverInterests.id', select: 'first_name last_name ratePerMile active' } // must not select id in select it will auto populate
-  ]);
+  ];
+  return Load.findById(id).populate($populate);
 };
 
 /**
@@ -154,12 +158,19 @@ const updateDriverLoadById = async (req, updateBody) => {
   // console.log(updateBody)
   // return false;
   Object.assign(load, updateBody);
-  if(load.onTheWayToDelivery === true && load.deliveredToCustomer === false){ // TODO:: move it to a generic place and also maintain other load status at same place
-    load.status = 'enroute'
-  }
+  Object.assign(load, setLoadStatus(load));
   await load.save();
   return load;
 };
+
+const setLoadStatus = async (load) => {
+  if(load.invitationSentToDriver === true && load.isInviteAcceptedByDriver === true && load.onTheWayToDelivery === true && load.deliveredToCustomer === false){
+    load.status = 'enroute'
+  }else if(load.invitationSentToDriver === true && load.isInviteAcceptedByDriver === true && load.onTheWayToDelivery === true && load.deliveredToCustomer === true){
+    load.status = 'completed'
+  }
+  return load;
+}
 
 /**
  * Accept driver invite

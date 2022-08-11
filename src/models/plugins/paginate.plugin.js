@@ -59,11 +59,9 @@ const paginate = (schema) => {
       // console.log('OPTIONS populate');
       // console.log(typeof options.populate);
       // console.log(options.populate);
-      let populates;
-      if(typeof options.populate === 'object') {
-        docsPromise = docsPromise.populate(options.populate)
-      }
-      else{
+      if (typeof options.populate === 'object') {
+        docsPromise = docsPromise.populate(options.populate);
+      } else {
         options.populate.split(',').forEach((populateOption) => {
           // console.log('OPTIONS populate each');
           // console.log(populateOption);

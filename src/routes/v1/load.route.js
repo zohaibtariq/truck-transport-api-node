@@ -11,10 +11,11 @@ const router = express.Router();
 /*
  APP API'S START
 */
-router.get('/counts', driverAuth('getLoads'), loadController.getLoadCounts);
-router.get('/tendered', driverAuth('getLoads'), loadController.getTenderedLoads);
+router.get('/counts', driverAuth(), loadController.getLoadCounts);
+router.get('/tendered', driverAuth(), loadController.getTenderedLoads);
 router.get('/drivers/:status', driverAuth(), loadController.getLoadsByStatusForDriver);
 router.post('/drivers/:loadId', driverAuth(), validate(loadValidation.updateLoadByDriver), loadController.updateLoadByDriver);
+router.get('/drivers/:loadId/load', driverAuth(), validate(loadValidation.loadQueryParam), loadController.getLoadByDriver);
 router.post('/:loadId/accept-invite-by-driver', driverAuth(), validate(loadValidation.loadQueryParam), loadController.loadInviteAcceptedByDriver);
 router.post('/:loadId/interest', driverAuth(), validate(loadValidation.loadQueryParam), loadController.loadDriverInterests);
 /*

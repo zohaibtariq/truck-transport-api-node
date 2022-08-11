@@ -1,6 +1,11 @@
 const httpStatus = require('http-status');
 const { Product } = require('../models');
 const ApiError = require('../utils/ApiError');
+const {
+  onlyCountryNameProjectionString,
+  onlyStateNameProjectionString,
+  onlyCityNameProjectionString,
+} = require('../config/countryStateCityProjections');
 
 /**
  * Create a product
@@ -35,15 +40,9 @@ const getProductById = async (id) => {
   // return Product.findById(id).populate({ path: 'locationCountry', model: 'Country' });
   // return Product.findById(id).populate('locationCountry');
   return Product.findById(id).populate([
-    // {
-    //   path: 'countryObj',
-    //   path: 'location.country',
-    //   model: 'model_name',
-    //   select: 'field_name, field_name',
-    // }
-    {path: "location.country"},
-    {path: "location.state"},
-    {path: "location.city"},
+    { path: 'location.country', select: onlyCountryNameProjectionString },
+    { path: 'location.state', select: onlyStateNameProjectionString },
+    { path: 'location.city', select: onlyCityNameProjectionString },
   ]);
 };
 //
@@ -100,5 +99,5 @@ module.exports = {
   // getProductByEmail,
   updateProductById,
   deleteProductById,
-  queryAllProducts
+  queryAllProducts,
 };
