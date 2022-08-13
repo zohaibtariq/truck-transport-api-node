@@ -55,17 +55,18 @@ const saveToken = async (token, userId, expires, type, blacklisted = false) => {
  * @param {boolean} [blacklisted]
  * @returns {Promise<Token>}
  */
-const saveDriverToken = async (token, driverId, expires, type, blacklisted = false, otp = '') => {
-  let create = {
+const saveDriverToken = async (token, driverId, expires, type, blacklisted = false, otp = '', isOtpVerified = false) => {
+  const create = {
     token,
     driver: driverId,
     expires: expires.toDate(),
     type,
     blacklisted,
     otp,
+    isOtpVerified,
   };
-  console.log('CREATE')
-  console.log(create)
+  // console.log('CREATE DRIVER TOKEN');
+  // console.log(create);
   const tokenDoc = await DriverToken.create(create);
   return tokenDoc;
 };
@@ -91,17 +92,26 @@ const verifyToken = async (token, type) => {
  * @param {string} type
  * @returns {Promise<Token>}
  */
-const verifyDriverToken = async (token, type, otp = '') => {
+const verifyDriverToken = async (token, type, otpOptions = {}) => {
   const payload = jwt.verify(token, config.jwt.secret);
-  console.log('verifyDriverToken')
-  console.log(payload)
-  console.log(token)
-  console.log(type)
-  console.log(otp)
-  const tokenDoc = await DriverToken.findOne({ token, type, otp, driver: payload.sub, blacklisted: false });
+  // console.log('verifyDriverToken');
+  // console.log(payload);
+  // console.log(token);
+  // console.log(type);
+  // console.log(otpOptions);
+  const findDriverTokenObj = { token, type, driver: payload.sub, blacklisted: false };
+  if (otpOptions.hasOwnProperty('otp')) findDriverTokenObj.otp = otpOptions.otp;
+  if (otpOptions.hasOwnProperty('isOtpVerified')) findDriverTokenObj.otp = otpOptions.isOtpVerified;
+  // console.log('FIND DRIVER TOKEN OBJECT');
+  // console.log(findDriverTokenObj);
+  const tokenDoc = await DriverToken.findOne(findDriverTokenObj);
   if (!tokenDoc) {
     throw new Error('Driver Token not found');
   }
+  Object.assign(tokenDoc, { isOtpVerified: true });
+  // console.log('tokenDoc')
+  // console.log(tokenDoc)
+  await tokenDoc.save();
   return tokenDoc;
 };
 

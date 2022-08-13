@@ -270,8 +270,13 @@ const forgotPassword = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send({ token: resetPasswordToken });
 });
 
+const verifyOtp = catchAsync(async (req, res) => {
+  await authService.verifyDriverOtp(req.query.token, req.body.otp);
+  res.status(httpStatus.NO_CONTENT).send({ token: req.query.token });
+});
+
 const resetPassword = catchAsync(async (req, res) => {
-  await authService.resetDriverPassword(req.query.token, req.body.password, req.body.otp);
+  await authService.resetDriverPassword(req.query.token, req.body.password);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
@@ -304,4 +309,5 @@ module.exports = {
   updateDriverFromApp,
   changeDriverPassword,
   getOneDriver,
+  verifyOtp,
 };

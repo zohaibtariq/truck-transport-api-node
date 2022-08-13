@@ -15,6 +15,7 @@ const router = express.Router();
 router.post('/login', validate(authValidation.login), driverController.login);
 router.post('/logout', validate(authValidation.logout), driverController.logout);
 router.post('/forgot-password', validate(authValidation.forgotPassword), driverController.forgotPassword);
+router.post('/verify-otp', validate(authValidation.verifyOtp), driverController.verifyOtp);
 router.post('/reset-password', validate(authValidation.resetPassword), driverController.resetPassword);
 router.post('/send-verification-email', driverAuth(), driverController.sendVerificationEmail);
 router.post('/verify-email', validate(authValidation.verifyEmail), driverController.verifyEmail);

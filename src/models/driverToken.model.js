@@ -31,6 +31,10 @@ const tokenSchema = mongoose.Schema(
       type: String,
       default: '',
     },
+    isOtpVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

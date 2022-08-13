@@ -5,7 +5,7 @@ const driverService = require('./driver.service');
 const Token = require('../models/token.model');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
-const {DriverToken} = require("../models");
+const { DriverToken } = require('../models');
 
 /**
  * Login with username and password
@@ -87,14 +87,43 @@ const resetPassword = async (resetPasswordToken, newPassword) => {
 };
 
 /**
+ * Verify Driver OTP
+ * @param {string} resetPasswordToken
+ * @param {string} newPassword
+ * @returns {Promise}
+ */
+const verifyDriverOtp = async (resetPasswordToken, otp = '') => {
+  try {
+    await tokenService.verifyDriverToken(resetPasswordToken, tokenTypes.OTP, { otp });
+    // Object.assign(verifyOtpDoc, { isOtpVerified: true });
+    // console.log('verifyDriverOtp')
+    // console.log(verifyOtpDoc)
+    // await verifyOtpDoc.save();
+    // return verifyOtpDoc
+    // console.log('resetDriverPassword')
+    // console.log(resetPasswordTokenDoc)
+    // return false;
+    // const driver = await driverService.getDriverById(resetPasswordTokenDoc.driver);
+    // if (!driver) {
+    // throw new Error();
+    // }
+    // await driverService.updateDriverById(driver.id, { password: newPassword });
+    // await DriverToken.deleteMany({ driver: driver.id, type: tokenTypes.OTP });
+  } catch (error) {
+    // console.log(error)
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Driver OTP verification failed');
+  }
+};
+
+/**
  * Reset password
  * @param {string} resetPasswordToken
  * @param {string} newPassword
  * @returns {Promise}
  */
-const resetDriverPassword = async (resetPasswordToken, newPassword, otp = '') => {
+const resetDriverPassword = async (resetPasswordToken, newPassword) => {
   try {
-    const resetPasswordTokenDoc = await tokenService.verifyDriverToken(resetPasswordToken, tokenTypes.OTP, otp);
+    const resetPasswordTokenDoc = await tokenService.verifyDriverToken(resetPasswordToken, tokenTypes.OTP);
     // console.log('resetDriverPassword')
     // console.log(resetPasswordTokenDoc)
     // return false;
@@ -171,4 +200,5 @@ module.exports = {
   logoutDriver,
   resetDriverPassword,
   verifyDriverEmail,
+  verifyDriverOtp,
 };
