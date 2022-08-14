@@ -5,10 +5,11 @@ const _ = require('lodash');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { driverService, codeService, userService, authService, tokenService, emailService } = require('../services');
+const { driverService, codeService, authService, tokenService, emailService } = require('../services');
 const logger = require('../config/logger');
 const downloadResource = require('../utils/download');
 const { Driver } = require('../models');
+const generateUniqueId = require('../utils/uniqueId');
 
 const createDriver = catchAsync(async (req, res) => {
   // const driver = await driverService.createDriver(req.body);
@@ -114,7 +115,10 @@ const storage = multer.diskStorage({
     cb(null, 'uploads');
   },
   filename(req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname)); // Appending extension
+    cb(
+      null,
+      (new Date().getTime() / 1000).toString().replaceAll('.', '') + generateUniqueId(8) + path.extname(file.originalname)
+    ); // Appending extension
   },
 });
 const upload = multer({ storage }).single('file');
@@ -130,7 +134,10 @@ const uploadDriverImage = catchAsync(async (req, res) => {
     // console.log(req.file);
     // console.log(req.file.filename);
     // console.log(req.driver._id);
-    const driver = await driverService.updateDriverImageById(req.driver._id, {
+    let driverId;
+    if (req.params.driverId) driverId = req.params.driverId;
+    else if (req.driver._id) driverId = req.driver._id;
+    const driver = await driverService.updateDriverImageById(driverId, {
       image: req.file.filename,
     });
     // console.log('D RETURN');

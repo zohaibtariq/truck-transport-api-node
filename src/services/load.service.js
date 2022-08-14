@@ -54,10 +54,10 @@ const queryLoadCount = async (match) => {
 
 /**
  * Get load by id
- * @param {ObjectId} id
- * @returns {Promise<Load>}
+ * @param id
+ * @param isPopulate
  */
-const getLoadById = async (id) => {
+const getLoadById = async (id, isPopulate = false) => {
   $populate = [
     'goods.good',
     'charges.type',
@@ -84,6 +84,10 @@ const getLoadById = async (id) => {
   ];
   return Load.findById(id).populate($populate);
 };
+
+const getOnlyLoadById = async (id) => {
+  return Load.findById(id)
+}
 
 /**
  * Update load by id
@@ -115,6 +119,10 @@ const updateLoadById = async (loadId, updateBody, checkTenderedStatus = false) =
       updateBody.driverInterests = load.driverInterests
     }
   }
+  // console.log('FETCHED LOAD BEFORE UPDATE');
+  // console.log(load);
+  // console.log('UPDATED BODY WITH LOAD BEFORE UPDATE');
+  // console.log(updateBody);
   Object.assign(load, updateBody);
   await load.save();
   return load;
@@ -151,7 +159,9 @@ const updateDriverLoadById = async (req, updateBody) => {
   // console.log(req.driver._id.toString())
   // console.log(typeof req.driver._id.toString())
   // need to check is this load assigned to that same driver or not
-  if(load?.inviteAcceptedByDriver.toString() !== req.driver._id.toString()){
+  console.log("inviteAcceptedByDriver");
+  console.log(load?.inviteAcceptedByDriver);
+  if(load?.inviteAcceptedByDriver === undefined || (load?.inviteAcceptedByDriver?.toString() !== req?.driver?._id?.toString())){
     throw new ApiError(httpStatus.NOT_FOUND, 'Load is not assigned to that driver.');
   }
   // console.log('Body to update')

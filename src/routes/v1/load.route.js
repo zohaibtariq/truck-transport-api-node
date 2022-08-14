@@ -18,6 +18,8 @@ router.post('/drivers/:loadId', driverAuth(), validate(loadValidation.updateLoad
 router.get('/drivers/:loadId/load', driverAuth(), validate(loadValidation.loadQueryParam), loadController.getLoadByDriver);
 router.post('/:loadId/accept-invite-by-driver', driverAuth(), validate(loadValidation.loadQueryParam), loadController.loadInviteAcceptedByDriver);
 router.post('/:loadId/interest', driverAuth(), validate(loadValidation.loadQueryParam), loadController.loadDriverInterests);
+router.post('/:loadId/img-upload', driverAuth(), loadController.uploadLoadDeliveredImages);
+router.post('/:loadId/img-delete/:imgId', driverAuth(), loadController.uploadLoadDeletedImages);
 /*
  APP API'S END
 */

@@ -65,10 +65,19 @@ const charges = Schema({
   },
   notes: String,
 });
+const deliveredImages = Schema({
+  id: {
+    type: mongoose.SchemaTypes.ObjectId,
+  },
+  image: String,
+  year: Number,
+  month: Number,
+});
 const loadSchema = Schema(
   {
     goods: [goods],
     charges: [charges],
+    deliveredImages: [deliveredImages],
     invitationSentToDrivers: [invitationSentToDrivers],
     driverInterests: [driverInterests],
     code: {
