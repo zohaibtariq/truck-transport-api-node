@@ -4,11 +4,11 @@ Joi.objectId = require('joi-objectid')(Joi);
 
 const createLoad = {
   body: Joi.object().keys({
-    invitationSentToDrivers: Joi.array().items(
-      Joi.object().keys({
-        id: Joi.string().custom(objectId).required(),
-      })
-    ),
+    // invitationSentToDrivers: Joi.array().items(
+    //   Joi.object().keys({
+    //     id: Joi.string().custom(objectId).required(),
+    //   })
+    // ),
     bolHash: Joi.string().required(),
     shipperRef: Joi.string().required(),
     poHash: Joi.string().required(),
@@ -22,6 +22,7 @@ const createLoad = {
     onTheWayToDelivery: Joi.boolean().optional(),
     deliveredToCustomer: Joi.boolean().optional(),
     inviteAcceptedByDriver: Joi.string().custom(objectId).optional(),
+    invitationSentToDriverId: Joi.string().custom(objectId).optional(),
     lastInvitedDriver: Joi.string().custom(objectId).optional(),
     isInviteAcceptedByDriver: Joi.boolean().optional(),
   }),
@@ -29,11 +30,11 @@ const createLoad = {
 
 const updateLoad = {
   body: Joi.object().keys({
-    invitationSentToDrivers: Joi.array().items(
-      Joi.object().keys({
-        id: Joi.string().custom(objectId).required(),
-      })
-    ),
+    // invitationSentToDrivers: Joi.array().items(
+    //   Joi.object().keys({
+    //     id: Joi.string().custom(objectId).required(),
+    //   })
+    // ),
     goods: Joi.array().items(
       Joi.object().keys({
         make: Joi.string().required(),
@@ -82,6 +83,7 @@ const updateLoad = {
     driverRatePerMile: Joi.number().optional(),
     isInviteAcceptedByDriver: Joi.boolean().optional(),
     inviteAcceptedByDriver: Joi.string().custom(objectId).optional(),
+    invitationSentToDriverId: Joi.string().custom(objectId).optional(),
     driverInterests: Joi.array().items(
       Joi.object().keys({
         id: Joi.string().custom(objectId).required(),

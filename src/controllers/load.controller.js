@@ -2,22 +2,25 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { loadService} = require('../services');
+const { loadService } = require('../services');
 const logger = require('../config/logger');
 var _ = require('lodash');
 const downloadResource = require('../utils/download');
-const {Load} = require("../models");
-const { loadStatuses } = require('../config/loads');
+const { Load } = require("../models");
+const { loadStatusTypes } = require('../config/loads');
+const { inviteActions } = require('../config/inviteActions');
 const {
   onlyCountryNameProjectionString,
   onlyStateNameProjectionString,
   onlyCityNameProjectionString,
-  onlyProfileAddressLocationProjectionString
+  onlyProfileAddressLocationProjectionString,
+  onlyGoodsProjectionString,
 } = require('../config/countryStateCityProjections');
 const multer = require("multer");
 const path = require("path");
 const fs = require('fs');
 const generateUniqueId = require("../utils/uniqueId");
+const moment = require('moment');
 
 const createLoad = catchAsync(async (req, res) => {
   await loadService.createLoad(req.body).then(success => {
@@ -59,6 +62,9 @@ const getLoads = catchAsync(async (req, res) => {
 });
 
 const getLoad = catchAsync(async (req, res) => {
+  // console.log('getLoad moment unix')
+  // console.log(moment().unix())
+  // console.log(moment.unix('1660777204').format("MM/DD/YYYY"))
   const load = await loadService.getLoadById(req.params.loadId, true);
   if (!load) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Load not found');
@@ -79,7 +85,7 @@ const getLoadByDriver = catchAsync(async (req, res) => {
 });
 
 const updateLoad = catchAsync(async (req, res) => {
-  const load = await loadService.updateLoadById(req.params.loadId, req.body);
+  const load = await loadService.updateLoadById(req.params.loadId, req);
   res.send(load);
 });
 
@@ -405,7 +411,7 @@ const getTenderedLoads = catchAsync(async (req, res) => {
 });
 
 const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
-  let filter = {};
+  const filter = {};
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   // driver is not allowed to see customer details and many other fields as well
   options.populate = [
@@ -428,12 +434,6 @@ const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
       ]
     },
   ];
-  filter.status = '' // driver can see only his loads
-  if(req.params.status)
-    filter.status = req.params.status;
-  filter.inviteAcceptedByDriver = req.driver._id;
-  // console.log('FILTER')
-  // console.log(filter)
   let project = {
     paidAmount: 0,
     balanceAmount: 0,
@@ -444,34 +444,141 @@ const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
     deliveredToCustomer: 0,
     isInviteAcceptedByDriver: 0,
     customer: 0,
-    goods: 0,
-    charges: 0,
-    invitationSentToDrivers: 0,
-    driverInterests: 0,
+    // goods: 0, // bcz goods will be visible on load detail page
+    charges: 0, // TODO:: payment details are required but i need to do calculation on backend and store new keys and share that keys in response
+    driverInterests: 0, // TODO:: need to make it same as invited driver but after awais approval
     createdAtDateTime: 0,
     updatedAtDateTime: 0,
     lastInvitedDriver: 0,
   };
+  filter.status = '' // driver can see only his loads
+  if(req.params.status){
+    switch (req.params.status) {
+      case loadStatusTypes.PENDING: // show invite received by admin loads to driver
+        // filter.invitationSentToDriver = true;
+        // filter.isInviteAcceptedByDriver = false;
+        // filter.onTheWayToDelivery = false;
+        // filter.deliveredToCustomer = false;
+        filter.status = {
+          '$in': [ // admin might invite from pending load status or tender load status // TODO:: we need to restrict from other load states to not able sent invite even if an admin
+            loadStatusTypes.PENDING,
+            loadStatusTypes.TENDER,
+          ]
+        }
+        // Object.assign(filter, {
+        //   '$or': [ // admin might invite from pending load status or tender load status // TODO:: we need to restrict from other load states to not able sent invite even if an admin
+        //     {'status': loadStatusTypes.PENDING},
+        //     {'status': loadStatusTypes.TENDER},
+        //   ]
+        // })
+        filter.lastInvitedDriver = req.driver._id;
+        break
+      case loadStatusTypes.ACTIVE: // show assigned loads to driver
+        // filter.invitationSentToDriver = true;
+        // filter.isInviteAcceptedByDriver = true;
+        // filter.onTheWayToDelivery = false;
+        // filter.deliveredToCustomer = false;
+        filter.status = loadStatusTypes.ASSIGNED;
+        filter.inviteAcceptedByDriver = req.driver._id;
+        delete project['customer'] // on assigned/active load we need to show customer detail // TODO:: show limited details of customer here
+        break
+      case loadStatusTypes.ENROUTE:
+        filter.onTheWayToDelivery = true;
+        filter.status = loadStatusTypes.ENROUTE;
+        filter.inviteAcceptedByDriver = req.driver._id;
+        options.populate.push({
+          path: 'customer',
+          select: onlyProfileAddressLocationProjectionString,
+          populate: [
+            { path: 'location.country', select: onlyCountryNameProjectionString },
+            { path: 'location.state', select: onlyStateNameProjectionString },
+            { path: 'location.city', select: onlyCityNameProjectionString },
+          ]
+        })
+        options.populate.push({
+          path: 'goods.good',
+          select: onlyGoodsProjectionString,
+          // populate: [
+          //   { path: 'location.country', select: onlyCountryNameProjectionString },
+          //   { path: 'location.state', select: onlyStateNameProjectionString },
+          //   { path: 'location.city', select: onlyCityNameProjectionString },
+          // ]
+        })
+        delete project['customer'] // on assigned/active load we need to show customer detail // TODO:: show limited details of customer here
+        delete project['charges'] // TODO:: payment details are required but i need to do calculation on backend and store new keys and share that keys in response
+        break
+      case loadStatusTypes.COMPLETED: // load delivered to customer and assigned to driver as well
+        filter.deliveredToCustomer = true;
+        filter.status = loadStatusTypes.COMPLETED;
+        filter.inviteAcceptedByDriver = req.driver._id;
+        break
+      case loadStatusTypes.CANCELLED: // cancelled loads // TODO:: need to ask this what we will display here
+        // TODO:: i think we need to look for rejected loads of driver from inviteddrivers and show all loads here
+        break
+    }
+  }
+  console.log('OPTIONS')
+  console.log(options)
+  console.log('PROJECT')
+  console.log(project)
+  console.log('FILTER')
+  console.log(filter)
   const loads = await loadService.queryLoads(filter, options, project);
   res.send(loads);
 });
 
 const getLoadCounts = catchAsync(async (req, res) => {
   const driverId = req.driver._id;
-  const filter = {inviteAcceptedByDriver: driverId}
+/*  const pendingLoadCount = await loadService.queryPendingLoadCount({
+    "inviteSentToDriverId" : driverId,
+    "driverAction" : inviteActions.DORMANT,
+    "driverActionDateTime" : null
+  });
+  console.log('pendingLoadCount')
+  console.log(pendingLoadCount)
+  const allInvitedLoadIdsOfDriver = _.map(pendingLoadCount, load => load._id)
+  console.log(allInvitedLoadIdsOfDriver)*/
+  // const filter = {inviteAcceptedByDriver: driverId}
+  const filter = {}
+  Object.assign(filter, {
+    '$or': [ // admin might invite from pending load status or tender load status // TODO:: we need to restrict from other load states to not able sent invite even if an admin
+      {'status': loadStatusTypes.PENDING, lastInvitedDriver: driverId},
+      {'status': loadStatusTypes.TENDER, lastInvitedDriver: driverId},
+      {inviteAcceptedByDriver: driverId},
+    ]
+  })
+  console.log('filter')
+  console.log(filter)
   const countsArray = [];
-  const loadCountsFromDb = await loadService.queryLoadCount(filter);
-  loadStatuses.forEach((status) => {
+  const loadAcceptedByDriverCount = await loadService.queryLoadCount(filter);
+  // TODO:: CANCEL count is need to be done
+  [
+    loadStatusTypes.PENDING,
+    loadStatusTypes.TENDER,
+    loadStatusTypes.ASSIGNED,
+    loadStatusTypes.COMPLETED
+  ].forEach((status) => {
+    let modifiedStatus = status;
+    if(status === loadStatusTypes.ASSIGNED)
+      modifiedStatus = loadStatusTypes.ACTIVE
     let eachCountStatus = {
-      status, count:0
+      status: modifiedStatus,
+      count: 0
     };
-    let matchedResult = _.find(loadCountsFromDb, function(dbCount) { return dbCount._id === status; });
+    console.log('loadAcceptedByDriverCount');
+    console.log(loadAcceptedByDriverCount);
+    let matchedResult = _.find(loadAcceptedByDriverCount, function(dbCount) { return dbCount._id === status; });
     console.log("matchedResult");
     console.log(matchedResult);
     if(matchedResult !== undefined)
       eachCountStatus.count = matchedResult.count
-    countsArray.push(eachCountStatus)
+    if(loadStatusTypes.TENDER === modifiedStatus){ // this conditional is to add tender count in pending
+      countsArray[0]['count'] = countsArray[0]['count'] + eachCountStatus.count
+    }
+    else
+      countsArray.push(eachCountStatus)
   });
+  // countsArray.push(pendingLoadCount);
   res.status(httpStatus.OK).send(countsArray);
 });
 

@@ -78,7 +78,7 @@ const loadSchema = Schema(
     goods: [goods],
     charges: [charges],
     deliveredImages: [deliveredImages],
-    invitationSentToDrivers: [invitationSentToDrivers],
+    // invitationSentToDrivers: [invitationSentToDrivers],
     driverInterests: [driverInterests],
     code: {
       type: String,

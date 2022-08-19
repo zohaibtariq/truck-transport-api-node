@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Load } = require('../models');
+const { Load, InvitedDriver} = require('../models');
 const ApiError = require('../utils/ApiError');
 const _ = require('lodash');
 const {
@@ -7,6 +7,8 @@ const {
   onlyStateNameProjectionString,
   onlyCityNameProjectionString,
 } = require('../config/countryStateCityProjections');
+const inviteDriverService = require('../../src/services/inviteDriver.service');
+const { loadStatusTypes } = require('../config/loads');
 
 /**
  * Create a load
@@ -15,9 +17,11 @@ const {
  */
 const createLoad = async (loadBody) => {
   const loadCount = await Load.countDocuments();
-  loadBody.code = 40000 + parseInt(loadCount);
+  // console.log('LOAD COUNT');
+  // console.log(loadCount);
+  loadBody.code = 40000 + ((parseInt(loadCount) > 0) ? parseInt(loadCount) + 1 : parseInt(loadCount));
   // console.log('LOAD CODE');
-  // console.log(loadCount, loadBody.code);
+  // console.log(loadBody.code);
    return Load.create(loadBody);
 };
 
@@ -95,7 +99,8 @@ const getOnlyLoadById = async (id) => {
  * @param {Object} updateBody
  * @returns {Promise<Load>}
  */
-const updateLoadById = async (loadId, updateBody, checkTenderedStatus = false) => {
+const updateLoadById = async (loadId, req, checkTenderedStatus = false) => {
+  const updateBody = req.body;
   const load = await getLoadById(loadId);
   if (!load) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Load not found');
@@ -105,12 +110,19 @@ const updateLoadById = async (loadId, updateBody, checkTenderedStatus = false) =
       throw new ApiError(httpStatus.NOT_FOUND, 'Load is not tendered load');
     }
   }
-  if(updateBody.invitationSentToDrivers && updateBody.invitationSentToDrivers.length > 0) {
-    if(!load.invitationSentToDrivers.some(each => each.id.toString() === updateBody.invitationSentToDrivers[0].id)){
-      updateBody.invitationSentToDrivers = load.invitationSentToDrivers.concat(updateBody.invitationSentToDrivers);
-    }else{
-      updateBody.invitationSentToDrivers = load.invitationSentToDrivers
-    }
+  // if(updateBody.invitationSentToDrivers && updateBody.invitationSentToDrivers.length > 0) {
+  //   if(!load.invitationSentToDrivers.some(each => each.id.toString() === updateBody.invitationSentToDrivers[0].id)){
+  //     updateBody.invitationSentToDrivers = load.invitationSentToDrivers.concat(updateBody.invitationSentToDrivers);
+  //   }else{
+  //     updateBody.invitationSentToDrivers = load.invitationSentToDrivers
+  //   }
+  // }
+  if(updateBody.invitationSentToDriverId && updateBody.invitationSentToDriverId.length > 0) {
+    if(load.status !== loadStatusTypes.TENDER && load.status !== loadStatusTypes.PENDING)
+      throw new ApiError(httpStatus.NOT_FOUND, 'Driver invite can only be sent on loads with status ('+loadStatusTypes.PENDING+', '+loadStatusTypes.TENDER+')');
+    updateBody.lastInvitedDriver = updateBody.invitationSentToDriverId
+    await inviteDriverService.createDriverInvite(loadId, updateBody.invitationSentToDriverId, req.user.id)
+    delete updateBody.invitationSentToDriverId // bcz we dont want to create this key in db modle
   }
   if(updateBody.driverInterests && updateBody.driverInterests.length > 0) {
     if(!load.driverInterests.some(each => each.id.toString() === updateBody.driverInterests[0].id)){
@@ -159,8 +171,8 @@ const updateDriverLoadById = async (req, updateBody) => {
   // console.log(req.driver._id.toString())
   // console.log(typeof req.driver._id.toString())
   // need to check is this load assigned to that same driver or not
-  console.log("inviteAcceptedByDriver");
-  console.log(load?.inviteAcceptedByDriver);
+  // console.log("inviteAcceptedByDriver");
+  // console.log(load?.inviteAcceptedByDriver);
   if(load?.inviteAcceptedByDriver === undefined || (load?.inviteAcceptedByDriver?.toString() !== req?.driver?._id?.toString())){
     throw new ApiError(httpStatus.NOT_FOUND, 'Load is not assigned to that driver.');
   }
@@ -225,6 +237,43 @@ const queryAllLoads = async (filter) => {
   return Load.find(filter).lean();
 };
 
+const queryPendingLoadCount = async (match) => {
+  const loads = await InvitedDriver.aggregate([
+    {
+      "$match": match
+    },
+    { "$group": { _id: "$invitedOnLoadId", /*count: { $sum: 1 }*/ } }
+  ])
+  return loads;
+};
+
+/*const queryPendingLoadCount = async (match) => {
+  console.log('queryPendingLoadCount')
+  console.log(match)
+  const loadPromise = await InvitedDriver.aggregate([
+    {
+      "$match": match
+    },
+    // { "$group": { _id: "$invitedOnLoadId", count: { $sum: 1 } } }
+  ])
+    // .exec()
+  // .exec().lean()
+  //   .exec((docs) => {
+  //   console.log("docs");
+  //   console.log(docs);
+  // }, () => {
+  //
+  // });
+  // return loads;
+  loadPromise.then((data) => {
+    console.log("data");
+    return data;
+  }).catch((err) => {
+    console.log("err");
+    return err;
+  });
+};*/
+
 module.exports = {
   createLoad,
   queryLoads,
@@ -235,5 +284,6 @@ module.exports = {
   updateLoadForDriverInvite,
   updateTenderedLoadById,
   updateDriverLoadById,
-  queryLoadCount
+  queryLoadCount,
+  queryPendingLoadCount
 };
