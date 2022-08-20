@@ -78,9 +78,12 @@ const getLoadByDriver = catchAsync(async (req, res) => {
   // console.log(typeof load.inviteAcceptedByDriver)
   // console.log(req.driver._id)
   // console.log(typeof req.driver._id)
-  if (!load || req.driver._id.toString() !== load?.inviteAcceptedByDriver?.toString()) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Load not found');
-  }
+  // if (!load || req.driver._id.toString() !== load?.inviteAcceptedByDriver?.toString()) {
+  //   throw new ApiError(httpStatus.NOT_FOUND, 'Load not found');
+  // }
+  // else if() {
+  // }
+  // TODO:: apply validation that driver can only see invited loads or accepted loads plus we need to hide customer object on certain load statuses
   res.send(load);
 });
 
@@ -498,11 +501,6 @@ const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
         options.populate.push({
           path: 'goods.good',
           select: onlyGoodsProjectionString,
-          // populate: [
-          //   { path: 'location.country', select: onlyCountryNameProjectionString },
-          //   { path: 'location.state', select: onlyStateNameProjectionString },
-          //   { path: 'location.city', select: onlyCityNameProjectionString },
-          // ]
         })
         delete project['customer'] // on assigned/active load we need to show customer detail // TODO:: show limited details of customer here
         delete project['charges'] // TODO:: payment details are required but i need to do calculation on backend and store new keys and share that keys in response

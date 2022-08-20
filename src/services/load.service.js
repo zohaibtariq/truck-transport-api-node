@@ -5,7 +5,7 @@ const _ = require('lodash');
 const {
   onlyCountryNameProjectionString,
   onlyStateNameProjectionString,
-  onlyCityNameProjectionString,
+  onlyCityNameProjectionString, onlyProfileAddressLocationProjectionString, onlyGoodsProjectionString, onlyChargesProjectionString
 } = require('../config/countryStateCityProjections');
 const inviteDriverService = require('../../src/services/inviteDriver.service');
 const { loadStatusTypes } = require('../config/loads');
@@ -63,8 +63,6 @@ const queryLoadCount = async (match) => {
  */
 const getLoadById = async (id, isPopulate = false) => {
   $populate = [
-    'goods.good',
-    'charges.type',
     {
       path: 'origin',
       select: 'location.address1 location.country location.state location.city location.zip location.phone location.fax email',
@@ -84,7 +82,24 @@ const getLoadById = async (id, isPopulate = false) => {
       ]
     },
     { path: 'lastInvitedDriver', select: 'image first_name last_name mobile phone active' },
-    { path: 'driverInterests.id', select: 'first_name last_name ratePerMile active' } // must not select id in select it will auto populate
+    { path: 'driverInterests.id', select: 'first_name last_name ratePerMile active' }, // must not select id in select it will auto populate
+    {
+      path: 'customer',
+      select: onlyProfileAddressLocationProjectionString,
+      populate: [
+        { path: 'location.country', select: onlyCountryNameProjectionString },
+        { path: 'location.state', select: onlyStateNameProjectionString },
+        { path: 'location.city', select: onlyCityNameProjectionString },
+      ]
+    },
+    {
+      path: 'goods.good',
+      select: onlyGoodsProjectionString,
+    },
+    {
+      path: 'charges.type',
+      select: onlyChargesProjectionString,
+    }
   ];
   return Load.findById(id).populate($populate);
 };
