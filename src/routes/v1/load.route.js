@@ -14,10 +14,31 @@ const router = express.Router();
 router.get('/counts', driverAuth(), loadController.getLoadCounts);
 router.get('/tendered', driverAuth(), loadController.getTenderedLoads);
 router.get('/drivers/:status', driverAuth(), loadController.getLoadsByStatusForDriver);
-router.post('/drivers/:loadId', driverAuth(), validate(loadValidation.updateLoadByDriver), loadController.updateLoadByDriver);
+router.post(
+  '/drivers/:loadId',
+  driverAuth(),
+  validate(loadValidation.updateLoadByDriver),
+  loadController.updateLoadByDriver
+);
 router.get('/drivers/:loadId/load', driverAuth(), validate(loadValidation.loadQueryParam), loadController.getLoadByDriver);
-router.post('/:loadId/accept-invite-by-driver', driverAuth(), validate(loadValidation.loadQueryParam), loadController.loadInviteAcceptedByDriver);
-router.post('/:loadId/interest', driverAuth(), validate(loadValidation.loadQueryParam), loadController.loadDriverInterests);
+router.post(
+  '/:loadId/accept-invite-by-driver',
+  driverAuth(),
+  validate(loadValidation.loadQueryParam),
+  loadController.loadInviteAcceptedByDriver
+);
+router.post(
+  '/:loadId/reject-invite-by-driver',
+  driverAuth(),
+  validate(loadValidation.loadQueryParam),
+  loadController.loadInviteRejectedByDriver
+);
+router.post(
+  '/:loadId/interest',
+  driverAuth(),
+  validate(loadValidation.loadQueryParam),
+  loadController.loadStoreDriverInterests
+);
 router.post('/:loadId/img-upload', driverAuth(), loadController.uploadLoadDeliveredImages);
 router.post('/:loadId/img-delete/:imgId', driverAuth(), loadController.uploadLoadDeletedImages);
 /*

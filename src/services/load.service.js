@@ -136,8 +136,9 @@ const updateLoadById = async (loadId, req, checkTenderedStatus = false) => {
     if(load.status !== loadStatusTypes.TENDER && load.status !== loadStatusTypes.PENDING)
       throw new ApiError(httpStatus.NOT_FOUND, 'Driver invite can only be sent on loads with status ('+loadStatusTypes.PENDING+', '+loadStatusTypes.TENDER+')');
     updateBody.lastInvitedDriver = updateBody.invitationSentToDriverId
+    // updateBody.status = loadStatusTypes.INVITED; // TODO:: set load to invited, ASK FROM AWAIS
     await inviteDriverService.createDriverInvite(loadId, updateBody.invitationSentToDriverId, req.user.id)
-    delete updateBody.invitationSentToDriverId // bcz we dont want to create this key in db modle
+    delete updateBody.invitationSentToDriverId // bcz we dont want to create this key in db model
   }
   if(updateBody.driverInterests && updateBody.driverInterests.length > 0) {
     if(!load.driverInterests.some(each => each.id.toString() === updateBody.driverInterests[0].id)){
@@ -235,6 +236,45 @@ const updateLoadForDriverInvite = async (loadId, updateBody) => {
 };
 
 /**
+ * Reject driver invite
+ * @param req
+ * @returns {Promise<Load>}
+ */
+const isUpdateLoadForDriverRejectInviteAllowed = async (loadId, driverId) => {
+  const load = await getLoadById(loadId)
+  if (!load) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Load not found')
+  }
+  if(driverId !== load?.lastInvitedDriver?.id) {
+    throw new ApiError(httpStatus.FORBIDDEN, 'Driver is not invited against provided load.')
+  }
+  return load;
+};
+
+/**
+ * Reject driver invite
+ * @param req
+ * @returns {Promise<Load>}
+ */
+const updateLoadForDriverRejectInvite = async (load) => {
+  Object.assign(load, {
+    "inviteAcceptedByDriverTime": null,
+    "isInviteAcceptedByDriver": false,
+    "invitationSentToDriver": false,
+    "driverRatePerMile": 0,
+    // "status": loadStatusTypes.TENDER, // TODO: no need to do this
+  });
+  load.inviteAcceptedByDriver = undefined
+  delete load.inviteAcceptedByDriver
+  load.lastInvitedDriver = undefined
+  delete load.lastInvitedDriver
+  // console.log('FINAL LOAD BEFORE SAVE IS 4')
+  // console.log(load)
+  await load.save();
+  return load;
+};
+
+/**
  * Delete load by id
  * @param {ObjectId} loadId
  * @returns {Promise<Load>}
@@ -300,5 +340,7 @@ module.exports = {
   updateTenderedLoadById,
   updateDriverLoadById,
   queryLoadCount,
-  queryPendingLoadCount
+  queryPendingLoadCount,
+  updateLoadForDriverRejectInvite,
+  isUpdateLoadForDriverRejectInviteAllowed
 };

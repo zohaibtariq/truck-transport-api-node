@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { toJSON } = require('./plugins');
-const { inviteActions } = require('../config/inviteActions');
+const { inviteActions, inviteActionTypes } = require('../config/inviteActions');
 
 const invitedDriverSchema = mongoose.Schema(
   {
@@ -25,9 +25,9 @@ const invitedDriverSchema = mongoose.Schema(
     },
     driverAction: {
       type: String,
-      enum: [inviteActions.DORMANT, inviteActions.ACCEPTED, inviteActions.REJECTED],
+      enum: inviteActions,
       required: true,
-      default: inviteActions.DORMANT,
+      default: inviteActionTypes.DORMANT,
     },
     driverActionDateTime: {
       type: Date,

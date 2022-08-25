@@ -1,6 +1,7 @@
 const loadStatusTypes = {
   PENDING: 'pending',
   TENDER: 'tender',
+  INVITED: 'invited',
   ASSIGNED: 'assigned',
   ACTIVE: 'active',
   ENROUTE: 'enroute',
@@ -11,6 +12,7 @@ const loadStatuses = [
   loadStatusTypes.PENDING,
   loadStatusTypes.TENDER,
   loadStatusTypes.ASSIGNED,
+  loadStatusTypes.INVITED,
   loadStatusTypes.ACTIVE,
   loadStatusTypes.ENROUTE,
   loadStatusTypes.COMPLETED,

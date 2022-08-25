@@ -10,12 +10,6 @@ const opts = {
     updatedAt: 'updatedAtDateTime',
   },
 };
-const invitationSentToDrivers = Schema({
-  id: {
-    type: mongoose.SchemaTypes.ObjectId,
-    ref: 'Driver',
-  },
-});
 const driverInterests = Schema({
   id: {
     type: mongoose.SchemaTypes.ObjectId,
@@ -78,7 +72,6 @@ const loadSchema = Schema(
     goods: [goods],
     charges: [charges],
     deliveredImages: [deliveredImages],
-    // invitationSentToDrivers: [invitationSentToDrivers],
     driverInterests: [driverInterests],
     code: {
       type: String,
@@ -169,6 +162,7 @@ const loadSchema = Schema(
     },
     inviteAcceptedByDriverTime: {
       type: Date,
+      default: null,
       required: false,
     },
     isInviteAcceptedByDriver: {

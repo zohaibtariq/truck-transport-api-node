@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { loadService } = require('../services');
+const { loadService, inviteDriverService} = require('../services');
 const logger = require('../config/logger');
 var _ = require('lodash');
 const downloadResource = require('../utils/download');
@@ -342,7 +342,25 @@ const loadInviteAcceptedByDriver = catchAsync(async (req, res) => {
   res.status(statusCode).send(bodyToUpdate);
 });
 
-const loadDriverInterests = catchAsync(async (req, res) => {
+const loadInviteRejectedByDriver = catchAsync(async (req, res) => {
+  let statusCode = httpStatus.NO_CONTENT
+  let response = {}
+  if(req.driver !== undefined) {
+    const loadId = req.params.loadId
+    const driverId = req.driver.id
+    const inviteDriverDoc = await inviteDriverService.isRejectDriverInviteAllowed(loadId, driverId);
+    const loadDoc = await loadService.isUpdateLoadForDriverRejectInviteAllowed(loadId, driverId);
+    const rejectedInviteDriverDoc = await inviteDriverService.rejectDriverInvite(inviteDriverDoc);
+    const updatedLoadDoc = await loadService.updateLoadForDriverRejectInvite(loadDoc);
+    statusCode = httpStatus.OK
+    response = {
+      message: 'Invite has been rejected against provided load.'
+    }
+  }
+  res.status(statusCode).send(response);
+});
+
+const loadStoreDriverInterests = catchAsync(async (req, res) => {
   let statusCode = httpStatus.NO_CONTENT
   let bodyToUpdate = {};
   let responseBody = {};
@@ -476,6 +494,13 @@ const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
         // })
         filter.lastInvitedDriver = req.driver._id;
         break
+      case loadStatusTypes.TENDER:
+        filter.status = loadStatusTypes.TENDER;
+        options.populate.push({
+          path: 'goods.good',
+          select: onlyGoodsProjectionString,
+        })
+        break
       case loadStatusTypes.ACTIVE: // show assigned loads to driver
         // filter.invitationSentToDriver = true;
         // filter.isInviteAcceptedByDriver = true;
@@ -529,7 +554,7 @@ const getLoadCounts = catchAsync(async (req, res) => {
   const driverId = req.driver._id;
 /*  const pendingLoadCount = await loadService.queryPendingLoadCount({
     "inviteSentToDriverId" : driverId,
-    "driverAction" : inviteActions.DORMANT,
+    "driverAction" : inviteActionTypes.DORMANT,
     "driverActionDateTime" : null
   });
   console.log('pendingLoadCount')
@@ -573,8 +598,7 @@ const getLoadCounts = catchAsync(async (req, res) => {
     if(loadStatusTypes.TENDER === modifiedStatus){ // this conditional is to add tender count in pending
       countsArray[0]['count'] = countsArray[0]['count'] + eachCountStatus.count
     }
-    else
-      countsArray.push(eachCountStatus)
+    countsArray.push(eachCountStatus)
   });
   // countsArray.push(pendingLoadCount);
   res.status(httpStatus.OK).send(countsArray);
@@ -735,12 +759,13 @@ module.exports = {
   exportLoads,
   exportLoad,
   loadInviteAcceptedByDriver,
-  loadDriverInterests,
+  loadStoreDriverInterests,
   getTenderedLoads,
   updateLoadByDriver,
   getLoadCounts,
   getLoadsByStatusForDriver,
   getLoadByDriver,
   uploadLoadDeliveredImages,
-  uploadLoadDeletedImages
+  uploadLoadDeletedImages,
+  loadInviteRejectedByDriver
 };
