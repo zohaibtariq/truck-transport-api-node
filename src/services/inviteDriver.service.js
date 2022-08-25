@@ -37,7 +37,7 @@ const createDriverInvite = async (loadId, driverId, adminId) => {
  * @param {ObjectId} driverId
  * @returns {Promise<InvitedDriver>}
  */
-const isRejectDriverInviteAllowed = async (loadId, driverId) => {
+const isDriverInviteValid = async (loadId, driverId) => {
   const invitedDriverDoc = await InvitedDriver.findOne({
     invitedOnLoadId: loadId,
     inviteSentToDriverId: driverId,
@@ -64,8 +64,41 @@ const rejectDriverInvite = async (invitedDriverDoc) => {
   return invitedDriverDoc.save();
 };
 
+/**
+ * Accept driver invite log
+ * @param {ObjectId} loadId
+ * @param {ObjectId} driverId
+ * @returns {Promise<InvitedDriver>}
+ */
+const acceptDriverInvite = async (invitedDriverDoc) => {
+  Object.assign(invitedDriverDoc, {
+    driverAction: inviteActionTypes.ACCEPTED,
+    driverActionDateTime: new Date(),
+  });
+  return invitedDriverDoc.save();
+};
+
+/**
+ * cancelled load count of a driver
+ * @param {Object} filter - Mongo filter
+ * @returns {Promise<QueryResult>}
+ */
+const cancelledLoadCount = async (match) => {
+  // console.log('cancelledLoadCount');
+  // console.log(match);
+  const cancelledLoads = await InvitedDriver.aggregate([
+    {
+      $match: match,
+    },
+    { $group: { _id: '$driverAction', count: { $sum: 1 } } },
+  ]);
+  return cancelledLoads;
+};
+
 module.exports = {
   createDriverInvite,
   rejectDriverInvite,
-  isRejectDriverInviteAllowed,
+  isDriverInviteValid,
+  cancelledLoadCount,
+  acceptDriverInvite,
 };

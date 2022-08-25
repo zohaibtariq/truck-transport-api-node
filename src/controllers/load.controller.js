@@ -8,7 +8,7 @@ var _ = require('lodash');
 const downloadResource = require('../utils/download');
 const { Load } = require("../models");
 const { loadStatusTypes } = require('../config/loads');
-const { inviteActions } = require('../config/inviteActions');
+const { inviteActions, inviteActionTypes} = require('../config/inviteActions');
 const {
   onlyCountryNameProjectionString,
   onlyStateNameProjectionString,
@@ -318,7 +318,7 @@ const loadInviteAcceptedByDriver = catchAsync(async (req, res) => {
   let statusCode = httpStatus.NO_CONTENT
   let bodyToUpdate = {};
   if(req.driver !== undefined) {
-    let driverId = req.driver.id
+    let driverId = req.driver._id
     // console.log('driverId');
     // console.log(driverId);
     // console.log('loadId');
@@ -337,6 +337,8 @@ const loadInviteAcceptedByDriver = catchAsync(async (req, res) => {
     // console.log('loadInviteAcceptedByDriver');
     // console.log(bodyToUpdate);
     const load = await loadService.updateLoadForDriverInvite(req.params.loadId, bodyToUpdate);
+    const inviteDriverDoc = await inviteDriverService.isDriverInviteValid(req.params.loadId, driverId);
+    await inviteDriverService.acceptDriverInvite(inviteDriverDoc);
     statusCode = httpStatus.OK
   }
   res.status(statusCode).send(bodyToUpdate);
@@ -347,8 +349,8 @@ const loadInviteRejectedByDriver = catchAsync(async (req, res) => {
   let response = {}
   if(req.driver !== undefined) {
     const loadId = req.params.loadId
-    const driverId = req.driver.id
-    const inviteDriverDoc = await inviteDriverService.isRejectDriverInviteAllowed(loadId, driverId);
+    const driverId = req.driver._id
+    const inviteDriverDoc = await inviteDriverService.isDriverInviteValid(loadId, driverId);
     const loadDoc = await loadService.isUpdateLoadForDriverRejectInviteAllowed(loadId, driverId);
     const rejectedInviteDriverDoc = await inviteDriverService.rejectDriverInvite(inviteDriverDoc);
     const updatedLoadDoc = await loadService.updateLoadForDriverRejectInvite(loadDoc);
@@ -365,7 +367,7 @@ const loadStoreDriverInterests = catchAsync(async (req, res) => {
   let bodyToUpdate = {};
   let responseBody = {};
   if(req.driver !== undefined) {
-    let driverId = req.driver.id
+    let driverId = req.driver._id
     // console.log('driverId');
     // console.log(driverId);
     // console.log('loadId');
@@ -540,27 +542,18 @@ const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
         break
     }
   }
-  console.log('OPTIONS')
-  console.log(options)
-  console.log('PROJECT')
-  console.log(project)
-  console.log('FILTER')
-  console.log(filter)
+  // console.log('OPTIONS')
+  // console.log(options)
+  // console.log('PROJECT')
+  // console.log(project)
+  // console.log('FILTER')
+  // console.log(filter)
   const loads = await loadService.queryLoads(filter, options, project);
   res.send(loads);
 });
 
 const getLoadCounts = catchAsync(async (req, res) => {
   const driverId = req.driver._id;
-/*  const pendingLoadCount = await loadService.queryPendingLoadCount({
-    "inviteSentToDriverId" : driverId,
-    "driverAction" : inviteActionTypes.DORMANT,
-    "driverActionDateTime" : null
-  });
-  console.log('pendingLoadCount')
-  console.log(pendingLoadCount)
-  const allInvitedLoadIdsOfDriver = _.map(pendingLoadCount, load => load._id)
-  console.log(allInvitedLoadIdsOfDriver)*/
   // const filter = {inviteAcceptedByDriver: driverId}
   const filter = {}
   Object.assign(filter, {
@@ -570,16 +563,28 @@ const getLoadCounts = catchAsync(async (req, res) => {
       {inviteAcceptedByDriver: driverId},
     ]
   })
-  console.log('filter')
-  console.log(filter)
+  // console.log('filter')
+  // console.log(filter)
   const countsArray = [];
   const loadAcceptedByDriverCount = await loadService.queryLoadCount(filter);
+  const cancelledLoadCountOfDriver = await inviteDriverService.cancelledLoadCount({
+    inviteSentToDriverId: req.driver._id,
+    driverAction: inviteActionTypes.REJECTED,
+  });
+  if(cancelledLoadCountOfDriver.length > 0)
+    cancelledLoadCountOfDriver[0]['_id'] = loadStatusTypes.CANCELLED
+  const allCounts = [...loadAcceptedByDriverCount, ...cancelledLoadCountOfDriver];
+  // console.log('COUNTS');
+  // console.log(loadAcceptedByDriverCount);
+  // console.log(cancelledLoadCountOfDriver);
+  // console.log(allCounts);
   // TODO:: CANCEL count is need to be done
   [
     loadStatusTypes.PENDING,
     loadStatusTypes.TENDER,
     loadStatusTypes.ASSIGNED,
-    loadStatusTypes.COMPLETED
+    loadStatusTypes.COMPLETED,
+    loadStatusTypes.CANCELLED
   ].forEach((status) => {
     let modifiedStatus = status;
     if(status === loadStatusTypes.ASSIGNED)
@@ -588,11 +593,11 @@ const getLoadCounts = catchAsync(async (req, res) => {
       status: modifiedStatus,
       count: 0
     };
-    console.log('loadAcceptedByDriverCount');
-    console.log(loadAcceptedByDriverCount);
-    let matchedResult = _.find(loadAcceptedByDriverCount, function(dbCount) { return dbCount._id === status; });
-    console.log("matchedResult");
-    console.log(matchedResult);
+    // console.log('allCounts');
+    // console.log(allCounts);
+    let matchedResult = _.find(allCounts, function(dbCount) { return dbCount._id === status; });
+    // console.log("matchedResult");
+    // console.log(matchedResult);
     if(matchedResult !== undefined)
       eachCountStatus.count = matchedResult.count
     if(loadStatusTypes.TENDER === modifiedStatus){ // this conditional is to add tender count in pending
@@ -601,6 +606,10 @@ const getLoadCounts = catchAsync(async (req, res) => {
     countsArray.push(eachCountStatus)
   });
   // countsArray.push(pendingLoadCount);
+  // console.log("cancelledLoadCountOfDriver");
+  // console.log(req.driver._id);
+  // console.log(req.driver._id);
+  // console.log(cancelledLoadCountOfDriver);
   res.status(httpStatus.OK).send(countsArray);
 });
 
@@ -618,8 +627,8 @@ const uploadLoadDeliveredImages = catchAsync(async (req, res) => {
   if(remainingUploadedDeliveredFilesLeft === 0){
     throw new ApiError(httpStatus.FORBIDDEN, maxAllowedDeliveredFilesToUpload +  ' Max allowed files already uploaded against this load, please delete any then retry.');
   }
-  console.log("remainingUploadedDeliveredFilesLeft")
-  console.log(remainingUploadedDeliveredFilesLeft)
+  // console.log("remainingUploadedDeliveredFilesLeft")
+  // console.log(remainingUploadedDeliveredFilesLeft)
   const today = new Date();
   const month = today.getMonth()+1;
   const year = today.getFullYear();
@@ -648,16 +657,16 @@ const uploadLoadDeliveredImages = catchAsync(async (req, res) => {
     if (req.files.length <= 0) {
       return res.status(httpStatus.FORBIDDEN).send({message:`You must select at least 1 file.`});
     }
-    console.log('Files')
-    console.log(req.files)
+    // console.log('Files')
+    // console.log(req.files)
     let uploadedFiles = req.files.map((file) => {
       return {image: file.filename, year, month}
     });
     let loadUpdateObj = {
       deliveredImages: [...load.deliveredImages,...uploadedFiles]
     }
-    console.log('Load Obj To Update')
-    console.log(loadUpdateObj)
+    // console.log('Load Obj To Update')
+    // console.log(loadUpdateObj)
     load = await loadService.updateDriverLoadById(req, loadUpdateObj)
     return res.status(httpStatus.OK).send({message: req.files.length + " Files are uploaded", load: load});
   });
@@ -673,9 +682,9 @@ const uploadLoadDeletedImages = catchAsync(async (req, res) => {
   let imgFoundIndex = _.findIndex(load?.deliveredImages, function(eachImage) { return eachImage._id.toString() === req.params.imgId.toString(); });
   load?.deliveredImages.splice(imgFoundIndex, 1);
   // console.log(_.findIndex(load?.deliveredImages, { _id: req.params.imgId}))
-  console.log("imgFoundIndex");
-  console.log(imgFoundIndex);
-  console.log(load?.deliveredImages);
+  // console.log("imgFoundIndex");
+  // console.log(imgFoundIndex);
+  // console.log(load?.deliveredImages);
   if(imgFoundIndex !== -1){
     let loadUpdateObj = {
       deliveredImages: load?.deliveredImages

@@ -227,7 +227,7 @@ const updateLoadForDriverInvite = async (loadId, updateBody) => {
   // console.log(load?.isInviteAcceptedByDriver)
   // console.log(load?.lastInvitedDriver?.id)
   // console.log(updateBody.inviteAcceptedByDriver)
-  if(load?.isInviteAcceptedByDriver === true || updateBody.inviteAcceptedByDriver !== load?.lastInvitedDriver?.id) {
+  if(load?.isInviteAcceptedByDriver === true || updateBody.inviteAcceptedByDriver?.toString() !== load?.lastInvitedDriver?.id?.toString()) {
     throw new ApiError(httpStatus.FORBIDDEN, 'This invite is expired')
   }
   Object.assign(load, updateBody);
@@ -245,7 +245,7 @@ const isUpdateLoadForDriverRejectInviteAllowed = async (loadId, driverId) => {
   if (!load) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Load not found')
   }
-  if(driverId !== load?.lastInvitedDriver?.id) {
+  if(driverId?.toString() !== load?.lastInvitedDriver?.id?.toString()) {
     throw new ApiError(httpStatus.FORBIDDEN, 'Driver is not invited against provided load.')
   }
   return load;
