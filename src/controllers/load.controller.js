@@ -538,7 +538,8 @@ const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
         filter.inviteAcceptedByDriver = req.driver._id;
         break
       case loadStatusTypes.CANCELLED: // cancelled loads // TODO:: need to ask this what we will display here
-        // TODO:: i think we need to look for rejected loads of driver from inviteddrivers and show all loads here
+        // TODO:: i think we need to look for rejected loads of driver from invited drivers and show all loads here
+        // TODO:: yes do as mentioned on above line pass these load ids in filter and show them in app screen it is already disabled
         break
     }
   }
