@@ -434,6 +434,7 @@ const getTenderedLoads = catchAsync(async (req, res) => {
 });
 
 const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
+  const driverId = req.driver._id;
   const filter = {};
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   // driver is not allowed to see customer details and many other fields as well
@@ -468,7 +469,7 @@ const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
     isInviteAcceptedByDriver: 0,
     customer: 0,
     // goods: 0, // bcz goods will be visible on load detail page
-    charges: 0, // TODO:: payment details are required but i need to do calculation on backend and store new keys and share that keys in response
+    // charges: 0, // TODO:: payment details are required but i need to do calculation on backend and store new keys and share that keys in response
     driverInterests: 0, // TODO:: need to make it same as invited driver but after awais approval
     createdAtDateTime: 0,
     updatedAtDateTime: 0,
@@ -494,7 +495,7 @@ const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
         //     {'status': loadStatusTypes.TENDER},
         //   ]
         // })
-        filter.lastInvitedDriver = req.driver._id;
+        filter.lastInvitedDriver = driverId;
         break
       case loadStatusTypes.TENDER:
         filter.status = loadStatusTypes.TENDER;
@@ -509,7 +510,7 @@ const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
         // filter.onTheWayToDelivery = false;
         // filter.deliveredToCustomer = false;
         filter.status = loadStatusTypes.ASSIGNED;
-        filter.inviteAcceptedByDriver = req.driver._id;
+        filter.inviteAcceptedByDriver = driverId;
         delete project['customer'] // on assigned/active load we need to show customer detail // TODO:: show limited details of customer here
         break
       case loadStatusTypes.ENROUTE:
@@ -535,11 +536,20 @@ const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
       case loadStatusTypes.COMPLETED: // load delivered to customer and assigned to driver as well
         filter.deliveredToCustomer = true;
         filter.status = loadStatusTypes.COMPLETED;
-        filter.inviteAcceptedByDriver = req.driver._id;
+        filter.inviteAcceptedByDriver = driverId;
         break
       case loadStatusTypes.CANCELLED: // cancelled loads // TODO:: need to ask this what we will display here
         // TODO:: i think we need to look for rejected loads of driver from invited drivers and show all loads here
         // TODO:: yes do as mentioned on above line pass these load ids in filter and show them in app screen it is already disabled
+        const invitedLoads = await inviteDriverService.getFilteredDriverInvites({
+          inviteSentToDriverId: driverId,
+          driverAction: inviteActionTypes.REJECTED
+        });
+        const invitedLoadIds = _.map(invitedLoads, 'invitedOnLoadId');
+        delete filter.status
+        filter._id = {
+          '$in': invitedLoadIds
+        }
         break
     }
   }

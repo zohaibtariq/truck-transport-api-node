@@ -95,10 +95,25 @@ const cancelledLoadCount = async (match) => {
   return cancelledLoads;
 };
 
+/**
+ * get filtered driver invites
+ * @param {Object} filter - Mongo filter
+ * @returns {Promise<QueryResult>}
+ */
+const getFilteredDriverInvites = async (match) => {
+  const cancelledLoads = await InvitedDriver.aggregate([
+    {
+      $match: match,
+    },
+  ]);
+  return cancelledLoads;
+};
+
 module.exports = {
   createDriverInvite,
   rejectDriverInvite,
   isDriverInviteValid,
   cancelledLoadCount,
   acceptDriverInvite,
+  getFilteredDriverInvites,
 };
