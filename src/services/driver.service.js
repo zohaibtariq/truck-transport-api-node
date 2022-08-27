@@ -125,6 +125,7 @@ const updateDriverImageById = async (driverId, updateBody) => {
     const fileFullPath = path.join(__dirname, '../../uploads/'+driver.image);
     fs.unlink(fileFullPath, (err) => {
       if (err) {
+        console.error('Error in deleting old driver profile image...')
         console.error(err)
         return
       }

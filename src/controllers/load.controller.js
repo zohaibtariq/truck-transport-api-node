@@ -629,17 +629,17 @@ const uploadLoadDeliveredImages = catchAsync(async (req, res) => {
   if (!load) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Load not found.');
   }
-  if(load.inviteAcceptedByDriver === undefined){
+  if(load.inviteAcceptedByDriver === undefined || load.inviteAcceptedByDriver.toString() !== req.driver._id.toString()) {
     throw new ApiError(httpStatus.FORBIDDEN, 'Load is not assigned to that driver.');
   }
+  let maxAllowedFileSize = (1 * 1024 * 1024); // 1 MB
   let maxAllowedDeliveredFilesToUpload = 4;
+  let maxSignFiles = 1;
   let countOfUploadedDeliveredFiles = load.deliveredImages.length;
   let remainingUploadedDeliveredFilesLeft = maxAllowedDeliveredFilesToUpload - countOfUploadedDeliveredFiles;
-  if(remainingUploadedDeliveredFilesLeft === 0){
-    throw new ApiError(httpStatus.FORBIDDEN, maxAllowedDeliveredFilesToUpload +  ' Max allowed files already uploaded against this load, please delete any then retry.');
+  if(remainingUploadedDeliveredFilesLeft === 0 && load?.signatureImage?.image !== null) {
+    throw new ApiError(httpStatus.FORBIDDEN, maxAllowedDeliveredFilesToUpload +  ' Max allowed load delivered images already uploaded against this load, please delete any then retry.');
   }
-  // console.log("remainingUploadedDeliveredFilesLeft")
-  // console.log(remainingUploadedDeliveredFilesLeft)
   const today = new Date();
   const month = today.getMonth()+1;
   const year = today.getFullYear();
@@ -655,33 +655,60 @@ const uploadLoadDeliveredImages = catchAsync(async (req, res) => {
       callback(null, (new Date().getTime() / 1000).toString().replaceAll('.', '') + generateUniqueId(8) + path.extname(file.originalname)); // Appending extension
     },
   });
-  let upload = multer({ storage : storage }).array('images', remainingUploadedDeliveredFilesLeft);
-  // try{
-  upload(req,res, async (err) => {
+  let uploadImages = multer({ storage : storage, limits: { fileSize: maxAllowedFileSize } }).fields([
+    {
+      name: 'images',
+      maxCount: remainingUploadedDeliveredFilesLeft
+    },
+    {
+      name: 'signature',
+      maxCount: maxSignFiles
+    }
+  ]);
+  uploadImages(req,res, async (err) => {
     if(err) {
-      console.log(err)
       if (err.code === "LIMIT_UNEXPECTED_FILE") {
         return res.status(httpStatus.FORBIDDEN).send({message: "Too many files to upload max " + remainingUploadedDeliveredFilesLeft + " allowed."});
       }
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res.status(httpStatus.FORBIDDEN).send({message: "Max allowed file size is " + maxAllowedFileSize + " bytes."});
+      }
       return res.status(httpStatus.FORBIDDEN).send({message:"Error uploading file."});
     }
-    if (req.files.length <= 0) {
+    if (req.files === undefined || req.files.length <= 0) {
       return res.status(httpStatus.FORBIDDEN).send({message:`You must select at least 1 file.`});
     }
-    // console.log('Files')
-    // console.log(req.files)
-    let uploadedFiles = req.files.map((file) => {
-      return {image: file.filename, year, month}
-    });
-    let loadUpdateObj = {
-      deliveredImages: [...load.deliveredImages,...uploadedFiles]
+    let loadUpdateObj = {}
+    let uploadedFilesLength = 0;
+    if(req.files.images){
+      const loadImages = req.files.images
+      let uploadedLoadFiles = loadImages.map((file) => {
+        return {image: file.filename, year, month}
+      });
+      loadUpdateObj['deliveredImages'] = [...load.deliveredImages,...uploadedLoadFiles]
+      uploadedFilesLength += loadImages.length
     }
-    // console.log('Load Obj To Update')
-    // console.log(loadUpdateObj)
+    if(req.files.signature){
+      const signatureImages = req.files.signature
+      let uploadedSignatureFiles = signatureImages.map((file) => {
+        return {image: file.filename, year, month}
+      });
+      loadUpdateObj['signatureImage'] = uploadedSignatureFiles[0]
+      uploadedFilesLength += signatureImages.length
+      if(signatureImages.length > 0 && load?.signatureImage?.image !== null && load?.signatureImage?.image !== ''){
+        const fileFullPath = path.join(__dirname, '../../uploads/loads/'+load.signatureImage.year+'/'+load.signatureImage.month+'/'+load.signatureImage.image);
+        fs.unlink(fileFullPath, (err) => {
+          if (err) {
+            console.error('Error in deleting old load signature image...')
+            console.error(err)
+            return
+          }
+        })
+      }
+    }
     load = await loadService.updateDriverLoadById(req, loadUpdateObj)
-    return res.status(httpStatus.OK).send({message: req.files.length + " Files are uploaded", load: load});
+    return res.status(httpStatus.OK).send({message: uploadedFilesLength + " File"+((uploadedFilesLength > 1)?"s are":" is")+" uploaded", load: load});
   });
-
 });
 
 const uploadLoadDeletedImages = catchAsync(async (req, res) => {
@@ -692,10 +719,6 @@ const uploadLoadDeletedImages = catchAsync(async (req, res) => {
   let imgFound = _.find(load?.deliveredImages, function(eachImage) { return eachImage._id.toString() === req.params.imgId.toString(); });
   let imgFoundIndex = _.findIndex(load?.deliveredImages, function(eachImage) { return eachImage._id.toString() === req.params.imgId.toString(); });
   load?.deliveredImages.splice(imgFoundIndex, 1);
-  // console.log(_.findIndex(load?.deliveredImages, { _id: req.params.imgId}))
-  // console.log("imgFoundIndex");
-  // console.log(imgFoundIndex);
-  // console.log(load?.deliveredImages);
   if(imgFoundIndex !== -1){
     let loadUpdateObj = {
       deliveredImages: load?.deliveredImages
@@ -712,61 +735,6 @@ const uploadLoadDeletedImages = catchAsync(async (req, res) => {
     }
   }
   return res.status(httpStatus.OK).send({message: 'Image deleted successfully'});
-  // req.params.imgId
-  // let maxAllowedDeliveredFilesToUpload = 4;
-  // let countOfUploadedDeliveredFiles = load.deliveredImages.length;
-  // let remainingUploadedDeliveredFilesLeft = maxAllowedDeliveredFilesToUpload - countOfUploadedDeliveredFiles;
-  // if(remainingUploadedDeliveredFilesLeft === 0){
-  //   throw new ApiError(httpStatus.FORBIDDEN, maxAllowedDeliveredFilesToUpload +  ' Max allowed files already uploaded against this load, please delete any then retry.');
-  // }
-  // const today = new Date();
-  // const month = today.getMonth()+1;
-  // const year = today.getFullYear();
-  // const dir = './uploads/loads/' + year + '/' + month; // http://localhost:3000/uploads/loads/2022/8/1660496788307.jpeg
-  // if (!fs.existsSync(dir)){
-  //   fs.mkdirSync(dir, { recursive: true });
-  // }
-  // let storage = multer.diskStorage({
-  //   destination: function (req, file, callback) {
-  //     callback(null, dir);
-  //   },
-  //   filename(req, file, callback) {
-  //     callback(null, Date.now() + path.extname(file.originalname)); // Appending extension
-  //   },
-  // });
-  // let upload = multer({ storage : storage }).array('images',4);
-  // try{
-  //   upload(req,res, async (err) => {
-  //     if(err) {
-  //       console.log(err)
-  //       if (err.code === "LIMIT_UNEXPECTED_FILE") {
-  //         return res.send("Too many files to upload max 4 allowed.");
-  //       }
-  //       return res.end("Error uploading file.");
-  //     }
-  //     if (req.files.length <= 0) {
-  //       return res.send(`You must select at least 1 file.`);
-  //     }
-  //     console.log('Files')
-  //     console.log(req.files)
-  //     let uploadedFiles = req.files.map((file) => {
-  //       return {image: file.filename, year, month}
-  //     });
-  //     let loadUpdateObj = {
-  //       deliveredImages: uploadedFiles
-  //     }
-  //     console.log('Load Obj To Update')
-  //     console.log(loadUpdateObj)
-  //     const load = await loadService.updateDriverLoadById(req, loadUpdateObj);
-  //     return res.send({message: req.files.length + " File is uploaded", load: load});
-  //   });
-  // } catch (error) {
-  //   console.log(error);
-  //   if (error.code === "LIMIT_UNEXPECTED_FILE") {
-  //     return res.send("Too many files to upload.");
-  //   }
-  //   return res.send(`Error when trying upload many files: ${error}`);
-  // }
 });
 
 module.exports = {

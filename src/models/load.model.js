@@ -63,7 +63,10 @@ const deliveredImages = Schema({
   id: {
     type: mongoose.SchemaTypes.ObjectId,
   },
-  image: String,
+  image: {
+    type: String,
+    default: null,
+  },
   year: Number,
   month: Number,
 });
@@ -168,6 +171,14 @@ const loadSchema = Schema(
     isInviteAcceptedByDriver: {
       type: Boolean,
       default: false,
+    },
+    signatureImage: {
+      image: {
+        type: String,
+        default: null,
+      },
+      year: Number,
+      month: Number,
     },
     inviteAcceptedByDriver: {
       // this will map to drivers

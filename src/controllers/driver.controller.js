@@ -121,8 +121,9 @@ const storage = multer.diskStorage({
     ); // Appending extension
   },
 });
-const upload = multer({ storage }).single('file');
+
 const uploadDriverImage = catchAsync(async (req, res) => {
+  const upload = multer({ storage }).single('file');
   // console.log('IN uploadDriver');
   upload(req, res, async (err) => {
     // console.log('UPLOADING SINGLE FILE');
