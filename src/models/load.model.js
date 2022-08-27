@@ -180,6 +180,14 @@ const loadSchema = Schema(
       year: Number,
       month: Number,
     },
+    loadEnroutedDateTime: {
+      type: Date,
+      default: null,
+    },
+    loadDeliveredDateTime: {
+      type: Date,
+      default: null,
+    },
     inviteAcceptedByDriver: {
       // this will map to drivers
       type: mongoose.SchemaTypes.ObjectId,

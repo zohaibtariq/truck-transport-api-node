@@ -195,6 +195,17 @@ const updateDriverLoadById = async (req, updateBody) => {
   // console.log('Body to update')
   // console.log(updateBody)
   // return false;
+  if(req?.driver?._id){ // means getting called from driver app
+    if(updateBody?.onTheWayToDelivery && updateBody?.deliveredToCustomer){
+      throw new ApiError(httpStatus.FORBIDDEN, 'please pass one key in the body at a time');
+    }
+    if(updateBody?.onTheWayToDelivery && updateBody?.onTheWayToDelivery === true){
+      updateBody.loadEnroutedDateTime = new Date();
+    }else if(updateBody?.deliveredToCustomer && updateBody?.deliveredToCustomer === true){
+      updateBody.loadDeliveredDateTime = new Date();
+    }
+  }
+  // console.log(updateBody);
   Object.assign(load, updateBody);
   Object.assign(load, setLoadStatus(load));
   await load.save();
