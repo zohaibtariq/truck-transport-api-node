@@ -88,7 +88,7 @@ const getLoadByDriver = catchAsync(async (req, res) => {
 });
 
 const updateLoad = catchAsync(async (req, res) => {
-  const load = await loadService.updateLoadById(req.params.loadId, req);
+  const load = await loadService.updateLoadById(req.params.loadId, req.body, false, req.user._id);
   res.send(load);
 });
 

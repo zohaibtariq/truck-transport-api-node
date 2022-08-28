@@ -15,6 +15,8 @@ const createDriverInvite = async (loadId, driverId, adminId) => {
     {
       invitedOnLoadId: loadId,
       inviteSentToDriverId: driverId,
+      driverAction: inviteActionTypes.DORMANT,
+      driverActionDateTime: null,
     },
     {
       invitedOnLoadId: loadId,
