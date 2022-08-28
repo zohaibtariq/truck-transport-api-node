@@ -132,19 +132,19 @@ const updateLoadById = async (loadId, req, checkTenderedStatus = false) => {
   //     updateBody.invitationSentToDrivers = load.invitationSentToDrivers
   //   }
   // }
-  if(updateBody.invitationSentToDriverId && updateBody.invitationSentToDriverId.length > 0) {
+  if(updateBody?.invitationSentToDriverId && updateBody?.invitationSentToDriverId.length > 0) {
     if(load.status !== loadStatusTypes.TENDER && load.status !== loadStatusTypes.PENDING)
       throw new ApiError(httpStatus.NOT_FOUND, 'Driver invite can only be sent on loads with status ('+loadStatusTypes.PENDING+', '+loadStatusTypes.TENDER+')');
-    updateBody.lastInvitedDriver = updateBody.invitationSentToDriverId
+    updateBody.lastInvitedDriver = updateBody?.invitationSentToDriverId
     // updateBody.status = loadStatusTypes.INVITED; // TODO:: set load to invited, ASK FROM AWAIS
-    await inviteDriverService.createDriverInvite(loadId, updateBody.invitationSentToDriverId, req.user.id)
+    await inviteDriverService.createDriverInvite(loadId, updateBody?.invitationSentToDriverId, req.user.id)
     delete updateBody.invitationSentToDriverId // bcz we dont want to create this key in db model
   }
-  if(updateBody.driverInterests && updateBody.driverInterests.length > 0) {
-    if(!load.driverInterests.some(each => each.id.toString() === updateBody.driverInterests[0].id)){
-      updateBody.driverInterests = load.driverInterests.concat(updateBody.driverInterests);
+  if(updateBody?.driverInterests && updateBody?.driverInterests.length > 0) {
+    if(!load?.driverInterests.some(each => each.id.toString() === updateBody?.driverInterests[0].id)){
+      updateBody.driverInterests = load?.driverInterests.concat(updateBody?.driverInterests);
     }else{
-      updateBody.driverInterests = load.driverInterests
+      updateBody.driverInterests = load?.driverInterests
     }
   }
   // console.log('FETCHED LOAD BEFORE UPDATE');
