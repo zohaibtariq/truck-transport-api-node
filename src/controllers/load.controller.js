@@ -511,6 +511,15 @@ const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
         // filter.deliveredToCustomer = false;
         filter.status = loadStatusTypes.ASSIGNED;
         filter.inviteAcceptedByDriver = driverId;
+        options.populate.push({
+          path: 'customer',
+          select: onlyProfileAddressLocationProjectionString,
+          populate: [
+            { path: 'location.country', select: onlyCountryNameProjectionString },
+            { path: 'location.state', select: onlyStateNameProjectionString },
+            { path: 'location.city', select: onlyCityNameProjectionString },
+          ]
+        })
         delete project['customer'] // on assigned/active load we need to show customer detail // TODO:: show limited details of customer here
         break
       case loadStatusTypes.ENROUTE:
@@ -578,6 +587,11 @@ const getLoadCounts = catchAsync(async (req, res) => {
   // console.log(filter)
   const countsArray = [];
   const loadAcceptedByDriverCount = await loadService.queryLoadCount(filter);
+  const tenderedLoadCount = await loadService.queryLoadCount({
+    'status': loadStatusTypes.TENDER
+  });
+  // console.log("tenderedLoadCount");
+  // console.log(tenderedLoadCount);
   const cancelledLoadCountOfDriver = await inviteDriverService.cancelledLoadCount({
     inviteSentToDriverId: req.driver._id,
     driverAction: inviteActionTypes.REJECTED,
@@ -613,8 +627,12 @@ const getLoadCounts = catchAsync(async (req, res) => {
       eachCountStatus.count = matchedResult.count
     if(loadStatusTypes.TENDER === modifiedStatus){ // this conditional is to add tender count in pending
       countsArray[0]['count'] = countsArray[0]['count'] + eachCountStatus.count
-    }
-    countsArray.push(eachCountStatus)
+      countsArray.push({
+        status: loadStatusTypes.TENDER,
+        count: tenderedLoadCount[0].count
+      })
+    } else
+      countsArray.push(eachCountStatus)
   });
   // countsArray.push(pendingLoadCount);
   // console.log("cancelledLoadCountOfDriver");
