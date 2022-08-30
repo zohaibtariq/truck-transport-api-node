@@ -1,9 +1,11 @@
 const httpStatus = require('http-status');
 const tokenService = require('./token.service');
 const userService = require('./user.service');
+const driverService = require('./driver.service');
 const Token = require('../models/token.model');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
+const { DriverToken } = require('../models');
 
 /**
  * Login with username and password
@@ -26,6 +28,19 @@ const loginUserWithEmailAndPassword = async (email, password) => {
  */
 const logout = async (refreshToken) => {
   const refreshTokenDoc = await Token.findOne({ token: refreshToken, type: tokenTypes.REFRESH, blacklisted: false });
+  if (!refreshTokenDoc) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Not found');
+  }
+  await refreshTokenDoc.remove();
+};
+
+/**
+ * Logout
+ * @param {string} refreshToken
+ * @returns {Promise}
+ */
+const logoutDriver = async (refreshToken) => {
+  const refreshTokenDoc = await DriverToken.findOne({ token: refreshToken, type: tokenTypes.REFRESH, blacklisted: false });
   if (!refreshTokenDoc) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Not found');
   }
@@ -72,6 +87,58 @@ const resetPassword = async (resetPasswordToken, newPassword) => {
 };
 
 /**
+ * Verify Driver OTP
+ * @param {string} resetPasswordToken
+ * @param {string} newPassword
+ * @returns {Promise}
+ */
+const verifyDriverOtp = async (resetPasswordToken, otp = '') => {
+  try {
+    await tokenService.verifyDriverToken(resetPasswordToken, tokenTypes.OTP, { otp });
+    // Object.assign(verifyOtpDoc, { isOtpVerified: true });
+    // console.log('verifyDriverOtp')
+    // console.log(verifyOtpDoc)
+    // await verifyOtpDoc.save();
+    // return verifyOtpDoc
+    // console.log('resetDriverPassword')
+    // console.log(resetPasswordTokenDoc)
+    // return false;
+    // const driver = await driverService.getDriverById(resetPasswordTokenDoc.driver);
+    // if (!driver) {
+    // throw new Error();
+    // }
+    // await driverService.updateDriverById(driver.id, { password: newPassword });
+    // await DriverToken.deleteMany({ driver: driver.id, type: tokenTypes.OTP });
+  } catch (error) {
+    // console.log(error)
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Driver OTP verification failed');
+  }
+};
+
+/**
+ * Reset password
+ * @param {string} resetPasswordToken
+ * @param {string} newPassword
+ * @returns {Promise}
+ */
+const resetDriverPassword = async (resetPasswordToken, newPassword) => {
+  try {
+    const resetPasswordTokenDoc = await tokenService.verifyDriverToken(resetPasswordToken, tokenTypes.OTP);
+    // console.log('resetDriverPassword')
+    // console.log(resetPasswordTokenDoc)
+    // return false;
+    const driver = await driverService.getDriverById(resetPasswordTokenDoc.driver);
+    if (!driver) {
+      throw new Error();
+    }
+    await driverService.updateDriverById(driver.id, { password: newPassword });
+    await DriverToken.deleteMany({ driver: driver.id, type: tokenTypes.OTP });
+  } catch (error) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Driver Password reset failed');
+  }
+};
+
+/**
  * Verify email
  * @param {string} verifyEmailToken
  * @returns {Promise}
@@ -90,10 +157,48 @@ const verifyEmail = async (verifyEmailToken) => {
   }
 };
 
+/**
+ * Verify driver email
+ * @param {string} verifyEmailToken
+ * @returns {Promise}
+ */
+const verifyDriverEmail = async (verifyEmailToken) => {
+  try {
+    const verifyEmailTokenDoc = await tokenService.verifyDriverToken(verifyEmailToken, tokenTypes.VERIFY_EMAIL);
+    const driver = await driverService.getDriverById(verifyEmailTokenDoc.driver);
+    if (!driver) {
+      throw new Error();
+    }
+    await DriverToken.deleteMany({ driver: driver.id, type: tokenTypes.VERIFY_EMAIL });
+    await driverService.updateDriverById(driver.id, { isEmailVerified: true });
+  } catch (error) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Email verification failed');
+  }
+};
+
+/**
+ * Login driver with email and password
+ * @param {string} email
+ * @param {string} password
+ * @returns {Promise<User>}
+ */
+const loginDriverWithEmailAndPassword = async (email, password) => {
+  const driver = await driverService.getDriverByEmail(email);
+  if (!driver || !(await driver.isPasswordMatch(password))) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Driver: Incorrect email or password');
+  }
+  return driver;
+};
+
 module.exports = {
   loginUserWithEmailAndPassword,
   logout,
   refreshAuth,
   resetPassword,
   verifyEmail,
+  loginDriverWithEmailAndPassword,
+  logoutDriver,
+  resetDriverPassword,
+  verifyDriverEmail,
+  verifyDriverOtp,
 };

@@ -19,40 +19,71 @@ const paginate = (schema) => {
    * @param {number} [options.page] - Current page (default = 1)
    * @returns {Promise<QueryResult>}
    */
-  schema.statics.paginate = async function (filter, options) {
+  schema.statics.paginate = async function (filter, options, project = {}) {
+    // console.log('inside paginate');
+    // console.log(options);
     let sort = '';
     if (options.sortBy) {
+      // console.log('OPTONS SORTBY');
+      // console.log(options.sortBy);
       const sortingCriteria = [];
       options.sortBy.split(',').forEach((sortOption) => {
+        // console.log('each sortOption');
+        // console.log(sortOption);
         const [key, order] = sortOption.split(':');
+        // console.log('each key');
+        // console.log(key);
+        // console.log('each order');
+        // console.log(order);
         sortingCriteria.push((order === 'desc' ? '-' : '') + key);
+        // console.log('each sortingCriteria');
+        // console.log(sortingCriteria);
       });
       sort = sortingCriteria.join(' ');
     } else {
-      sort = 'createdAt';
+      sort = '-createdAt';
     }
-
+    // console.log('sort');
+    // console.log(sort);
     const limit = options.limit && parseInt(options.limit, 10) > 0 ? parseInt(options.limit, 10) : 10;
     const page = options.page && parseInt(options.page, 10) > 0 ? parseInt(options.page, 10) : 1;
     const skip = (page - 1) * limit;
 
     const countPromise = this.countDocuments(filter).exec();
-    let docsPromise = this.find(filter).sort(sort).skip(skip).limit(limit);
-
+    // console.log('CUSTOM FLITER LOG')
+    // console.log({ ...filter })
+    let docsPromise = this.find(filter, project).sort(sort).skip(skip).limit(limit);
+    // if(project !== null)
+    //   docsPromise = docsPromise.project(project)
     if (options.populate) {
-      options.populate.split(',').forEach((populateOption) => {
-        docsPromise = docsPromise.populate(
-          populateOption
-            .split('.')
-            .reverse()
-            .reduce((a, b) => ({ path: b, populate: a }))
-        );
-      });
+      // console.log('OPTIONS populate');
+      // console.log(typeof options.populate);
+      // console.log(options.populate);
+      if (typeof options.populate === 'object') {
+        docsPromise = docsPromise.populate(options.populate);
+      } else {
+        options.populate.split(',').forEach((populateOption) => {
+          // console.log('OPTIONS populate each');
+          // console.log(populateOption);
+          // console.log(populateOption
+          //   .split(':')
+          //   .reverse()
+          //   .reduce((a, b) => ({ path: b, populate: a })))
+          docsPromise = docsPromise.populate(
+            populateOption
+              .split(':')
+              .reverse()
+              .reduce((a, b) => ({ path: b, populate: a }))
+          );
+        });
+      }
     }
 
     docsPromise = docsPromise.exec();
 
     return Promise.all([countPromise, docsPromise]).then((values) => {
+      // console.log('::: VALUES :::')
+      // console.log(values)
       const [totalResults, results] = values;
       const totalPages = Math.ceil(totalResults / limit);
       const result = {
@@ -62,6 +93,8 @@ const paginate = (schema) => {
         totalPages,
         totalResults,
       };
+      // console.log('::: RESULT :::')
+      // console.log({...result})
       return Promise.resolve(result);
     });
   };

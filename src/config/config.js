@@ -61,4 +61,6 @@ module.exports = {
     },
     from: envVars.EMAIL_FROM,
   },
+  apiUrl: envVars.API_URL,
+  adminUrl: envVars.ADMIN_URL,
 };

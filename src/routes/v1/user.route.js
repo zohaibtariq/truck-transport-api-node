@@ -6,16 +6,14 @@ const userController = require('../../controllers/user.controller');
 
 const router = express.Router();
 
-router
-  .route('/')
-  .post(auth('manageUsers'), validate(userValidation.createUser), userController.createUser)
-  .get(auth('getUsers'), validate(userValidation.getUsers), userController.getUsers);
-
-router
-  .route('/:userId')
-  .get(auth('getUsers'), validate(userValidation.getUser), userController.getUser)
-  .patch(auth('manageUsers'), validate(userValidation.updateUser), userController.updateUser)
-  .delete(auth('manageUsers'), validate(userValidation.deleteUser), userController.deleteUser);
+router.post('/unique/email', auth('isEmailsUnique'), userController.isEmailsUnique);
+router.post('/import/users', auth('importUsers'), userController.importUsers);
+router.post('/export/users', auth('exportUsers'), userController.exportUsers);
+router.post('/', validate(userValidation.createUser), userController.createUser);
+router.get('/', auth('getUsers'), userController.getUsers);
+router.get('/:userId', auth('getUser'), validate(userValidation.getUser), userController.getUser);
+router.post('/:userId', auth('updateUser'), validate(userValidation.updateUser), userController.updateUser);
+router.delete('/:userId', auth('deleteUser'), validate(userValidation.deleteUser), userController.deleteUser);
 
 module.exports = router;
 

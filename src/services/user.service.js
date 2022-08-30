@@ -79,6 +79,18 @@ const deleteUserById = async (userId) => {
   return user;
 };
 
+const queryAllUsers = async (filter) => {
+  return User.find(filter).lean();
+};
+
+const insert = async (docs, options, callback) => {
+  return User.collection.insert(docs, options, callback);
+};
+
+const uniqueEmails = async (filter) => {
+  return User.find(filter);
+};
+
 module.exports = {
   createUser,
   queryUsers,
@@ -86,4 +98,7 @@ module.exports = {
   getUserByEmail,
   updateUserById,
   deleteUserById,
+  queryAllUsers,
+  insert,
+  uniqueEmails
 };

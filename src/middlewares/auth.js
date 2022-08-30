@@ -10,7 +10,12 @@ const verifyCallback = (req, resolve, reject, requiredRights) => async (err, use
   req.user = user;
 
   if (requiredRights.length) {
+    // console.log('superadmin permissions');
+    // console.log(roleRights.get('superadmin'));
+    // console.log(user.role);
     const userRights = roleRights.get(user.role);
+    // console.log(userRights);
+    // console.log(requiredRights);
     const hasRequiredRights = requiredRights.every((requiredRight) => userRights.includes(requiredRight));
     if (!hasRequiredRights && req.params.userId !== user.id) {
       return reject(new ApiError(httpStatus.FORBIDDEN, 'Forbidden'));
