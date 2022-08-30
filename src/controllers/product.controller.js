@@ -80,8 +80,8 @@ const getProducts = catchAsync(async (req, res) => {
   // console.log({ ...filter });
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
 
-  logger.debug({ ...filter });
-  logger.debug({ ...options });
+  // logger.debug({ ...filter });
+  // logger.debug({ ...options });
   options.populate = "location.country,location.state,location.city"
   const result = await productService.queryProducts(filter, options);
   res.send(result);

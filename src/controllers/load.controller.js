@@ -51,8 +51,8 @@ const getLoads = catchAsync(async (req, res) => {
     filter = _.omit(filter, ['search']);
   }
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  logger.debug({ ...filter });
-  logger.debug({ ...options });
+  // logger.debug({ ...filter });
+  // logger.debug({ ...options });
   // options.populate = 'customer,origin,destination,driver,goods.good';
   options.populate = 'customer,origin,destination';
   const result = await loadService.queryLoads(filter, options);
@@ -475,6 +475,11 @@ const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
     updatedAtDateTime: 0,
     lastInvitedDriver: 0,
   };
+  const cancelInvitedLoads = await inviteDriverService.getFilteredDriverInvites({
+    inviteSentToDriverId: driverId,
+    driverAction: inviteActionTypes.REJECTED
+  });
+  const cancelInvitedLoadIds = _.map(cancelInvitedLoads, 'invitedOnLoadId');
   filter.status = '' // driver can see only his loads
   if(req.params.status){
     switch (req.params.status) {
@@ -499,6 +504,9 @@ const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
         break
       case loadStatusTypes.TENDER:
         filter.status = loadStatusTypes.TENDER;
+        filter._id = {
+          '$nin': cancelInvitedLoadIds
+        }
         options.populate.push({
           path: 'goods.good',
           select: onlyGoodsProjectionString,
@@ -550,14 +558,14 @@ const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
       case loadStatusTypes.CANCELLED: // cancelled loads // TODO:: need to ask this what we will display here
         // TODO:: i think we need to look for rejected loads of driver from invited drivers and show all loads here
         // TODO:: yes do as mentioned on above line pass these load ids in filter and show them in app screen it is already disabled
-        const invitedLoads = await inviteDriverService.getFilteredDriverInvites({
-          inviteSentToDriverId: driverId,
-          driverAction: inviteActionTypes.REJECTED
-        });
-        const invitedLoadIds = _.map(invitedLoads, 'invitedOnLoadId');
+        // const invitedLoads = await inviteDriverService.getFilteredDriverInvites({ // This code moved to top so it can be used for tender and cancel as well
+        //   inviteSentToDriverId: driverId,
+        //   driverAction: inviteActionTypes.REJECTED
+        // });
+        // const invitedLoadIds = _.map(invitedLoads, 'invitedOnLoadId');
         delete filter.status
         filter._id = {
-          '$in': invitedLoadIds
+          '$in': cancelInvitedLoadIds
         }
         break
     }
@@ -573,13 +581,21 @@ const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
 });
 
 const getLoadCounts = catchAsync(async (req, res) => {
+  let cancelledLoadIds = [];
+  let cancelledLoadCountOfDriver = await inviteDriverService.cancelledLoadCount({
+    inviteSentToDriverId: req.driver._id,
+    driverAction: inviteActionTypes.REJECTED,
+  });
+  cancelledLoadCountOfDriver.forEach((cancelled) => {
+    cancelledLoadIds.push(cancelled._id);
+  });
   const driverId = req.driver._id;
   // const filter = {inviteAcceptedByDriver: driverId}
   const filter = {}
   Object.assign(filter, {
     '$or': [ // admin might invite from pending load status or tender load status // TODO:: we need to restrict from other load states to not able sent invite even if an admin
       {'status': loadStatusTypes.PENDING, lastInvitedDriver: driverId},
-      {'status': loadStatusTypes.TENDER, lastInvitedDriver: driverId},
+      {'status': loadStatusTypes.TENDER, lastInvitedDriver: driverId, _id: {$nin: cancelledLoadIds}},
       {inviteAcceptedByDriver: driverId},
     ]
   })
@@ -588,16 +604,33 @@ const getLoadCounts = catchAsync(async (req, res) => {
   const countsArray = [];
   const loadAcceptedByDriverCount = await loadService.queryLoadCount(filter);
   const tenderedLoadCount = await loadService.queryLoadCount({
+    _id: {$nin: cancelledLoadIds},
     'status': loadStatusTypes.TENDER
   });
   // console.log("tenderedLoadCount");
   // console.log(tenderedLoadCount);
-  const cancelledLoadCountOfDriver = await inviteDriverService.cancelledLoadCount({
-    inviteSentToDriverId: req.driver._id,
-    driverAction: inviteActionTypes.REJECTED,
-  });
-  if(cancelledLoadCountOfDriver.length > 0)
-    cancelledLoadCountOfDriver[0]['_id'] = loadStatusTypes.CANCELLED
+  // let cancelledCount = 0
+  // cancelledLoadCountOfDriver = [...cancelledLoadCountOfDriver];
+  // console.log("req.driver._id")
+  // console.log(req.driver._id)
+  // console.log("cancelledLoadCountOfDriver")
+  // console.log(cancelledLoadCountOfDriver)
+  // console.log(typeof cancelledLoadCountOfDriver)
+  // console.log(cancelledLoadCountOfDriver.length)
+  // if(cancelledLoadCountOfDriver.length > 0){
+    // for (const cancelled of cancelledLoadCountOfDriver) {
+    //   cancelledCount += cancelled.count;
+    // }
+  //   cancelledLoadCountOfDriver.forEach((cancelled) => {
+  //     console.log(cancelled)
+  //     cancelledCount += cancelled.count;
+  //   });
+  //   cancelledLoadCountOfDriver = [{_id: loadStatusTypes.CANCELLED, count: cancelledCount}]
+  // }else{
+  // cancelledLoadCountOfDriver = [{_id: loadStatusTypes.CANCELLED, count: cancelledLoadCountOfDriver.length}]
+  // }
+    // cancelledLoadCountOfDriver[0]['_id'] = loadStatusTypes.CANCELLED
+  cancelledLoadCountOfDriver = [{_id: loadStatusTypes.CANCELLED, count: cancelledLoadCountOfDriver.length}]
   const allCounts = [...loadAcceptedByDriverCount, ...cancelledLoadCountOfDriver];
   // console.log('COUNTS');
   // console.log(loadAcceptedByDriverCount);

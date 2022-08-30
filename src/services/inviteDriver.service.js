@@ -92,7 +92,7 @@ const cancelledLoadCount = async (match) => {
     {
       $match: match,
     },
-    { $group: { _id: '$driverAction', count: { $sum: 1 } } },
+    { $group: { _id: '$invitedOnLoadId', count: { $sum: 1 } } },
   ]);
   return cancelledLoads;
 };

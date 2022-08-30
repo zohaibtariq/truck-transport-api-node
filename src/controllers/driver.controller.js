@@ -38,10 +38,20 @@ const getDrivers = catchAsync(async (req, res) => {
   // console.log('DRIVER REQ FILTER');
   // console.log({ ...filter });
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  logger.debug({ ...filter });
-  logger.debug({ ...options });
+  // logger.debug({ ...filter });
+  // logger.debug({ ...options });
   if (filter.search) {
-    const searchMe = { $regex: new RegExp(filter.search), $options: 'i' };
+    // console.log('DFS');
+    // console.log(filter.search);
+    // console.log(typeof filter.search);
+    const searchMe = { $regex: new RegExp(filter.search.toString()), $options: 'i' };
+    // console.log(searchMe);
+    // const searchMe = { $regex: new RegExp(filter.search.toString(), 'i') };
+    // const searchMe = filter.search;
+    // { name: new RegExp(x, 'i')}}
+    // JSON.stringify({where : {name : { $regex : "example", $options : "i"} } })
+    // const searchMe = { $regex: new RegExp(filter.search, $options: 'i') };
+    // const searchMe = { $regex: new RegExp(filter.search, 'i')};
     // console.log("Search Me")
     // console.log(searchMe)
     Object.assign(filter, {
@@ -51,7 +61,7 @@ const getDrivers = catchAsync(async (req, res) => {
         { last_name: searchMe },
         { address: searchMe },
         { zip: searchMe },
-        { city: searchMe },
+        // { city: searchMe }, // TODO:: neet to work on it so it can filter through city as well
         { phone: searchMe },
         { mobile: searchMe },
         { ssn: searchMe },
