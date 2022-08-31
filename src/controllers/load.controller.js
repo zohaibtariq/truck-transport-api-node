@@ -14,7 +14,7 @@ const {
   onlyStateNameProjectionString,
   onlyCityNameProjectionString,
   onlyProfileAddressLocationProjectionString,
-  onlyGoodsProjectionString,
+  onlyGoodsProjectionString, onlyChargesProjectionString,
 } = require('../config/countryStateCityProjections');
 const multer = require("multer");
 const path = require("path");
@@ -457,6 +457,24 @@ const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
         { path: 'location.city', select: onlyCityNameProjectionString },
       ]
     },
+    ,
+    {
+      path: 'charges.type',
+      select: onlyChargesProjectionString,
+    },
+    {
+      path: 'goods.good',
+      select: onlyGoodsProjectionString,
+    },
+    {
+      path: 'customer',
+      select: onlyProfileAddressLocationProjectionString,
+      populate: [
+        { path: 'location.country', select: onlyCountryNameProjectionString },
+        { path: 'location.state', select: onlyStateNameProjectionString },
+        { path: 'location.city', select: onlyCityNameProjectionString },
+      ]
+    },
   ];
   let project = {
     paidAmount: 0,
@@ -467,7 +485,7 @@ const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
     onTheWayToDelivery: 0,
     deliveredToCustomer: 0,
     isInviteAcceptedByDriver: 0,
-    customer: 0,
+    // customer: 0,
     // goods: 0, // bcz goods will be visible on load detail page
     // charges: 0, // TODO:: payment details are required but i need to do calculation on backend and store new keys and share that keys in response
     driverInterests: 0, // TODO:: need to make it same as invited driver but after awais approval
@@ -507,10 +525,10 @@ const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
         filter._id = {
           '$nin': cancelInvitedLoadIds
         }
-        options.populate.push({
-          path: 'goods.good',
-          select: onlyGoodsProjectionString,
-        })
+        // options.populate.push({
+        //   path: 'goods.good',
+        //   select: onlyGoodsProjectionString,
+        // })
         break
       case loadStatusTypes.ACTIVE: // show assigned loads to driver
         // filter.invitationSentToDriver = true;
@@ -519,36 +537,36 @@ const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
         // filter.deliveredToCustomer = false;
         filter.status = loadStatusTypes.ASSIGNED;
         filter.inviteAcceptedByDriver = driverId;
-        options.populate.push({
-          path: 'customer',
-          select: onlyProfileAddressLocationProjectionString,
-          populate: [
-            { path: 'location.country', select: onlyCountryNameProjectionString },
-            { path: 'location.state', select: onlyStateNameProjectionString },
-            { path: 'location.city', select: onlyCityNameProjectionString },
-          ]
-        })
-        delete project['customer'] // on assigned/active load we need to show customer detail // TODO:: show limited details of customer here
+        // options.populate.push({
+        //   path: 'customer',
+        //   select: onlyProfileAddressLocationProjectionString,
+        //   populate: [
+        //     { path: 'location.country', select: onlyCountryNameProjectionString },
+        //     { path: 'location.state', select: onlyStateNameProjectionString },
+        //     { path: 'location.city', select: onlyCityNameProjectionString },
+        //   ]
+        // })
+        // delete project['customer'] // on assigned/active load we need to show customer detail // TODO:: show limited details of customer here
         break
       case loadStatusTypes.ENROUTE:
         filter.onTheWayToDelivery = true;
         filter.status = loadStatusTypes.ENROUTE;
         filter.inviteAcceptedByDriver = req.driver._id;
-        options.populate.push({
-          path: 'customer',
-          select: onlyProfileAddressLocationProjectionString,
-          populate: [
-            { path: 'location.country', select: onlyCountryNameProjectionString },
-            { path: 'location.state', select: onlyStateNameProjectionString },
-            { path: 'location.city', select: onlyCityNameProjectionString },
-          ]
-        })
-        options.populate.push({
-          path: 'goods.good',
-          select: onlyGoodsProjectionString,
-        })
-        delete project['customer'] // on assigned/active load we need to show customer detail // TODO:: show limited details of customer here
-        delete project['charges'] // TODO:: payment details are required but i need to do calculation on backend and store new keys and share that keys in response
+        // options.populate.push({
+        //   path: 'customer',
+        //   select: onlyProfileAddressLocationProjectionString,
+        //   populate: [
+        //     { path: 'location.country', select: onlyCountryNameProjectionString },
+        //     { path: 'location.state', select: onlyStateNameProjectionString },
+        //     { path: 'location.city', select: onlyCityNameProjectionString },
+        //   ]
+        // })
+        // options.populate.push({
+        //   path: 'goods.good',
+        //   select: onlyGoodsProjectionString,
+        // })
+        // delete project['customer'] // on assigned/active load we need to show customer detail // TODO:: show limited details of customer here
+        // delete project['charges'] // TODO:: payment details are required but i need to do calculation on backend and store new keys and share that keys in response
         break
       case loadStatusTypes.COMPLETED: // load delivered to customer and assigned to driver as well
         filter.deliveredToCustomer = true;
