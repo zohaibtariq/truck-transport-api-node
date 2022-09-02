@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'alliance_api',
+      name: 'AllianceApiStaging',
       script: 'src/index.js',
       instances: 1,
       autorestart: true,
