@@ -1,7 +1,5 @@
 // const SUFFIX = process.argv.indexOf('--env') === -1 ? '' : `-${process.argv[process.argv.indexOf('--env') + 1]}`;
 const SUFFIX = process.argv.indexOf('--env') === -1 ? '' : `${process.argv[process.argv.indexOf('--env') + 1]}`;
-console.log(process.argv);
-console.log(SUFFIX);
 let NODE_ENV = '';
 let APP_NAME = '';
 let PORT = 0;
@@ -33,6 +31,7 @@ if (SUFFIX === 'development') {
   MAX_MEMORY = '512M';
   INSTANCES = 1;
 }
+console.log(`SUFFIX : ${SUFFIX}`);
 console.log(`APP NAME : ${APP_NAME}`);
 console.log(`PORT : ${PORT}`);
 console.log(`CWD : ${CWD}`);
