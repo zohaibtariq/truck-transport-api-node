@@ -7,7 +7,6 @@ package-lock.json
 
 # yarn error logs
 yarn-error.log
-ecosystem.config.js
 # Environment varibales
 .env*
 .env*.example
