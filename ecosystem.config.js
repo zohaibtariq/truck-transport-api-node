@@ -4,7 +4,7 @@ let NODE_ENV = '';
 let APP_NAME = '';
 let PORT = 0;
 let CWD = '';
-let MAX_MEMORY = '1000M';
+let MAX_MEMORY = '2048M';
 let INSTANCES = 1;
 const SCRIPT = 'src/index.js';
 let AUTO_RESTART = true;
@@ -14,21 +14,21 @@ if (SUFFIX === 'development') {
   APP_NAME = 'AllianceApiLocal';
   PORT = 3001;
   CWD = '/home/zohaib/Projects/Awais/Backend';
-  MAX_MEMORY = '1000M';
+  MAX_MEMORY = '2048M';
   INSTANCES = 1;
 } else if (SUFFIX === 'staging') {
   NODE_ENV = 'production';
   APP_NAME = 'AllianceApiStaging';
   PORT = 3001;
   CWD = '/var/www/alliance/staging/api';
-  MAX_MEMORY = '1024M';
+  MAX_MEMORY = '2048M';
   INSTANCES = 1;
 } else if (SUFFIX === 'production') {
   NODE_ENV = 'production';
   APP_NAME = 'AllianceApiProduction';
   PORT = 3000;
   CWD = '/var/www/alliance/production/api';
-  MAX_MEMORY = '1024M';
+  MAX_MEMORY = '2048M';
   INSTANCES = 1;
   AUTO_RESTART = true;
 }
