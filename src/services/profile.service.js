@@ -56,7 +56,7 @@ const getProfileById = async (id) => {
  * @returns {Promise<Profile>}
  */
 const getProfileByEmail = async (email) => {
-  console.log('inside getProfileByEmail');
+  // console.log('inside getProfileByEmail');
   return Profile.findOne({ email });
 };
 
