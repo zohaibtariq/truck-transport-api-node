@@ -3,7 +3,7 @@ const authRoute = require('./auth.route');
 const userRoute = require('./user.route');
 const goodRoute = require('./good.route');
 const chargeRoute = require('./charge.route');
-const productRoute = require('./product.route');
+const profileRoute = require('./profile.route');
 const driverRoute = require('./driver.route');
 const loadRoute = require('./load.route');
 const countryRoute = require('./country.route');
@@ -30,8 +30,8 @@ const defaultRoutes = [
     route: chargeRoute,
   },
   {
-    path: '/products',
-    route: productRoute,
+    path: '/profiles',
+    route: profileRoute,
   },
   {
     path: '/drivers',

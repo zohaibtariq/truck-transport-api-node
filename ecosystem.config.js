@@ -1,4 +1,3 @@
-// const SUFFIX = process.argv.indexOf('--env') === -1 ? '' : `-${process.argv[process.argv.indexOf('--env') + 1]}`;
 const SUFFIX = process.argv.indexOf('--env') === -1 ? '' : `${process.argv[process.argv.indexOf('--env') + 1]}`;
 let NODE_ENV = '';
 let APP_NAME = '';
@@ -8,7 +7,7 @@ let MAX_MEMORY = '2048M';
 let INSTANCES = 1;
 const SCRIPT = 'src/index.js';
 let AUTO_RESTART = true;
-const WATCH = false;
+let WATCH = false;
 if (SUFFIX === 'development') {
   NODE_ENV = 'development';
   APP_NAME = 'AllianceApiLocal';
@@ -16,6 +15,7 @@ if (SUFFIX === 'development') {
   CWD = '/home/zohaib/Projects/Awais/Backend';
   MAX_MEMORY = '2048M';
   INSTANCES = 1;
+  WATCH = true;
 } else if (SUFFIX === 'staging') {
   NODE_ENV = 'production';
   APP_NAME = 'AllianceApiStaging';

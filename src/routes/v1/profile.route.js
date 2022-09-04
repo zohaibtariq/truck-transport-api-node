@@ -1,36 +1,89 @@
 const express = require('express');
 const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
-const productValidation = require('../../validations/product.validation');
-const productController = require('../../controllers/product.controller');
+const profileValidation = require('../../validations/profile.validation');
+const profileController = require('../../controllers/profile.controller');
+const authValidation = require('../../validations/auth.validation');
+const profileAuth = require('../../middlewares/profileAuth');
+const loadController = require('../../controllers/load.controller');
+const loadValidation = require('../../validations/load.validation');
 
 const router = express.Router();
 
-router.post('/import/profiles', auth('importProfiles'), productController.importProfiles);
-router.post('/export/profiles', auth('exportProfiles'), productController.exportProfiles);
-router.post('/export/profile/:profileId', auth('exportProfile'), validate(productValidation.validateProfileIdQueryParam), productController.exportProfile);
-router.get('/', auth('getProducts'), productController.getProducts);
-router.post('/create', auth('createProduct'), validate(productValidation.createProduct), productController.createProduct);
-router.get('/:productId', auth('getProduct'), validate(productValidation.productQueryParam), productController.getProduct);
-router.post('/:productId', auth('updateProduct'), validate(productValidation.createProduct), productController.updateProduct);
-router.delete('/:productId', auth('deleteProduct'), validate(productValidation.productQueryParam), productController.deleteProduct);
+/*
+ CUSTOMER PORTAL API'S
+*/
+router.post('/login', validate(authValidation.login), profileController.login);
+router.post('/logout', validate(authValidation.logout), profileController.logout);
+router.post('/forgot-password', validate(authValidation.forgotPassword), profileController.forgotPassword);
+router.post('/reset-password', validate(authValidation.resetPassword), profileController.resetPassword);
+
+/* TODO:: we are not going to move these APIS but we need to be caefull when we update these methods logics */
+router.get('/loads/', profileAuth('getLoads'), profileController.getLoads);
+router.get('/loads/:loadId', profileAuth('getLoad'), validate(loadValidation.loadQueryParam), profileController.getLoad);
+
+/* These commented apis below has not been tested or integrated so whenever uncommented plz exec complete test flow */
+// router.post('/verify-otp', validate(authValidation.verifyOtp), profileController.verifyOtp);
+// router.post('/send-verification-email', profileAuth(), profileController.sendVerificationEmail);
+// router.post('/verify-email', validate(authValidation.verifyEmail), profileController.verifyEmail);
+// router.get('/profile', profileAuth(), profileController.getOneProfile);
+// router.post(
+//   '/update',
+//   profileAuth(),
+//   validate(profileValidation.updateProfile),
+//   profileController.updateProfileFromCustomerPortal
+// );
+// router.post(
+//   '/change-password',
+//   profileAuth(),
+//   validate(profileValidation.changeProfilePassword),
+//   profileController.changeProfilePassword
+// );
+/* These commented apis above has not been tested or integrated so whenever uncommented plz exec complete test flow */
+
+/*
+ ADMIN PORTAL API'S
+*/
+router.post('/import/profiles', auth('importProfiles'), profileController.importProfiles);
+router.post('/export/profiles', auth('exportProfiles'), profileController.exportProfiles);
+router.post(
+  '/export/profile/:profileId',
+  auth('exportProfile'),
+  validate(profileValidation.validateProfileIdQueryParam),
+  profileController.exportProfile
+);
+router.get('/', auth('getProfiles'), profileController.getProfiles);
+router.post('/create', auth('createProfile'), validate(profileValidation.createProfile), profileController.createProfile);
+router.get('/:profileId', auth('getProfile'), validate(profileValidation.profileQueryParam), profileController.getProfile);
+router.post(
+  '/:profileId',
+  auth('updateProfile'),
+  validate(profileValidation.updateProfile),
+  profileController.updateProfile
+);
+router.delete(
+  '/:profileId',
+  auth('deleteProfile'),
+  validate(profileValidation.profileQueryParam),
+  profileController.deleteProfile
+);
 
 module.exports = router;
 
 /**
  * @swagger
  * tags:
- *   name: Products
- *   description: Product management and retrieval
+ *   name: Profiles
+ *   description: Profile management and retrieval
  */
 
 /**
  * @swagger
- * /products:
+ * /profiles:
  *   post:
- *     summary: Create a product
- *     description: Only admins can create product.
- *     tags: [Products]
+ *     summary: Create a profile
+ *     description: Only admins can create profile.
+ *     tags: [Profiles]
  *     security:
  *       - bearerAuth: []
  *     requestBody:

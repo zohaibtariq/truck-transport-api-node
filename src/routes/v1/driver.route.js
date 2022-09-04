@@ -1,7 +1,7 @@
 const express = require('express');
 const auth = require('../../middlewares/auth');
 const driverAuth = require('../../middlewares/driverAuth');
-const driverOrUser = require('../../middlewares/driverOrUser');
+// const driverOrUser = require('../../middlewares/driverOrUser');
 const validate = require('../../middlewares/validate');
 const driverValidation = require('../../validations/driver.validation');
 const driverController = require('../../controllers/driver.controller');
@@ -21,7 +21,12 @@ router.post('/send-verification-email', driverAuth(), driverController.sendVerif
 router.post('/verify-email', validate(authValidation.verifyEmail), driverController.verifyEmail);
 router.get('/driver', driverAuth(), driverController.getOneDriver);
 router.post('/update', driverAuth(), validate(driverValidation.updateDriver), driverController.updateDriverFromApp);
-router.post('/change-password', driverAuth(), validate(driverValidation.changeDriverPassword), driverController.changeDriverPassword);
+router.post(
+  '/change-password',
+  driverAuth(),
+  validate(driverValidation.changeDriverPassword),
+  driverController.changeDriverPassword
+);
 router.post('/upload', driverAuth(), driverController.uploadDriverImage);
 /*
  APP API'S END
@@ -32,7 +37,12 @@ router.post('/export/drivers', auth('exportDrivers'), driverController.exportDri
 router.get('/', auth('getDrivers'), driverController.getDrivers);
 router.get('/:driverId', auth('getDriver'), driverController.getDriver);
 router.post('/create', auth('createDriver'), validate(driverValidation.createDriver), driverController.createDriver);
-router.delete('/:driverId', auth('deleteDriver'), validate(driverValidation.driverQueryParam), driverController.deleteDriver);
+router.delete(
+  '/:driverId',
+  auth('deleteDriver'),
+  validate(driverValidation.driverQueryParam),
+  driverController.deleteDriver
+);
 router.post('/:driverId', auth('updateDriver'), validate(driverValidation.updateDriver), driverController.updateDriver);
 router.post('/:driverId/upload', auth('uploadDriverImage'), driverController.uploadDriverImage);
 

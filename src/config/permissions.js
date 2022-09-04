@@ -29,15 +29,15 @@ module.exports = [
   'getLoad',
   'updateLoad',
   'deleteLoad',
-  // product
+  // profile
   'importProfiles',
   'exportProfiles',
   'exportProfile',
-  'getProducts',
-  'createProduct',
-  'getProduct',
-  'updateProduct',
-  'deleteProduct',
+  'getProfiles',
+  'createProfile',
+  'getProfile',
+  'updateProfile',
+  'deleteProfile',
   // users
   'isEmailsUnique',
   'importUsers',

@@ -34,6 +34,7 @@ const createLoad = catchAsync(async (req, res) => {
 });
 
 const getLoads = catchAsync(async (req, res) => {
+  // TODO ::: IMPORTANT whenever you do any change in this function please also think to update profile.controller.getLoads
   let filter = pick(req.query, [
     'status',
     'search',
@@ -62,6 +63,7 @@ const getLoads = catchAsync(async (req, res) => {
 });
 
 const getLoad = catchAsync(async (req, res) => {
+  // TODO ::: IMPORTANT whenever you do any change in this function please also think to update profile.controller.getLoad
   // console.log('getLoad moment unix')
   // console.log(moment().unix())
   // console.log(moment.unix('1660777204').format("MM/DD/YYYY"))

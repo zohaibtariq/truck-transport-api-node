@@ -2,19 +2,20 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { productService, codeService, driverService} = require('../services');
-const logger = require('../config/logger');
+const { profileService, codeService, authService, tokenService, emailService, loadService} = require('../services');
+// const logger = require('../config/logger');
 var _ = require('lodash');
 const downloadResource = require('../utils/download');
-const User = require("../../src/models/user.model");
-const {Product} = require("../models");
+// const User = require("../../src/models/user.model");
+const {Profile} = require("../models");
+const {object} = require("joi");
 
-const createProduct = catchAsync(async (req, res) => {
-  // const product = await productService.createProduct(req.body);
-  // res.status(httpStatus.CREATED).send(product);
+const createProfile = catchAsync(async (req, res) => {
+  // const profile = await profileService.createProfile(req.body);
+  // res.status(httpStatus.CREATED).send(profile);
   let newUniqueGeneratedCode = await codeService.createCode('profiles');
   req.body.code = newUniqueGeneratedCode;
-  await productService.createProduct(req.body).then(success => {
+  await profileService.createProfile(req.body).then(success => {
     res.status(httpStatus.CREATED).send(success);
   }).catch(error => {
     if(error?.errors?.code?.properties?.value && error?.errors?.code?.properties?.path)
@@ -24,7 +25,7 @@ const createProduct = catchAsync(async (req, res) => {
   })
 });
 
-const getProducts = catchAsync(async (req, res) => {
+const getProfiles = catchAsync(async (req, res) => {
   // console.log('QUERY FILTER');
   // console.log(req.query);
   // const filter = pick(req.query, ['name', 'role']);
@@ -83,25 +84,25 @@ const getProducts = catchAsync(async (req, res) => {
   // logger.debug({ ...filter });
   // logger.debug({ ...options });
   options.populate = "location.country,location.state,location.city"
-  const result = await productService.queryProducts(filter, options);
+  const result = await profileService.queryProfiles(filter, options);
   res.send(result);
 });
 
-const getProduct = catchAsync(async (req, res) => {
-  const product = await productService.getProductById(req.params.productId);
-  if (!product) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Product not found');
+const getProfile = catchAsync(async (req, res) => {
+  const profile = await profileService.getProfileById(req.params.profileId);
+  if (!profile) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Profile not found');
   }
-  res.send(product);
+  res.send(profile);
 });
 
-const updateProduct = catchAsync(async (req, res) => {
-  const product = await productService.updateProductById(req.params.productId, req.body);
-  res.send(product);
+const updateProfile = catchAsync(async (req, res) => {
+  const profile = await profileService.updateProfileById(req.params.profileId, req.body);
+  res.send(profile);
 });
 
-const deleteProduct = catchAsync(async (req, res) => {
-  await productService.deleteProductById(req.params.productId);
+const deleteProfile = catchAsync(async (req, res) => {
+  await profileService.deleteProfileById(req.params.profileId);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
@@ -109,8 +110,8 @@ const importProfiles = catchAsync(async (req, res) => {
   let profiles = req.body;
   // console.log('PROFILES');
   // console.log(profiles);
-  // let data = await Product.insertMany(profiles.map((profile) => (profiles)));
-  let data = await Product.insertMany(profiles);
+  // let data = await Profile.insertMany(profiles.map((profile) => (profiles)));
+  let data = await Profile.insertMany(profiles);
   res.status(httpStatus.OK).send({count: data.length, results: data});
 });
 
@@ -236,7 +237,7 @@ const exportProfiles = catchAsync(async (req, res) => {
       value: 'location_name'
     },
   ];
-  let data = await productService.queryAllProducts(filter);
+  let data = await profileService.queryAllProfiles(filter);
   data = data.map((d) => {
     let newData = {...d}
     newData['location_id'] = newData['location']['id'];
@@ -289,7 +290,7 @@ const exportProfile = catchAsync(async (req, res) => {
       value: 'email'
     },
   ];
-  const profile = await productService.getProductById(req.params.profileId);
+  const profile = await profileService.getProfileById(req.params.profileId);
   let data = profile.contactPersons;
   // data = data.map((d) => {
   //   let newData = {...d}
@@ -316,13 +317,127 @@ const exportProfile = catchAsync(async (req, res) => {
   return downloadResource(res, fileName, fields, data);
 });
 
+const login = catchAsync(async (req, res) => {
+  const { email, password } = req.body;
+  const profile = await authService.loginProfileWithEmailAndPassword(email, password);
+  const tokens = await tokenService.generateProfileAuthTokens(profile);
+  res.send({ profile, tokens });
+});
+
+const logout = catchAsync(async (req, res) => {
+  await authService.logoutProfile(req.body.refreshToken);
+  res.status(httpStatus.NO_CONTENT).send();
+});
+
+const forgotPassword = catchAsync(async (req, res) => {
+  // const otp = Math.floor(1000 + Math.random() * 9000).toString();
+  // const resetPasswordToken = await tokenService.generateProfileResetPasswordToken(req.body.email, otp);
+  // await emailService.sendProfileResetPasswordEmail(req.body.email, resetPasswordToken, otp);
+  const resetPasswordToken = await tokenService.generateProfileResetPasswordToken(req.body.email);
+  await emailService.sendProfileResetPasswordEmail(req.body.email, resetPasswordToken);
+  res.status(httpStatus.OK).send({ token: resetPasswordToken });
+});
+
+const verifyOtp = catchAsync(async (req, res) => {
+  await authService.verifyProfileOtp(req.query.token, req.body.otp);
+  res.status(httpStatus.NO_CONTENT).send({ token: req.query.token });
+});
+
+const resetPassword = catchAsync(async (req, res) => {
+  console.log('PROFILE resetPassword');
+  await authService.resetProfilePassword(req.query.token, req.body.password);
+  res.status(httpStatus.NO_CONTENT).send();
+});
+
+const sendVerificationEmail = catchAsync(async (req, res) => {
+  const verifyEmailToken = await tokenService.generateProfileVerifyEmailToken(req.profile);
+  await emailService.sendProfileVerificationEmail(req.profile.email, verifyEmailToken);
+  res.status(httpStatus.NO_CONTENT).send();
+});
+
+const verifyEmail = catchAsync(async (req, res) => {
+  await authService.verifyProfileEmail(req.query.token);
+  res.status(httpStatus.NO_CONTENT).send();
+});
+
+const getOneProfile = catchAsync(async (req, res) => {
+  const profile = await profileService.getProfileById(req.profile._id);
+  if (!profile) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Customer not found');
+  }
+  res.send(profile);
+});
+
+// TODO:: need to test below func
+const updateProfileFromCustomerPortal = catchAsync(async (req, res) => {
+  const profileRequestBody = pick(req.body, ['first_name', 'last_name', 'phone', 'gender']); // in case of driver update add allowed keys for update here.
+  // console.log(req.profile._id);
+  const profile = await profileService.updateProfileById(req.profile._id, profileRequestBody);
+  res.send(profile);
+});
+
+const changeProfilePassword = catchAsync(async (req, res) => {
+  const driverRequestBody = pick(req.body, ['old_password', 'password']);
+  const driver = await profileService.updateProfilePasswordById(req.profile._id, driverRequestBody);
+  res.send(driver);
+});
+
+const getLoads = catchAsync(async (req, res) => {
+  // TODO ::: IMPORTANT whenever you do any change in this function please also think to update load.controller.getLoads
+  let filter = pick(req.query, [
+    'status',
+    'search',
+  ]);
+  if(filter['search']){
+    var searchMe = { $regex: new RegExp(filter['search']), $options: 'i'};
+    Object.assign(filter, {
+      '$or': [
+        {'proCode': searchMe},
+        {'poHash': searchMe},
+        {'shipperRef': searchMe},
+        {'bolHash': searchMe},
+        {'code': searchMe},
+      ]})
+    filter = _.omit(filter, ['search']);
+  }
+  const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  Object.assign(filter, {customer: req.profile._id.toString()})
+  options.populate = 'customer,origin,destination';
+  const result = await loadService.queryLoads(filter, options);
+  res.send(result);
+});
+
+const getLoad = catchAsync(async (req, res) => {
+  // TODO ::: IMPORTANT whenever you do any change in this function please also think to update load.controller.getLoad
+  const load = await loadService.getLoadById(req.params.loadId, true);
+  if (!load) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Profile load not found');
+  }
+  if(!(load.customer._id.toString() === req.profile._id.toString())){
+    throw new ApiError(httpStatus.NOT_FOUND, 'Profile load not found');
+  }
+  res.send(load);
+});
+
 module.exports = {
-  createProduct,
-  getProducts,
-  getProduct,
-  updateProduct,
-  deleteProduct,
+  createProfile,
+  getProfiles,
+  getProfile,
+  updateProfile,
+  deleteProfile,
   importProfiles,
   exportProfiles,
-  exportProfile
+  exportProfile,
+  login,
+  logout,
+  forgotPassword,
+  resetPassword,
+  sendVerificationEmail,
+  verifyEmail,
+  updateProfileFromCustomerPortal,
+  changeProfilePassword,
+  getOneProfile,
+  verifyOtp,
+  getLoads,
+  getLoad
 };

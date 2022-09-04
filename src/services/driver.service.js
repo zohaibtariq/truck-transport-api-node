@@ -19,7 +19,7 @@ const createDriver = async (driverBody) => {
   // console.log(driverBody)
   if (await Driver.isEmailTaken(driverBody.email)) {
     // console.log('throw new error')
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+    throw new ApiError(httpStatus.BAD_REQUEST, 'provided driver email already taken');
   }
   // console.log('driver created call')
   return Driver.create(driverBody);
@@ -78,7 +78,7 @@ const updateDriverById = async (driverId, updateBody) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Driver not found');
   }
   if (updateBody.email && (await Driver.isEmailTaken(updateBody.email, driverId))) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Driver email already taken');
   }
   Object.assign(driver, updateBody);
   await driver.save();
