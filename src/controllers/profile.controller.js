@@ -344,7 +344,7 @@ const verifyOtp = catchAsync(async (req, res) => {
 });
 
 const resetPassword = catchAsync(async (req, res) => {
-  console.log('PROFILE resetPassword');
+  // console.log('PROFILE resetPassword');
   await authService.resetProfilePassword(req.query.token, req.body.password);
   res.status(httpStatus.NO_CONTENT).send();
 });
