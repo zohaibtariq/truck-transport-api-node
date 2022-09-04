@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
+const uniqueValidator = require('mongoose-unique-validator');
+const validator = require('validator');
+const bcrypt = require('bcryptjs');
 const { toJSON, paginate } = require('./plugins');
-const uniqueValidator = require("mongoose-unique-validator");
-const Joi = require("joi");
+
 const LocationSchema = mongoose.Schema({
   id: {
     type: String,
@@ -48,17 +50,17 @@ const LocationSchema = mongoose.Schema({
   country: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'Country',
-    required: true
+    required: true,
   },
   state: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'State',
-    required: true
+    required: true,
   },
   city: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'City',
-    required: true
+    required: true,
   },
   phone: {
     type: String,
@@ -112,11 +114,9 @@ const ContactPersonSchema = mongoose.Schema({
   email: String,
 });
 
-const productSchema = mongoose.Schema(
+const profileSchema = mongoose.Schema(
   {
-    contactPersons: [
-      ContactPersonSchema
-    ],
+    contactPersons: [ContactPersonSchema],
     location: LocationSchema,
     code: {
       type: String,
@@ -178,54 +178,99 @@ const productSchema = mongoose.Schema(
       required: false,
       trim: true,
     },
-    email: {
-      type: String,
-      default: '',
-      required: false,
-      trim: true,
-      lowercase: true,
-    },
     officeHours: {
       type: String,
       default: '',
       required: false,
       trim: true,
     },
-    userId:{
+    userId: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'User',
       required: false,
-    }
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
+      default: '',
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error('Invalid email');
+        }
+      },
+    },
+    password: {
+      type: String,
+      required: true,
+      trim: true,
+      default: '',
+      minlength: 8,
+      validate(value) {
+        if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
+          throw new Error('Password must contain at least one letter and one number');
+        }
+      },
+      private: true, // used by the toJSON plugin
+    },
   },
   {
     timestamps: true,
   }
 );
 
-// productSchema.virtual('countryObj', {
+// profileSchema.virtual('countryObj', {
 //   ref: 'Country',
 //   localField: 'location.country',
 //   foreignField: 'isoCode'
 // });
 
-// productSchema.pre('find', function () {
+// profileSchema.pre('find', function () {
 //   this.populate('countryObj');
 // });
 
 // add plugin that converts mongoose to json
-productSchema.plugin(toJSON);
-productSchema.plugin(paginate);
-productSchema.plugin(uniqueValidator);
-productSchema.pre('save', async function (next) {
+profileSchema.plugin(toJSON);
+profileSchema.plugin(paginate);
+profileSchema.plugin(uniqueValidator);
+
+/**
+ * Check if email is taken
+ * @param {string} email - The profile's email
+ * @param {ObjectId} [excludeProfileId] - The id of the profile to be excluded
+ * @returns {Promise<boolean>}
+ */
+profileSchema.statics.isEmailTaken = async function (email, excludeProfileId) {
+  const driver = await this.findOne({ email, _id: { $ne: excludeProfileId } });
+  return !!driver;
+};
+
+/**
+ * Check if password matches the profile's password
+ * @param {string} password
+ * @returns {Promise<boolean>}
+ */
+profileSchema.methods.isPasswordMatch = async function (password) {
+  const profile = this;
+  return bcrypt.compare(password, profile.password);
+};
+
+profileSchema.pre('save', async function (next) {
+  const profile = this;
+  if (profile.isModified('password')) {
+    profile.password = await bcrypt.hash(profile.password, 8);
+  }
   next();
 });
 
-productSchema.set('toObject', { virtuals: true })
-productSchema.set('toJSON', { virtuals: true })
+profileSchema.set('toObject', { virtuals: true });
+profileSchema.set('toJSON', { virtuals: true });
 
 /**
- * @typedef Product
+ * @typedef Profile
  */
-const Product = mongoose.model('Product', productSchema);
+const Profile = mongoose.model('Profile', profileSchema);
 
-module.exports = Product;
+module.exports = Profile;

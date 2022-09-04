@@ -199,19 +199,19 @@ const loadSchema = Schema(
       ref: 'Driver',
     },
     customer: {
-      // this will map to isCustomer key of (profile, type, product)
+      // this will map to isCustomer key of (profile, type, profile)
       type: mongoose.SchemaTypes.ObjectId,
-      ref: 'Product',
+      ref: 'Profile',
     },
     destination: {
-      // this will map to isCustomer key of (profile, type, product)
+      // this will map to isCustomer key of (profile, type, profile)
       type: mongoose.SchemaTypes.ObjectId,
-      ref: 'Product',
+      ref: 'Profile',
     },
     origin: {
-      // this will map to isShipper key of (profile, type, product)
+      // this will map to isShipper key of (profile, type, profile)
       type: mongoose.SchemaTypes.ObjectId,
-      ref: 'Product',
+      ref: 'Profile',
     },
   },
   opts

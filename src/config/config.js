@@ -63,4 +63,5 @@ module.exports = {
   },
   apiUrl: envVars.API_URL,
   adminUrl: envVars.ADMIN_URL,
+  customerUrl: envVars.CUSTOMER_URL,
 };

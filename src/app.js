@@ -6,15 +6,16 @@ const compression = require('compression');
 const cors = require('cors');
 const passport = require('passport');
 const httpStatus = require('http-status');
+const path = require('path');
 const config = require('./config/config');
 const morgan = require('./config/morgan');
 const { jwtStrategy } = require('./config/passport');
 const { jwtDriverStrategy } = require('./config/driverPassport');
+const { jwtProfileStrategy } = require('./config/profilePassport');
 const { authLimiter } = require('./middlewares/rateLimiter');
 const routes = require('./routes/v1');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
-const path = require('path');
 
 const app = express();
 
@@ -23,7 +24,7 @@ if (config.env !== 'test') {
   app.use(morgan.errorHandler);
 }
 
-app.use('/uploads', express.static(path.join(__dirname + "/../uploads")))
+app.use('/uploads', express.static(path.join(`${__dirname}/../uploads`)));
 
 // set security HTTP headers
 app.use(helmet());
@@ -49,6 +50,7 @@ app.options('*', cors());
 app.use(passport.initialize());
 passport.use('jwt', jwtStrategy);
 passport.use('jwtDriver', jwtDriverStrategy);
+passport.use('jwtProfile', jwtProfileStrategy);
 
 // limit repeated failed requests to auth endpoints
 if (config.env === 'production') {
