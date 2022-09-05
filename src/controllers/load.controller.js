@@ -626,8 +626,8 @@ const getLoadCounts = catchAsync(async (req, res) => {
     _id: {$nin: cancelledLoadIds},
     'status': loadStatusTypes.TENDER
   });
-  console.log("tenderedLoadCount");
-  console.log(tenderedLoadCount);
+  // console.log("tenderedLoadCount");
+  // console.log(tenderedLoadCount);
   // let cancelledCount = 0
   // cancelledLoadCountOfDriver = [...cancelledLoadCountOfDriver];
   // console.log("req.driver._id")
@@ -671,17 +671,17 @@ const getLoadCounts = catchAsync(async (req, res) => {
       count: 0
     };
     let matchedResult = _.find(allCounts, function(dbCount) { return dbCount._id === status; });
-    console.log("matchedResult");
-    console.log(matchedResult);
+    // console.log("matchedResult");
+    // console.log(matchedResult);
     if(matchedResult !== undefined)
       eachCountStatus.count = matchedResult.count
     if(loadStatusTypes.TENDER === modifiedStatus){ // this conditional is to add tender count in pending
-      console.log("countsArray");
-      console.log(countsArray);
+      // console.log("countsArray");
+      // console.log(countsArray);
       countsArray[0]['count'] = countsArray[0]['count'] + eachCountStatus.count
       countsArray.push({
         status: loadStatusTypes.TENDER,
-        count: tenderedLoadCount[0].count
+        count: (tenderedLoadCount[0]?.count > 0 ? tenderedLoadCount[0]?.count : 0)
       })
     } else
       countsArray.push(eachCountStatus)
