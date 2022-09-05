@@ -610,7 +610,6 @@ const getLoadCounts = catchAsync(async (req, res) => {
     cancelledLoadIds.push(cancelled._id);
   });
   const driverId = req.driver._id;
-  // const filter = {inviteAcceptedByDriver: driverId}
   const filter = {}
   Object.assign(filter, {
     '$or': [ // admin might invite from pending load status or tender load status // TODO:: we need to restrict from other load states to not able sent invite even if an admin
@@ -671,18 +670,18 @@ const getLoadCounts = catchAsync(async (req, res) => {
       status: modifiedStatus,
       count: 0
     };
-    // console.log('allCounts');
-    // console.log(allCounts);
     let matchedResult = _.find(allCounts, function(dbCount) { return dbCount._id === status; });
     // console.log("matchedResult");
     // console.log(matchedResult);
     if(matchedResult !== undefined)
       eachCountStatus.count = matchedResult.count
     if(loadStatusTypes.TENDER === modifiedStatus){ // this conditional is to add tender count in pending
+      // console.log("countsArray");
+      // console.log(countsArray);
       countsArray[0]['count'] = countsArray[0]['count'] + eachCountStatus.count
       countsArray.push({
         status: loadStatusTypes.TENDER,
-        count: tenderedLoadCount[0].count
+        count: (tenderedLoadCount[0]?.count > 0 ? tenderedLoadCount[0]?.count : 0)
       })
     } else
       countsArray.push(eachCountStatus)
