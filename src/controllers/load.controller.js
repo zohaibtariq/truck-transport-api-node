@@ -626,6 +626,8 @@ const getLoadCounts = catchAsync(async (req, res) => {
     _id: {$nin: cancelledLoadIds},
     'status': loadStatusTypes.TENDER
   });
+  console.log("loadAcceptedByDriverCount");
+  console.log(loadAcceptedByDriverCount);
   // console.log("tenderedLoadCount");
   // console.log(tenderedLoadCount);
   // let cancelledCount = 0
