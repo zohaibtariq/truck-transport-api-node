@@ -6,3 +6,4 @@ module.exports.loadValidation = require('./load.validation');
 module.exports.profileValidation = require('./profile.validation');
 module.exports.driverValidation = require('./driver.validation');
 module.exports.customValidation = require('./custom.validation');
+module.exports.faqValidation = require('./faq.validation');

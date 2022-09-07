@@ -51,4 +51,9 @@ module.exports = [
   'getAllCountries',
   'getAllStates',
   'getAllCities',
+  'getFaqs',
+  'getFaq',
+  'createFaq',
+  'updateFaq',
+  'deleteFaq',
 ];
