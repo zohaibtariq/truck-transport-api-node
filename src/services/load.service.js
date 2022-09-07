@@ -65,7 +65,7 @@ const getLoadById = async (id, isPopulate = false) => {
   $populate = [
     {
       path: 'origin',
-      select: 'location.address1 location.country location.state location.city location.zip location.phone location.fax email',
+      select: 'location.address1 location.name location.country location.state location.city location.zip location.phone location.fax email',
       populate: [
         { path: 'location.country', select: onlyCountryNameProjectionString },
         { path: 'location.state', select: onlyStateNameProjectionString },
@@ -74,7 +74,7 @@ const getLoadById = async (id, isPopulate = false) => {
     },
     {
       path: 'destination',
-      select: 'location.address1 location.country location.state location.city location.zip location.phone location.fax email',
+      select: 'location.address1 location.name location.country location.state location.city location.zip location.phone location.fax email',
       populate: [
         { path: 'location.country', select: onlyCountryNameProjectionString },
         { path: 'location.state', select: onlyStateNameProjectionString },
