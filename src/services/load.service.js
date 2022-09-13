@@ -135,7 +135,7 @@ const updateLoadById = async (loadId, updateBody, checkTenderedStatus = false, u
     if(load.status !== loadStatusTypes.TENDER && load.status !== loadStatusTypes.PENDING)
       throw new ApiError(httpStatus.NOT_FOUND, 'Driver invite can only be sent on loads with status ('+loadStatusTypes.PENDING+', '+loadStatusTypes.TENDER+')');
     updateBody.lastInvitedDriver = updateBody?.invitationSentToDriverId
-    // updateBody.status = loadStatusTypes.INVITED; // TODO:: set load to invited, ASK FROM AWAIS
+    updateBody.status = loadStatusTypes.ASSIGNED; // TODO:: set load to invited, ASK FROM AWAIS
     await inviteDriverService.createDriverInvite(loadId, updateBody?.invitationSentToDriverId, userId)
     delete updateBody.invitationSentToDriverId // bcz we dont want to create this key in db model
   }
@@ -151,7 +151,7 @@ const updateLoadById = async (loadId, updateBody, checkTenderedStatus = false, u
   // console.log(load);
   // console.log('UPDATED BODY WITH LOAD BEFORE UPDATE');
   // console.log(updateBody);
-  Object.assign(load, updateBody);
+  Object.assign(load, {...updateBody, updatedByUser: userId, updatedByUserDateTime: new Date()});
   await load.save();
   return load;
 };
@@ -205,8 +205,7 @@ const updateDriverLoadById = async (req, updateBody) => {
       updateBody.loadDeliveredDateTime = new Date();
     }
   }
-  // console.log(updateBody);
-  Object.assign(load, updateBody);
+  Object.assign(load, {...updateBody, updatedByDriver: req?.driver?._id, updatedByDriverDateTime: new Date()});
   Object.assign(load, setLoadStatus(load));
   await load.save();
   return load;
@@ -273,7 +272,7 @@ const updateLoadForDriverRejectInvite = async (load) => {
     "isInviteAcceptedByDriver": false,
     "invitationSentToDriver": false,
     "driverRatePerMile": 0,
-    // "status": loadStatusTypes.TENDER, // TODO: no need to do this
+    "status": loadStatusTypes.TENDER,
   });
   load.inviteAcceptedByDriver = undefined
   delete load.inviteAcceptedByDriver

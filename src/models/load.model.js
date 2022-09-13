@@ -70,11 +70,23 @@ const deliveredImages = Schema({
   year: Number,
   month: Number,
 });
+const enroutedImages = Schema({
+  id: {
+    type: mongoose.SchemaTypes.ObjectId,
+  },
+  image: {
+    type: String,
+    default: null,
+  },
+  year: Number,
+  month: Number,
+});
 const loadSchema = Schema(
   {
     goods: [goods],
     charges: [charges],
     deliveredImages: [deliveredImages],
+    enroutedImages: [enroutedImages],
     driverInterests: [driverInterests],
     code: {
       type: String,
@@ -192,6 +204,26 @@ const loadSchema = Schema(
       // this will map to drivers
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'Driver',
+    },
+    updatedByDriver: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'Driver',
+    },
+    updatedByDriverDateTime: {
+      type: Date,
+      default: null,
+    },
+    updatedByUser: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'User',
+    },
+    updatedByUserDateTime: {
+      type: Date,
+      default: null,
+    },
+    createdByUser: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'User',
     },
     lastInvitedDriver: {
       // this will map to drivers

@@ -23,7 +23,8 @@ const generateUniqueId = require("../utils/uniqueId");
 const moment = require('moment');
 
 const createLoad = catchAsync(async (req, res) => {
-  await loadService.createLoad(req.body).then(success => {
+  const createLoadBody = {...req.body, createdByUser: req.user._id}
+  await loadService.createLoad(createLoadBody).then(success => {
     res.status(httpStatus.CREATED).send(success);
   }).catch(error => {
     if(error?.errors?.code?.properties?.value && error?.errors?.code?.properties?.path)
@@ -331,7 +332,7 @@ const loadInviteAcceptedByDriver = catchAsync(async (req, res) => {
       // "inviteAcceptedByDriverTime": new ISODate(),
       "inviteAcceptedByDriver": driverId,
       "isInviteAcceptedByDriver": true,
-      "status": "assigned",
+      "status": loadStatusTypes.ACTIVE
       // "driverInterests": [
       //   {"id": driverId}
       // ]
@@ -613,7 +614,8 @@ const getLoadCounts = catchAsync(async (req, res) => {
   const filter = {}
   Object.assign(filter, {
     '$or': [ // admin might invite from pending load status or tender load status // TODO:: we need to restrict from other load states to not able sent invite even if an admin
-      {'status': loadStatusTypes.PENDING, lastInvitedDriver: driverId},
+      {'status': loadStatusTypes.ASSIGNED, lastInvitedDriver: driverId, _id: {$nin: cancelledLoadIds}},
+      {'status': loadStatusTypes.PENDING, lastInvitedDriver: driverId, _id: {$nin: cancelledLoadIds}},
       {'status': loadStatusTypes.TENDER, lastInvitedDriver: driverId, _id: {$nin: cancelledLoadIds}},
       {inviteAcceptedByDriver: driverId},
     ]
@@ -662,12 +664,13 @@ const getLoadCounts = catchAsync(async (req, res) => {
     loadStatusTypes.PENDING,
     loadStatusTypes.TENDER,
     loadStatusTypes.ASSIGNED,
+    loadStatusTypes.ACTIVE,
     loadStatusTypes.COMPLETED,
     loadStatusTypes.CANCELLED
   ].forEach((status) => {
     let modifiedStatus = status;
-    if(status === loadStatusTypes.ASSIGNED)
-      modifiedStatus = loadStatusTypes.ACTIVE
+    // if(status === loadStatusTypes.ASSIGNED)
+    //   modifiedStatus = loadStatusTypes.ACTIVE
     let eachCountStatus = {
       status: modifiedStatus,
       count: 0
@@ -685,6 +688,11 @@ const getLoadCounts = catchAsync(async (req, res) => {
         status: loadStatusTypes.TENDER,
         count: (tenderedLoadCount[0]?.count > 0 ? tenderedLoadCount[0]?.count : 0)
       })
+    } else if(loadStatusTypes.ASSIGNED === modifiedStatus){ // this conditional is to add assigned (invited) count in pending
+      // console.log("countsArray");
+      // console.log(countsArray);
+      countsArray[0]['count'] = countsArray[0]['count'] + eachCountStatus.count
+      // countsArray.push(eachCountStatus)
     } else
       countsArray.push(eachCountStatus)
   });
@@ -704,13 +712,16 @@ const uploadLoadDeliveredImages = catchAsync(async (req, res) => {
   if(load.inviteAcceptedByDriver === undefined || load.inviteAcceptedByDriver.toString() !== req.driver._id.toString()) {
     throw new ApiError(httpStatus.FORBIDDEN, 'Load is not assigned to that driver.');
   }
+  if(load.status !== loadStatusTypes.COMPLETED) {
+    throw new ApiError(httpStatus.FORBIDDEN, `Image upload only allowed over ${loadStatusTypes.COMPLETED} load.`);
+  }
   let maxAllowedFileSize = (1 * 1024 * 1024); // 1 MB
   let maxAllowedDeliveredFilesToUpload = 4;
   let maxSignFiles = 1;
   let countOfUploadedDeliveredFiles = load.deliveredImages.length;
   let remainingUploadedDeliveredFilesLeft = maxAllowedDeliveredFilesToUpload - countOfUploadedDeliveredFiles;
   if(remainingUploadedDeliveredFilesLeft === 0 && load?.signatureImage?.image !== null) {
-    throw new ApiError(httpStatus.FORBIDDEN, maxAllowedDeliveredFilesToUpload +  ' Max allowed load delivered images already uploaded against this load, please delete any then retry.');
+    throw new ApiError(httpStatus.FORBIDDEN, `${maxAllowedDeliveredFilesToUpload} Max allowed load ${loadStatusTypes.COMPLETE} images already uploaded against this load, please delete any then retry.`);
   }
   const today = new Date();
   const month = today.getMonth()+1;
@@ -747,6 +758,8 @@ const uploadLoadDeliveredImages = catchAsync(async (req, res) => {
       }
       return res.status(httpStatus.FORBIDDEN).send({message:"Error uploading file."});
     }
+    console.log("req.files 1")
+    console.log(req.files)
     if (req.files === undefined || req.files.length <= 0) {
       return res.status(httpStatus.FORBIDDEN).send({message:`You must select at least 1 file.`});
     }
@@ -783,7 +796,77 @@ const uploadLoadDeliveredImages = catchAsync(async (req, res) => {
   });
 });
 
-const uploadLoadDeletedImages = catchAsync(async (req, res) => {
+const uploadLoadEnroutedImages = catchAsync(async (req, res) => {
+  let load = await loadService.getLoadById(req.params.loadId);
+  if (!load) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Load not found.');
+  }
+  if(load.inviteAcceptedByDriver === undefined || load.inviteAcceptedByDriver.toString() !== req.driver._id.toString()) {
+    throw new ApiError(httpStatus.FORBIDDEN, 'Load is not assigned to that driver.');
+  }
+  if(load.status !== loadStatusTypes.ENROUTE) {
+    throw new ApiError(httpStatus.FORBIDDEN, `Image upload only allowed over ${loadStatusTypes.ENROUTE} load.`);
+  }
+  let maxAllowedFileSize = (1 * 1024 * 1024); // 1 MB
+  let maxAllowedEnroutedFilesToUpload = 4;
+  let maxSignFiles = 1;
+  let countOfUploadedEnroutedFiles = load.enroutedImages.length;
+  let remainingUploadedEnroutedFilesLeft = maxAllowedEnroutedFilesToUpload - countOfUploadedEnroutedFiles;
+  if(remainingUploadedEnroutedFilesLeft === 0 && load?.signatureImage?.image !== null) {
+    throw new ApiError(httpStatus.FORBIDDEN, `${maxAllowedEnroutedFilesToUpload} Max allowed load ${loadStatusTypes.ENROUTE} images already uploaded against this load, please delete any then retry.`);
+  }
+  const today = new Date();
+  const month = today.getMonth()+1;
+  const year = today.getFullYear();
+  const dir = './uploads/loads/' + year + '/' + month; // http://localhost:3000/uploads/loads/2022/8/1660496788307.jpeg
+  if (!fs.existsSync(dir)){
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  let storage = multer.diskStorage({
+    destination: function (req, file, callback) {
+      callback(null, dir);
+    },
+    filename(req, file, callback) {
+      callback(null, (new Date().getTime() / 1000).toString().replaceAll('.', '') + generateUniqueId(8) + path.extname(file.originalname)); // Appending extension
+    },
+  });
+  let uploadImages = multer({ storage : storage, limits: { fileSize: maxAllowedFileSize } }).fields([
+    {
+      name: 'images',
+      maxCount: remainingUploadedEnroutedFilesLeft
+    }
+  ]);
+  uploadImages(req,res, async (err) => {
+    if(err) {
+      if (err.code === "LIMIT_UNEXPECTED_FILE") {
+        return res.status(httpStatus.FORBIDDEN).send({message: "Too many files to upload max " + remainingUploadedEnroutedFilesLeft + " allowed."});
+      }
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res.status(httpStatus.FORBIDDEN).send({message: "Max allowed file size is " + maxAllowedFileSize + " bytes."});
+      }
+      return res.status(httpStatus.FORBIDDEN).send({message:"Error uploading file."});
+    }
+    console.log("req.files 2")
+    console.log(req.files)
+    if (req.files === undefined || req.files.length <= 0) {
+      return res.status(httpStatus.FORBIDDEN).send({message:`You must select at least 1 file.`});
+    }
+    let loadUpdateObj = {}
+    let uploadedFilesLength = 0;
+    if(req.files.images){
+      const loadImages = req.files.images
+      let uploadedLoadFiles = loadImages.map((file) => {
+        return {image: file.filename, year, month}
+      });
+      loadUpdateObj['enroutedImages'] = [...load.enroutedImages,...uploadedLoadFiles]
+      uploadedFilesLength += loadImages.length
+    }
+    load = await loadService.updateDriverLoadById(req, loadUpdateObj)
+    return res.status(httpStatus.OK).send({message: uploadedFilesLength + " File"+((uploadedFilesLength > 1)?"s are":" is")+" uploaded", load: load});
+  });
+});
+
+const deleteCompletedLoadImages = catchAsync(async (req, res) => {
   const load = await loadService.getLoadById(req.params.loadId);
   if (!load) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Load not found.');
@@ -800,13 +883,39 @@ const uploadLoadDeletedImages = catchAsync(async (req, res) => {
       const fileFullPath = path.join(__dirname, '../../uploads/loads/'+imgFound.year+'/'+imgFound.month+'/'+imgFound.image);
       fs.unlink(fileFullPath, (err) => {
         if (err) {
-          console.error('LOAD DELETE IMG FAILS')
+          console.error(`${loadStatusTypes.COMPLETED} LOAD DELETE IMG FAILS`)
           console.error(err)
         }
       })
     }
   }
-  return res.status(httpStatus.OK).send({message: 'Image deleted successfully'});
+  return res.status(httpStatus.OK).send({message: `Image deleted successfully of ${loadStatusTypes.COMPLETED} load`});
+});
+
+const deleteEnroutedLoadImages = catchAsync(async (req, res) => {
+  const load = await loadService.getLoadById(req.params.loadId);
+  if (!load) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Load not found.');
+  }
+  let imgFound = _.find(load?.enroutedImages, function(eachImage) { return eachImage._id.toString() === req.params.imgId.toString(); });
+  let imgFoundIndex = _.findIndex(load?.enroutedImages, function(eachImage) { return eachImage._id.toString() === req.params.imgId.toString(); });
+  load?.enroutedImages.splice(imgFoundIndex, 1);
+  if(imgFoundIndex !== -1){
+    let loadUpdateObj = {
+      enroutedImages: load?.enroutedImages
+    }
+    await loadService.updateDriverLoadById(req, loadUpdateObj);
+    if(imgFound){
+      const fileFullPath = path.join(__dirname, '../../uploads/loads/'+imgFound.year+'/'+imgFound.month+'/'+imgFound.image);
+      fs.unlink(fileFullPath, (err) => {
+        if (err) {
+          console.error(`${loadStatusTypes.ENROUTE} LOAD DELETE IMG FAILS`)
+          console.error(err)
+        }
+      })
+    }
+  }
+  return res.status(httpStatus.OK).send({message: `Image deleted successfully of ${loadStatusTypes.ENROUTE} load`});
 });
 
 module.exports = {
@@ -826,6 +935,8 @@ module.exports = {
   getLoadsByStatusForDriver,
   getLoadByDriver,
   uploadLoadDeliveredImages,
-  uploadLoadDeletedImages,
-  loadInviteRejectedByDriver
+  uploadLoadEnroutedImages,
+  deleteCompletedLoadImages,
+  loadInviteRejectedByDriver,
+  deleteEnroutedLoadImages
 };

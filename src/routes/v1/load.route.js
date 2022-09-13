@@ -39,8 +39,13 @@ router.post(
   validate(loadValidation.loadQueryParam),
   loadController.loadStoreDriverInterests
 );
-router.post('/:loadId/img-upload', driverAuth(), loadController.uploadLoadDeliveredImages);
-router.post('/:loadId/img-delete/:imgId', driverAuth(), loadController.uploadLoadDeletedImages);
+
+router.post('/upload/enroute/:loadId', driverAuth(), loadController.uploadLoadEnroutedImages);
+router.post('/delete/:loadId/enroute/:imgId', driverAuth(), loadController.deleteEnroutedLoadImages);
+
+router.post('/upload/completed/:loadId', driverAuth(), loadController.uploadLoadDeliveredImages);
+router.post('/delete/:loadId/completed/:imgId', driverAuth(), loadController.deleteCompletedLoadImages);
+
 /*
  APP API'S END
 */

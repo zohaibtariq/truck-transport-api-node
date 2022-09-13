@@ -12,7 +12,7 @@
   },
   "scripts": {
     "startw": "pm2 start ecosystem.config.js --no-daemon --watch --env development",
-    "start": "pm2 start ecosystem.config.js --no-daemon",
+    "start": "pm2 start ecosystem.config.js --no-daemon --env development",
     "dev": "cross-env NODE_ENV=development nodemon src/index.js",
     "test": "jest -i --colors --verbose --detectOpenHandles",
     "test:watch": "jest -i --watchAll",
