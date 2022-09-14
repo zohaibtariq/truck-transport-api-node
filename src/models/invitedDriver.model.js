@@ -44,7 +44,7 @@ const invitedDriverSchema = mongoose.Schema(
 // invitedDriverSchema.plugin(toJSON);
 
 /**
- * @typedef Token
+ * @typedef InvitedDriver
  */
 const InvitedDriver = mongoose.model('InvitedDriver', invitedDriverSchema);
 

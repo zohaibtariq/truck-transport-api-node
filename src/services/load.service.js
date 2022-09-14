@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Load, InvitedDriver} = require('../models');
+const { Load, InvitedDriver, DriverInterest } = require('../models');
 const ApiError = require('../utils/ApiError');
 const _ = require('lodash');
 const {
@@ -9,6 +9,7 @@ const {
 } = require('../config/countryStateCityProjections');
 const inviteDriverService = require('../../src/services/inviteDriver.service');
 const { loadStatusTypes } = require('../config/loads');
+const {inviteActionTypes} = require("../config/inviteActions");
 
 /**
  * Create a load
@@ -164,6 +165,29 @@ const updateLoadById = async (loadId, updateBody, checkTenderedStatus = false, u
  */
 const updateTenderedLoadById = async (loadId, updateBody) => {
   return await updateLoadById(loadId, updateBody, true);
+};
+
+/**
+ * Update tendered load by id
+ * @param {ObjectId} loadId
+ * @param {ObjectId} driverId
+ * @returns {Promise<DriverInterest>}
+ */
+const storeDriverInterestsOnLoad = async (loadId, driverId) => {
+  return DriverInterest.findOneAndUpdate(
+    {
+      interestsOnLoadId: loadId,
+      interestsByDriverId: driverId,
+    },
+    {
+      interestsOnLoadId: loadId,
+      interestsByDriverId: driverId,
+    },
+    {
+      new: true,
+      upsert: true,
+    }
+  );
 };
 
 /**
@@ -352,5 +376,6 @@ module.exports = {
   queryLoadCount,
   queryPendingLoadCount,
   updateLoadForDriverRejectInvite,
-  isUpdateLoadForDriverRejectInviteAllowed
+  isUpdateLoadForDriverRejectInviteAllowed,
+  storeDriverInterestsOnLoad
 };

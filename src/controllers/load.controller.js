@@ -383,7 +383,8 @@ const loadStoreDriverInterests = catchAsync(async (req, res) => {
     responseBody = {...bodyToUpdate}
     // console.log('driverInterests');
     // console.log(bodyToUpdate);
-    const load = await loadService.updateTenderedLoadById(req.params.loadId, bodyToUpdate);
+    await loadService.updateTenderedLoadById(req.params.loadId, bodyToUpdate);
+    await loadService.storeDriverInterestsOnLoad(req.params.loadId, driverId);
     statusCode = httpStatus.OK
   }
   res.status(statusCode).send(responseBody);
