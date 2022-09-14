@@ -191,25 +191,29 @@ const profileSchema = mongoose.Schema(
     },
     email: {
       type: String,
-      required: true,
-      unique: true,
+      required: false,
+      // unique: true,
       trim: true,
       lowercase: true,
       default: '',
       validate(value) {
-        if (!validator.isEmail(value)) {
+        // console.log('value email');
+        // console.log(value);
+        if (value !== '' && value !== null && !validator.isEmail(value)) {
           throw new Error('Invalid email');
         }
       },
     },
     password: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
       default: '',
-      minlength: 8,
+      minlength: 0,
       validate(value) {
-        if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
+        // console.log('value password');
+        // console.log(value);
+        if (value !== '' && value !== null && (!value.match(/\d/) || !value.match(/[a-zA-Z]/))) {
           throw new Error('Password must contain at least one letter and one number');
         }
       },
@@ -243,8 +247,13 @@ profileSchema.plugin(uniqueValidator);
  * @returns {Promise<boolean>}
  */
 profileSchema.statics.isEmailTaken = async function (email, excludeProfileId) {
-  const driver = await this.findOne({ email, _id: { $ne: excludeProfileId } });
-  return !!driver;
+  console.log('isEmailTaken');
+  console.log(email);
+  if (email !== '' && email !== null) {
+    const driver = await this.findOne({ email, _id: { $ne: excludeProfileId } });
+    return !!driver;
+  }
+  return false;
 };
 
 /**
@@ -253,13 +262,17 @@ profileSchema.statics.isEmailTaken = async function (email, excludeProfileId) {
  * @returns {Promise<boolean>}
  */
 profileSchema.methods.isPasswordMatch = async function (password) {
+  console.log('isPasswordMatch');
   const profile = this;
+  console.log(profile.password);
   return bcrypt.compare(password, profile.password);
 };
 
 profileSchema.pre('save', async function (next) {
   const profile = this;
-  if (profile.isModified('password')) {
+  if (profile.password !== '' && profile.password !== null && profile.isModified('password')) {
+    console.log('isModified password');
+    console.log(profile.password);
     profile.password = await bcrypt.hash(profile.password, 8);
   }
   next();

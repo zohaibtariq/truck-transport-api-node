@@ -18,8 +18,16 @@ const createProfile = catchAsync(async (req, res) => {
   await profileService.createProfile(req.body).then(success => {
     res.status(httpStatus.CREATED).send(success);
   }).catch(error => {
+    // console.error(error)
+    // console.error(error)
+    console.error({...error})
+    // console.error(error)
     if(error?.errors?.code?.properties?.value && error?.errors?.code?.properties?.path)
       res.status(httpStatus.UNPROCESSABLE_ENTITY).send({message: `value ${error.errors.code.properties.value} of ${error.errors.code.properties.path} must be unique`});
+    else if(error.statusCode === 400)
+      res.status(httpStatus.UNPROCESSABLE_ENTITY).send({message: `email already taken.`});
+    else if(error?.errors?.password?.properties?.message)
+      res.status(httpStatus.UNPROCESSABLE_ENTITY).send({message: error.errors.password.properties.message});
     else
       res.status(httpStatus.UNPROCESSABLE_ENTITY).send({message: `error in creating profile.`});
   })
@@ -401,7 +409,12 @@ const getLoads = catchAsync(async (req, res) => {
     filter = _.omit(filter, ['search']);
   }
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  Object.assign(filter, {customer: req.profile._id.toString()})
+  // Object.assign(filter, {customer: req.profile._id.toString()})
+  Object.assign(filter, {
+    '$or': [
+      {'customer': req.profile._id.toString()},
+      {'destination': req.profile._id.toString()},
+    ]})
   options.populate = 'customer,origin,destination';
   const result = await loadService.queryLoads(filter, options);
   res.send(result);

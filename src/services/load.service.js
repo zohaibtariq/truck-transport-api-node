@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Load, InvitedDriver} = require('../models');
+const { Load, InvitedDriver, DriverInterest } = require('../models');
 const ApiError = require('../utils/ApiError');
 const _ = require('lodash');
 const {
@@ -9,6 +9,7 @@ const {
 } = require('../config/countryStateCityProjections');
 const inviteDriverService = require('../../src/services/inviteDriver.service');
 const { loadStatusTypes } = require('../config/loads');
+const {inviteActionTypes} = require("../config/inviteActions");
 
 /**
  * Create a load
@@ -65,7 +66,7 @@ const getLoadById = async (id, isPopulate = false) => {
   $populate = [
     {
       path: 'origin',
-      select: 'location.address1 location.country location.state location.city location.zip location.phone location.fax email',
+      select: 'location.address1 location.name location.country location.state location.city location.zip location.phone location.fax email',
       populate: [
         { path: 'location.country', select: onlyCountryNameProjectionString },
         { path: 'location.state', select: onlyStateNameProjectionString },
@@ -74,7 +75,7 @@ const getLoadById = async (id, isPopulate = false) => {
     },
     {
       path: 'destination',
-      select: 'location.address1 location.country location.state location.city location.zip location.phone location.fax email',
+      select: 'location.address1 location.name location.country location.state location.city location.zip location.phone location.fax email',
       populate: [
         { path: 'location.country', select: onlyCountryNameProjectionString },
         { path: 'location.state', select: onlyStateNameProjectionString },
@@ -135,7 +136,7 @@ const updateLoadById = async (loadId, updateBody, checkTenderedStatus = false, u
     if(load.status !== loadStatusTypes.TENDER && load.status !== loadStatusTypes.PENDING)
       throw new ApiError(httpStatus.NOT_FOUND, 'Driver invite can only be sent on loads with status ('+loadStatusTypes.PENDING+', '+loadStatusTypes.TENDER+')');
     updateBody.lastInvitedDriver = updateBody?.invitationSentToDriverId
-    // updateBody.status = loadStatusTypes.INVITED; // TODO:: set load to invited, ASK FROM AWAIS
+    updateBody.status = loadStatusTypes.ASSIGNED; // TODO:: set load to invited, ASK FROM AWAIS
     await inviteDriverService.createDriverInvite(loadId, updateBody?.invitationSentToDriverId, userId)
     delete updateBody.invitationSentToDriverId // bcz we dont want to create this key in db model
   }
@@ -151,7 +152,7 @@ const updateLoadById = async (loadId, updateBody, checkTenderedStatus = false, u
   // console.log(load);
   // console.log('UPDATED BODY WITH LOAD BEFORE UPDATE');
   // console.log(updateBody);
-  Object.assign(load, updateBody);
+  Object.assign(load, {...updateBody, updatedByUser: userId, updatedByUserDateTime: new Date()});
   await load.save();
   return load;
 };
@@ -164,6 +165,29 @@ const updateLoadById = async (loadId, updateBody, checkTenderedStatus = false, u
  */
 const updateTenderedLoadById = async (loadId, updateBody) => {
   return await updateLoadById(loadId, updateBody, true);
+};
+
+/**
+ * Update tendered load by id
+ * @param {ObjectId} loadId
+ * @param {ObjectId} driverId
+ * @returns {Promise<DriverInterest>}
+ */
+const storeDriverInterestsOnLoad = async (loadId, driverId) => {
+  return DriverInterest.findOneAndUpdate(
+    {
+      interestsOnLoadId: loadId,
+      interestsByDriverId: driverId,
+    },
+    {
+      interestsOnLoadId: loadId,
+      interestsByDriverId: driverId,
+    },
+    {
+      new: true,
+      upsert: true,
+    }
+  );
 };
 
 /**
@@ -205,8 +229,7 @@ const updateDriverLoadById = async (req, updateBody) => {
       updateBody.loadDeliveredDateTime = new Date();
     }
   }
-  // console.log(updateBody);
-  Object.assign(load, updateBody);
+  Object.assign(load, {...updateBody, updatedByDriver: req?.driver?._id, updatedByDriverDateTime: new Date()});
   Object.assign(load, setLoadStatus(load));
   await load.save();
   return load;
@@ -273,7 +296,7 @@ const updateLoadForDriverRejectInvite = async (load) => {
     "isInviteAcceptedByDriver": false,
     "invitationSentToDriver": false,
     "driverRatePerMile": 0,
-    // "status": loadStatusTypes.TENDER, // TODO: no need to do this
+    "status": loadStatusTypes.TENDER,
   });
   load.inviteAcceptedByDriver = undefined
   delete load.inviteAcceptedByDriver
@@ -353,5 +376,6 @@ module.exports = {
   queryLoadCount,
   queryPendingLoadCount,
   updateLoadForDriverRejectInvite,
-  isUpdateLoadForDriverRejectInviteAllowed
+  isUpdateLoadForDriverRejectInviteAllowed,
+  storeDriverInterestsOnLoad
 };

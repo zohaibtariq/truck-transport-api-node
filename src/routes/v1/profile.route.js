@@ -53,7 +53,11 @@ router.post(
   profileController.exportProfile
 );
 router.get('/', auth('getProfiles'), profileController.getProfiles);
-router.post('/create', auth('createProfile'), validate(profileValidation.createProfile), profileController.createProfile);
+router.post(
+  '/create',
+  auth('createProfile'),
+  /* validate(profileValidation.createProfile), */ profileController.createProfile
+);
 router.get('/:profileId', auth('getProfile'), validate(profileValidation.profileQueryParam), profileController.getProfile);
 router.post(
   '/:profileId',
