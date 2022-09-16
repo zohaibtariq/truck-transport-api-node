@@ -707,6 +707,9 @@ const getLoadCounts = catchAsync(async (req, res) => {
 });
 
 const uploadLoadDeliveredImages = catchAsync(async (req, res) => {
+  /*
+  * If file upload does not work from post man please unselect files from form data and then reselect file again it will resolve this issue
+  * */
   let load = await loadService.getLoadById(req.params.loadId);
   if (!load) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Load not found.');
@@ -799,6 +802,9 @@ const uploadLoadDeliveredImages = catchAsync(async (req, res) => {
 });
 
 const uploadLoadEnroutedImages = catchAsync(async (req, res) => {
+  /*
+  * If file upload does not work from post man please unselect files from form data and then reselect file again it will resolve this issue
+  * */
   let load = await loadService.getLoadById(req.params.loadId);
   if (!load) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Load not found.');
@@ -811,7 +817,6 @@ const uploadLoadEnroutedImages = catchAsync(async (req, res) => {
   }
   let maxAllowedFileSize = (1 * 1024 * 1024); // 1 MB
   let maxAllowedEnroutedFilesToUpload = 4;
-  let maxSignFiles = 1;
   let countOfUploadedEnroutedFiles = load.enroutedImages.length;
   let remainingUploadedEnroutedFilesLeft = maxAllowedEnroutedFilesToUpload - countOfUploadedEnroutedFiles;
   if(remainingUploadedEnroutedFilesLeft === 0 && load?.signatureImage?.image !== null) {
@@ -848,8 +853,6 @@ const uploadLoadEnroutedImages = catchAsync(async (req, res) => {
       }
       return res.status(httpStatus.FORBIDDEN).send({message:"Error uploading file."});
     }
-    console.log("req.files 2")
-    console.log(req.files)
     if (req.files === undefined || req.files.length <= 0) {
       return res.status(httpStatus.FORBIDDEN).send({message:`You must select at least 1 file.`});
     }
