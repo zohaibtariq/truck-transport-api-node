@@ -514,6 +514,7 @@ const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
           '$in': [ // admin might invite from pending load status or tender load status // TODO:: we need to restrict from other load states to not able sent invite even if an admin
             loadStatusTypes.PENDING,
             loadStatusTypes.TENDER,
+            loadStatusTypes.ASSIGNED,
           ]
         }
         // Object.assign(filter, {
@@ -539,7 +540,7 @@ const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
         // filter.isInviteAcceptedByDriver = true;
         // filter.onTheWayToDelivery = false;
         // filter.deliveredToCustomer = false;
-        filter.status = loadStatusTypes.ASSIGNED;
+        filter.status = loadStatusTypes.ACTIVE;
         filter.inviteAcceptedByDriver = driverId;
         // options.populate.push({
         //   path: 'customer',
