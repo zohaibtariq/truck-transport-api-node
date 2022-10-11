@@ -95,11 +95,11 @@ const updateLoad = catchAsync(async (req, res) => {
   res.send(load);
 });
 
-const updateLoadByDriver = catchAsync(async (req, res) => {
-  const loadBodyForUpdateByDriver = pick(req.body, ['onTheWayToDelivery', 'deliveredToCustomer']); // in case of driver update add allowed keys for update here.
-  const load = await loadService.updateDriverLoadById(req, loadBodyForUpdateByDriver);
-  res.send(load);
-});
+// const updateLoadByDriver = catchAsync(async (req, res) => {
+//   const loadBodyForUpdateByDriver = pick(req.body, ['onTheWayToDelivery', 'deliveredToCustomer']); // in case of driver update add allowed keys for update here.
+//   const load = await loadService.updateDriverLoadById(req, loadBodyForUpdateByDriver);
+//   res.send(load);
+// });
 
 const deleteLoad = catchAsync(async (req, res) => {
   await loadService.deleteLoadById(req.params.loadId);
@@ -768,7 +768,7 @@ const uploadLoadDeliveredImages = catchAsync(async (req, res) => {
     if (req.files === undefined || req.files.length <= 0) {
       return res.status(httpStatus.FORBIDDEN).send({message:`You must select at least 1 file.`});
     }
-    let loadUpdateObj = {}
+    let loadUpdateObj = {deliveredToCustomer: true}
     let uploadedFilesLength = 0;
     if(req.files.images){
       const loadImages = req.files.images
@@ -856,7 +856,7 @@ const uploadLoadEnroutedImages = catchAsync(async (req, res) => {
     if (req.files === undefined || req.files.length <= 0) {
       return res.status(httpStatus.FORBIDDEN).send({message:`You must select at least 1 file.`});
     }
-    let loadUpdateObj = {}
+    let loadUpdateObj = {onTheWayToDelivery: true}
     let uploadedFilesLength = 0;
     if(req.files.images){
       const loadImages = req.files.images
@@ -935,7 +935,7 @@ module.exports = {
   loadInviteAcceptedByDriver,
   loadStoreDriverInterests,
   getTenderedLoads,
-  updateLoadByDriver,
+  // updateLoadByDriver,
   getLoadCounts,
   getLoadsByStatusForDriver,
   getLoadByDriver,
