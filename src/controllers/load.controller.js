@@ -630,8 +630,8 @@ const getLoadCounts = catchAsync(async (req, res) => {
     _id: {$nin: cancelledLoadIds},
     'status': loadStatusTypes.TENDER
   });
-  console.log("loadAcceptedByDriverCount");
-  console.log(loadAcceptedByDriverCount);
+  // console.log("loadAcceptedByDriverCount");
+  // console.log(loadAcceptedByDriverCount);
   // console.log("tenderedLoadCount");
   // console.log(tenderedLoadCount);
   // let cancelledCount = 0
@@ -717,8 +717,8 @@ const uploadLoadDeliveredImages = catchAsync(async (req, res) => {
   if(load.inviteAcceptedByDriver === undefined || load.inviteAcceptedByDriver.toString() !== req.driver._id.toString()) {
     throw new ApiError(httpStatus.FORBIDDEN, 'Load is not assigned to that driver.');
   }
-  if(load.status !== loadStatusTypes.COMPLETED) {
-    throw new ApiError(httpStatus.FORBIDDEN, `Image upload only allowed over ${loadStatusTypes.COMPLETED} load.`);
+  if(load.status !== loadStatusTypes.ENROUTE) {
+    throw new ApiError(httpStatus.FORBIDDEN, `Image upload only allowed over ${loadStatusTypes.ENROUTE} load.`);
   }
   let maxAllowedFileSize = (1 * 1024 * 1024); // 1 MB
   let maxAllowedDeliveredFilesToUpload = 4;
@@ -763,8 +763,8 @@ const uploadLoadDeliveredImages = catchAsync(async (req, res) => {
       }
       return res.status(httpStatus.FORBIDDEN).send({message:"Error uploading file."});
     }
-    console.log("req.files 1")
-    console.log(req.files)
+    // console.log("req.files 1")
+    // console.log(req.files)
     if (req.files === undefined || req.files.length <= 0) {
       return res.status(httpStatus.FORBIDDEN).send({message:`You must select at least 1 file.`});
     }
@@ -812,8 +812,8 @@ const uploadLoadEnroutedImages = catchAsync(async (req, res) => {
   if(load.inviteAcceptedByDriver === undefined || load.inviteAcceptedByDriver.toString() !== req.driver._id.toString()) {
     throw new ApiError(httpStatus.FORBIDDEN, 'Load is not assigned to that driver.');
   }
-  if(load.status !== loadStatusTypes.ENROUTE) {
-    throw new ApiError(httpStatus.FORBIDDEN, `Image upload only allowed over ${loadStatusTypes.ENROUTE} load.`);
+  if(load.status !== loadStatusTypes.ACTIVE) {
+    throw new ApiError(httpStatus.FORBIDDEN, `Image upload only allowed over ${loadStatusTypes.ACTIVE} load.`);
   }
   let maxAllowedFileSize = (1 * 1024 * 1024); // 1 MB
   let maxAllowedEnroutedFilesToUpload = 4;
