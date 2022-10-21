@@ -17,12 +17,14 @@ const {inviteActionTypes} = require("../config/inviteActions");
  * @returns {Promise<Load>}
  */
 const createLoad = async (loadBody) => {
-  const loadCount = await Load.countDocuments();
-  // console.log('LOAD COUNT');
-  // console.log(loadCount);
-  loadBody.code = 40000 + ((parseInt(loadCount) > 0) ? parseInt(loadCount) + 1 : parseInt(loadCount));
-  // console.log('LOAD CODE');
-  // console.log(loadBody.code);
+  const loadMaxCodeRow = await Load.find({}).sort({"code":-1}).limit(1);
+  let loadCount = 40000;
+  if(loadMaxCodeRow.length > 0){
+    const maxCodeObj = loadMaxCodeRow[0]
+    if(maxCodeObj && maxCodeObj?.code)
+      loadCount = parseInt(maxCodeObj?.code)
+  }
+  loadBody.code = parseInt(loadCount) + 1;
    return Load.create(loadBody);
 };
 
