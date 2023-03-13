@@ -247,8 +247,8 @@ profileSchema.plugin(uniqueValidator);
  * @returns {Promise<boolean>}
  */
 profileSchema.statics.isEmailTaken = async function (email, excludeProfileId) {
-  console.log('isEmailTaken');
-  console.log(email);
+  // console.log('isEmailTaken');
+  // console.log(email);
   if (email !== '' && email !== null) {
     const driver = await this.findOne({ email, _id: { $ne: excludeProfileId } });
     return !!driver;
@@ -262,17 +262,17 @@ profileSchema.statics.isEmailTaken = async function (email, excludeProfileId) {
  * @returns {Promise<boolean>}
  */
 profileSchema.methods.isPasswordMatch = async function (password) {
-  console.log('isPasswordMatch');
+  // console.log('isPasswordMatch');
   const profile = this;
-  console.log(profile.password);
+  // console.log(profile.password);
   return bcrypt.compare(password, profile.password);
 };
 
 profileSchema.pre('save', async function (next) {
   const profile = this;
   if (profile.password !== '' && profile.password !== null && profile.isModified('password')) {
-    console.log('isModified password');
-    console.log(profile.password);
+    // console.log('isModified password');
+    // console.log(profile.password);
     profile.password = await bcrypt.hash(profile.password, 8);
   }
   next();

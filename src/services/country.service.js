@@ -107,11 +107,11 @@ const createCountriesStatesAndCities = async () => {
   let CountryPlugin = require('country-state-city').Country;
   const allCountries = CountryPlugin.getAllCountries()
   if(allCountries.length > 0 && countriesCountFromDb === 0) {
-    console.log('countries insertion started');
+    // console.log('countries insertion started');
     await Country.deleteMany();
     await Country.insertMany(allCountries)
       .then(function(mongooseDocuments) {
-        console.log('countries insertion ended');
+        // console.log('countries insertion ended');
         countriesCountInsertions = mongooseDocuments.length;
       })
       .catch(function(err) {
@@ -127,11 +127,11 @@ const createCountriesStatesAndCities = async () => {
   let StatePlugin = require('country-state-city').State;
   const allStates = StatePlugin.getAllStates()
   if(allStates.length > 0 && statesCountFromDb === 0) {
-    console.log('states insertion started');
+    // console.log('states insertion started');
     await State.deleteMany();
     await State.insertMany(allStates)
       .then(function(mongooseDocuments) {
-        console.log('states insertion ended');
+        // console.log('states insertion ended');
         statesCountInsertions = mongooseDocuments.length;
       })
       .catch(function(err) {
@@ -147,11 +147,11 @@ const createCountriesStatesAndCities = async () => {
   let CityPlugin = require('country-state-city').City;
   const allCities = CityPlugin.getAllCities();
   if(allCities.length > 0 && citiesCountFromDb === 0) {
-    console.log('cities insertion started');
+    // console.log('cities insertion started');
     await City.deleteMany();
     await City.insertMany(allCities)
       .then(function(mongooseDocuments) {
-        console.log('cities insertion ended');
+        // console.log('cities insertion ended');
         citiesCountInsertions = mongooseDocuments.length;
       })
       .catch(function(err) {

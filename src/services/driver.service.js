@@ -80,7 +80,11 @@ const updateDriverById = async (driverId, updateBody) => {
   if (updateBody.email && (await Driver.isEmailTaken(updateBody.email, driverId))) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Driver email already taken');
   }
+  // console.log('updateBody');
+  // console.log({ ...updateBody });
   Object.assign(driver, updateBody);
+  // console.log('driver');
+  // console.log({ ...driver });
   await driver.save();
   return driver;
 };

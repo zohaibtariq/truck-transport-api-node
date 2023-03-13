@@ -56,6 +56,13 @@ router.post('/export/load/:loadId', auth('exportLoad'), validate(loadValidation.
 router.get('/', auth('getLoads'), loadController.getLoads);
 router.post('/create', auth('createLoad'), validate(loadValidation.createLoad), loadController.createLoad);
 router.post('/:loadId', auth('updateLoad'), validate(loadValidation.updateLoad), loadController.updateLoad);
+router.post('/:loadId/payment', auth('payment'), validate(loadValidation.payment), loadController.payment);
+router.get(
+  '/:loadId/payment/transactions',
+  auth('paymentTransactions'),
+  validate(loadValidation.paymentTransactions),
+  loadController.paymentTransactions
+);
 router.get('/:loadId', auth('getLoad'), validate(loadValidation.loadQueryParam), loadController.getLoad);
 router.delete('/:loadId', auth('deleteLoad'), validate(loadValidation.loadQueryParam), loadController.deleteLoad);
 

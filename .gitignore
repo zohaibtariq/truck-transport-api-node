@@ -17,3 +17,5 @@ coverage
 .husky
 
 uploads
+
+.DS_Store

@@ -64,4 +64,9 @@ module.exports = {
   apiUrl: envVars.API_URL,
   adminUrl: envVars.ADMIN_URL,
   customerUrl: envVars.CUSTOMER_URL,
+  comDataCustomerId: envVars.COM_DATA_CUSTOMER_ID,
+  comDataPassword: envVars.COM_DATA_PASSWORD,
+  comDataSecurityInfo: envVars.COM_DATA_SECURITY_INFO,
+  comDataSignOnName: envVars.COM_DATA_SIGN_ON_NAME,
+  comDataAccountCode: envVars.COM_DATA_ACCOUNT_CODE,
 };

@@ -7,6 +7,7 @@ module.exports.Driver = require('./driver.model');
 module.exports.Load = require('./load.model');
 module.exports.Good = require('./good.model');
 module.exports.Charge = require('./charge.model');
+module.exports.PaymentLoad = require('./PaymentLoad.model');
 module.exports.Country = require('./country.model');
 module.exports.State = require('./state.model');
 module.exports.City = require('./city.model');

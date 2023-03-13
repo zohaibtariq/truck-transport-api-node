@@ -105,9 +105,23 @@ const updateLoadByDriver = {
   }),
 };
 
+const payment = {
+  body: Joi.object().keys({
+    loadAmount: Joi.number().required(),
+  }),
+};
+
+const paymentTransactions = {
+  params: Joi.object().keys({
+    loadId: Joi.string().custom(objectId),
+  }),
+};
+
 module.exports = {
   createLoad,
   updateLoad,
   loadQueryParam,
   updateLoadByDriver,
+  payment,
+  paymentTransactions,
 };

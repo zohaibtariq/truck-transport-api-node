@@ -29,6 +29,8 @@ module.exports = [
   'getLoad',
   'updateLoad',
   'deleteLoad',
+  'payment',
+  'paymentTransactions',
   // profile
   'importProfiles',
   'exportProfiles',

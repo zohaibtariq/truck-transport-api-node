@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { loadService, inviteDriverService} = require('../services');
+const { loadService, inviteDriverService, driverService } = require('../services');
 const logger = require('../config/logger');
 var _ = require('lodash');
 const downloadResource = require('../utils/download');
@@ -21,6 +21,7 @@ const path = require("path");
 const fs = require('fs');
 const generateUniqueId = require("../utils/uniqueId");
 const moment = require('moment');
+const ComData = require('../utils/comData');
 
 const createLoad = catchAsync(async (req, res) => {
   const createLoadBody = {...req.body, createdByUser: req.user._id}
@@ -93,6 +94,50 @@ const getLoadByDriver = catchAsync(async (req, res) => {
 const updateLoad = catchAsync(async (req, res) => {
   const load = await loadService.updateLoadById(req.params.loadId, req.body, false, req.user._id);
   res.send(load);
+});
+
+const payment = catchAsync(async (req, res) => {
+  let paymentBody = req.body;
+  let paymentResponse = {
+    "responseCode": 422,
+    "responseMessage": `Either load or driver not found.`,
+  };
+  console.log(req.params.loadId);
+  const load = await loadService.getLoadById(req.params.loadId);
+  const driver = await driverService.getDriverById(load.inviteAcceptedByDriver);
+  if(load && driver){
+    paymentResponse = await ComData.loadMoney(paymentBody, load, driver);
+    console.log('payment response from com data call');
+    console.log(paymentResponse);
+    if(typeof paymentResponse === 'object' && paymentResponse.responseCode !== '422') {
+      let beforePaymentLoadPaidAmount = parseFloat(load.paidAmount);
+      let afterPaymentLoadPaidAmount = parseFloat(paymentResponse.paidAmount) + parseFloat(paymentResponse.loadAmount);
+      let pendingTobePaidLoadAmount = parseFloat(paymentResponse.pendingToBePaid) - parseFloat(paymentResponse.loadAmount);
+      // TODO: need to create logs here bcz it can be log in both cases of success and failure as well...
+      const createLoadPayment = { ...paymentResponse, loadId: req.params.loadId, driverId: load.inviteAcceptedByDriver, beforePaymentLoadPaidAmount, afterPaymentLoadPaidAmount, pendingTobePaidLoadAmount};
+      delete createLoadPayment?.pendingToBePaid;
+      delete createLoadPayment?.paidAmount;
+      delete createLoadPayment?.balanceAmount;
+      console.log('createLoadPayment');
+      console.log(createLoadPayment);
+      await loadService.createLoadPaymentLog(createLoadPayment);
+      if(
+        paymentResponse.hasOwnProperty('responseCode') && paymentResponse.responseCode === '0' &&
+        paymentResponse.hasOwnProperty('addSubtractFlag') && paymentResponse.addSubtractFlag === 'A' &&
+        paymentResponse.hasOwnProperty('plusLessFlag') && paymentResponse.plusLessFlag === 'P'
+      ){
+        await loadService.updateLoadInResponseOfComDataPayment(req.params.loadId, {
+          paidAmount: afterPaymentLoadPaidAmount,
+          balanceAmount: pendingTobePaidLoadAmount,
+        });
+      }
+    }
+  }
+  res.send(paymentResponse);
+});
+
+const paymentTransactions = catchAsync(async (req, res) => {
+  res.send(await loadService.getPaymentTransactions(req.params.loadId));
 });
 
 // const updateLoadByDriver = catchAsync(async (req, res) => {
@@ -943,5 +988,7 @@ module.exports = {
   uploadLoadEnroutedImages,
   deleteCompletedLoadImages,
   loadInviteRejectedByDriver,
-  deleteEnroutedLoadImages
+  deleteEnroutedLoadImages,
+  payment,
+  paymentTransactions
 };

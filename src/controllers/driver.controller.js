@@ -6,7 +6,7 @@ const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { driverService, codeService, authService, tokenService, emailService } = require('../services');
-const logger = require('../config/logger');
+// const logger = require('../config/logger');
 const downloadResource = require('../utils/download');
 const { Driver } = require('../models');
 const generateUniqueId = require('../utils/uniqueId');
@@ -14,8 +14,7 @@ const generateUniqueId = require('../utils/uniqueId');
 const createDriver = catchAsync(async (req, res) => {
   // const driver = await driverService.createDriver(req.body);
   // res.status(httpStatus.CREATED).send(driver);
-  const newUniqueGeneratedCode = await codeService.createCode('drivers');
-  req.body.code = newUniqueGeneratedCode;
+  req.body.code = await codeService.createCode('drivers');
   // await driverService.createDriver(req.body).then(success => {
   //   res.status(httpStatus.CREATED).send(success);
   // }).catch(error => {
@@ -61,7 +60,7 @@ const getDrivers = catchAsync(async (req, res) => {
         { last_name: searchMe },
         { address: searchMe },
         { zip: searchMe },
-        // { city: searchMe }, // TODO:: neet to work on it so it can filter through city as well
+        // { city: searchMe }, // TODO:: need to work on it so it can filter through city as well
         { phone: searchMe },
         { mobile: searchMe },
         { ssn: searchMe },
@@ -101,7 +100,7 @@ const updateDriver = catchAsync(async (req, res) => {
 });
 
 const updateDriverFromApp = catchAsync(async (req, res) => {
-  const driverRequestBody = pick(req.body, ['first_name', 'last_name', 'phone', 'gender']); // in case of driver update add allowed keys for update here.
+  const driverRequestBody = pick(req.body, ['first_name', 'last_name', 'phone', 'gender', 'cardNumber']); // in case of driver update add allowed keys for update here.
   // console.log(req.driver._id);
   const driver = await driverService.updateDriverById(req.driver._id, driverRequestBody);
   res.send(driver);
