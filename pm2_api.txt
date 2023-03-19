@@ -1,0 +1,31 @@
+pm2 status
+pm2 start ecosystem.config.js
+pm2 restart ecosystem.config.js
+pm2 reload ecosystem.config.js
+pm2 stop ecosystem.config.js
+ps aux | grep PM2
+kill -9 204544
+
+sudo nano build.sh
+sudo chmod +x ./build.sh
+
+cd /var/www/alliance/production/api
+git checkout master
+git pull
+pm2 reload AllianceApiProduction --env production --update-env
+
+cd /var/www/alliance/staging/api
+git checkout development
+git pull
+pm2 reload AllianceApiStaging --env staging --update-env
+
+
+
+EXTRA
+-----
+https://devhints.io/pm2
+https://pm2.io/docs/runtime/guide/installation/
+https://pm2.keymetrics.io/docs/usage/quick-start/
+https://programmer.group/61a05b4430e7f.html
+
+git commit -m "pm2 start ecosystem.config.js --env production | pm2 start ecosystem.config.js --env staging | pm2 start ecosystem.config.js --env development"

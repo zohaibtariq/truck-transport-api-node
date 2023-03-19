@@ -1,0 +1,28 @@
+mongosh admin -u mongoDbUserWithRoleOFuserAdminAnyDatabase -p 'Anc3vOnmongoDbUserWithRoleOfuserAdminAnyDatabase3mAngAvx'
+use qasaresheerenLocal
+db.dropUser("qasaresheerenLocalUser", {w: "majority", wtimeout: 4000})
+db.createUser({user:"qasaresheerenLocalUser",pwd:passwordPrompt(),roles:[{role:"readWrite",db:"qasaresheerenLocal"}]})
+qasaresheerenLocalUserPass
+
+Connection String
+mongodb://qasaresheerenLocalUser:qasaresheerenLocalUserPass@localhost:27017/qasaresheerenLocal
+
+To Replicate For QSR Local
+
+sudo nano /etc/mongod.conf
+comment security with hash 
+then
+sudo systemctl restart mongod
+sudo systemctl status mongod
+
+again do
+sudo nano /etc/mongod.conf
+
+uncomment 
+replication:
+  replSetName: "rs0"
+
+mongosh
+rs.initiate()
+
+it works!
