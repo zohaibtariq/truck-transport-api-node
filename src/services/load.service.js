@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Load, InvitedDriver, DriverInterest } = require('../models');
+const { Load, InvitedDriver, DriverInterest, PaymentLoad } = require('../models');
 const ApiError = require('../utils/ApiError');
 const _ = require('lodash');
 const {
@@ -10,6 +10,7 @@ const {
 const inviteDriverService = require('../../src/services/inviteDriver.service');
 const { loadStatusTypes } = require('../config/loads');
 const {inviteActionTypes} = require("../config/inviteActions");
+const mongoose = require("mongoose");
 
 /**
  * Create a load
@@ -17,12 +18,14 @@ const {inviteActionTypes} = require("../config/inviteActions");
  * @returns {Promise<Load>}
  */
 const createLoad = async (loadBody) => {
-  const loadCount = await Load.countDocuments();
-  // console.log('LOAD COUNT');
-  // console.log(loadCount);
-  loadBody.code = 40000 + ((parseInt(loadCount) > 0) ? parseInt(loadCount) + 1 : parseInt(loadCount));
-  // console.log('LOAD CODE');
-  // console.log(loadBody.code);
+  const loadMaxCodeRow = await Load.find({}).sort({"code":-1}).limit(1);
+  let loadCount = 40000;
+  if(loadMaxCodeRow.length > 0){
+    const maxCodeObj = loadMaxCodeRow[0]
+    if(maxCodeObj && maxCodeObj?.code)
+      loadCount = parseInt(maxCodeObj?.code)
+  }
+  loadBody.code = parseInt(loadCount) + 1;
    return Load.create(loadBody);
 };
 
@@ -138,7 +141,7 @@ const updateLoadById = async (loadId, updateBody, checkTenderedStatus = false, u
     updateBody.lastInvitedDriver = updateBody?.invitationSentToDriverId
     updateBody.status = loadStatusTypes.ASSIGNED; // TODO:: set load to invited, ASK FROM AWAIS
     await inviteDriverService.createDriverInvite(loadId, updateBody?.invitationSentToDriverId, userId)
-    delete updateBody.invitationSentToDriverId // bcz we dont want to create this key in db model
+    delete updateBody.invitationSentToDriverId // bcz we don't want to create this key in db model
   }
   if(updateBody?.driverInterests && updateBody?.driverInterests.length > 0) {
     const driverInterestFound = load?.driverInterests.some(eachInterest => eachInterest.id._id.toString() === updateBody?.driverInterests[0].id.toString());
@@ -336,6 +339,41 @@ const queryPendingLoadCount = async (match) => {
   return loads;
 };
 
+/**
+ * Update Load In Response Of Com Data Payment
+ * @param loadId
+ * @param updateBody
+ * @returns {Promise<Query<T extends Document ? T : (T & Document<any, any, T> & TMethods), T extends Document ? T : (T & Document<any, any, T> & TMethods), TQueryHelpers, T> & TQueryHelpers>}
+ */
+const updateLoadInResponseOfComDataPayment = async (loadId, updateBody) => {
+  return Load.findOneAndUpdate(
+    {
+      _id: loadId,
+    },
+    updateBody,
+    {
+      new: false,
+      upsert: false,
+    }
+  );
+  // const load = await getLoadById(loadId)
+  // Object.assign(load, {
+  //   "inviteAcceptedByDriverTime": null,
+  //   "isInviteAcceptedByDriver": false,
+  //   "invitationSentToDriver": false,
+  //   "driverRatePerMile": 0,
+  //   "status": loadStatusTypes.TENDER,
+  // });
+  // load.inviteAcceptedByDriver = undefined
+  // delete load.inviteAcceptedByDriver
+  // load.lastInvitedDriver = undefined
+  // delete load.lastInvitedDriver
+  // console.log('FINAL LOAD BEFORE SAVE IS 4')
+  // console.log(load)
+  // await load.save();
+  // return load;
+};
+
 /*const queryPendingLoadCount = async (match) => {
   console.log('queryPendingLoadCount')
   console.log(match)
@@ -363,6 +401,26 @@ const queryPendingLoadCount = async (match) => {
   });
 };*/
 
+const createLoadPaymentLog = async (loadPaymentLogBody) => {
+  return PaymentLoad.create(loadPaymentLogBody);
+};
+
+const getPaymentTransactions = async (loadId = ''/*, driverId = ''*/) => {
+  const match = {};
+  if(loadId !== '')
+    match.loadId = mongoose.Types.ObjectId(loadId);
+  // if(driverId !== '')
+  //   match.driverId = mongoose.Types.ObjectId(driverId);
+  console.log('match');
+  console.log(match);
+  if(Object.keys(match).length > 0){
+    return PaymentLoad.aggregate([
+      { "$match": match }
+    ]);
+  }
+  return [];
+};
+
 module.exports = {
   createLoad,
   queryLoads,
@@ -377,5 +435,8 @@ module.exports = {
   queryPendingLoadCount,
   updateLoadForDriverRejectInvite,
   isUpdateLoadForDriverRejectInviteAllowed,
-  storeDriverInterestsOnLoad
+  storeDriverInterestsOnLoad,
+  updateLoadInResponseOfComDataPayment,
+  createLoadPaymentLog,
+  getPaymentTransactions,
 };

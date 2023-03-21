@@ -1,0 +1,15 @@
+ADMIN LIVE
+----------
+http://20.25.132.122/auth/login
+
+ADMIN STAGING
+-------------
+http://20.25.132.122:4200/auth/login
+
+CUSTOMER LIVE
+-------------
+http://20.25.132.122:8080/auth/login
+
+CUSTOMER STAGING
+----------------
+http://20.25.132.122:4201/auth/login

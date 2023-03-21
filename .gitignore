@@ -10,12 +10,8 @@ yarn-error.log
 # Environment varibales
 .env*
 .env*.example
-
 # Code coverage
 coverage
-
 .idea
-
 .husky
-
-uploads
+.DS_Store

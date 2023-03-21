@@ -1,0 +1,4 @@
+http://20.25.132.122/profiles/customers
+http://20.25.132.122:4200/auth/login
+http://20.25.132.122:4201/auth/login
+http://20.25.132.122:8080/auth/login

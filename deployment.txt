@@ -1,0 +1,65 @@
+----------------------------------------------------
+                   PRODUCTION
+----------------------------------------------------
+
+
+ADMIN
+-----
+cd /var/www/production/alliance-admin/
+git checkout master
+git pull
+npm run build --configuration=production
+
+
+CUSTOMER
+--------
+cd /var/www/production/alliance-customer/
+git checkout master
+git pull
+npm run build --configuration=production
+
+
+----------------------------------------------------
+                   STAGING
+----------------------------------------------------
+
+
+ADMIN
+-----
+cd /var/www/staging/alliance-admin/
+git checkout development
+git pull
+npm run build --configuration=staging
+
+
+CUSTOMER
+--------
+cd /var/www/staging/alliance-customer
+git checkout development
+git pull
+npm run build --configuration=staging
+
+
+-----
+EXTRA
+-----
+
+
+npm run build --configuration=development
+npm run build --configuration=staging
+npm run build --configuration=production
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  
+  # Redirection of requests to index.html
+  RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -f [OR]
+  RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -d
+  RewriteRule ^.*$ - [NC,L]
+  # Redirect all non-file routes to index.html
+  RewriteRule ^(?!.*\.).*$ index.html [NC,L]
+</IfModule>
+
+
+pm2 start app.json
+pm2 start app.json --env staging

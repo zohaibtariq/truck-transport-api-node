@@ -1,10 +1,10 @@
 {
-  "name": "node-js-express-app",
+  "name": "alliancedriveaway.com-api",
   "version": "1.7.0",
   "description": "Create a Node.js app for building production-ready RESTful APIs using Express, by running one command",
   "bin": "bin/createNodejsApp.js",
   "main": "src/index.js",
-  "repository": "https://github.com/hagopj13/node-express-boilerplate.git",
+  "repository": "https://github.com/zohaibtariq/mobilephoneinfoapi.git",
   "author": "Zohaib Tariq <se.zohaib@gmail.com>",
   "license": "MIT",
   "engines": {
@@ -50,6 +50,7 @@
     "prettier"
   ],
   "dependencies": {
+    "axios": "^1.3.4",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.0",
     "compression": "^1.7.4",
@@ -65,7 +66,8 @@
     "joi": "^17.3.0",
     "joi-objectid": "^4.0.2",
     "json2csv": "^5.0.7",
-    "jsonwebtoken": "^8.5.1",
+    "jsontoxml": "^1.0.1",
+    "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "mongoose": "^5.13.14",
@@ -73,13 +75,14 @@
     "morgan": "^1.9.1",
     "multer": "^1.4.4",
     "nodemailer": "^6.3.1",
-    "passport": "^0.4.0",
+    "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
     "pm2": "^5.2.0",
     "swagger-jsdoc": "^6.0.8",
     "swagger-ui-express": "^4.1.6",
     "validator": "^13.0.0",
     "winston": "^3.2.1",
+    "xml2js": "^0.4.23",
     "xss-clean": "^0.1.1"
   },
   "devDependencies": {

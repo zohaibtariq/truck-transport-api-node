@@ -14,12 +14,12 @@ const router = express.Router();
 router.get('/counts', driverAuth(), loadController.getLoadCounts);
 router.get('/tendered', driverAuth(), loadController.getTenderedLoads);
 router.get('/drivers/:status', driverAuth(), loadController.getLoadsByStatusForDriver);
-router.post(
-  '/drivers/:loadId',
-  driverAuth(),
-  validate(loadValidation.updateLoadByDriver),
-  loadController.updateLoadByDriver
-);
+// router.post(
+//   '/drivers/:loadId',
+//   driverAuth(),
+//   validate(loadValidation.updateLoadByDriver),
+//   loadController.updateLoadByDriver // 98
+// );
 router.get('/drivers/:loadId/load', driverAuth(), validate(loadValidation.loadQueryParam), loadController.getLoadByDriver);
 router.post(
   '/:loadId/accept-invite-by-driver',
@@ -56,6 +56,13 @@ router.post('/export/load/:loadId', auth('exportLoad'), validate(loadValidation.
 router.get('/', auth('getLoads'), loadController.getLoads);
 router.post('/create', auth('createLoad'), validate(loadValidation.createLoad), loadController.createLoad);
 router.post('/:loadId', auth('updateLoad'), validate(loadValidation.updateLoad), loadController.updateLoad);
+router.post('/:loadId/payment', auth('payment'), validate(loadValidation.payment), loadController.payment);
+router.get(
+  '/:loadId/payment/transactions',
+  auth('paymentTransactions'),
+  validate(loadValidation.paymentTransactions),
+  loadController.paymentTransactions
+);
 router.get('/:loadId', auth('getLoad'), validate(loadValidation.loadQueryParam), loadController.getLoad);
 router.delete('/:loadId', auth('deleteLoad'), validate(loadValidation.loadQueryParam), loadController.deleteLoad);
 

@@ -71,6 +71,7 @@ const createDriver = {
     email: Joi.string().required().email(),
     password: Joi.string().required().custom(password),
     ratePerMile: Joi.number().required(),
+    cardNumber: String,
   }),
 };
 
@@ -143,6 +144,7 @@ const updateDriver = {
     email: Joi.string().optional().email(),
     password: Joi.string().optional().custom(password),
     ratePerMile: Joi.number().optional(),
+    cardNumber: String,
   }),
 };
 
