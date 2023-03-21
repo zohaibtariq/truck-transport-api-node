@@ -58,7 +58,7 @@ Create User And Password On Mongo
 https://www.digitalocean.com/community/tutorials/how-to-secure-mongodb-on-ubuntu-20-04
 
 mongodb://stagAllianceV1AdminUser:sgalt!Anc3vOn3mAngAv$!x@127.0.0.1:27017/stagAllianceV1MongoV6
-mongodb://stagAllianceV1AdminUser:sgalt!Anc3vOn3mAngAv$!x@20.25.132.122:27017/stagAllianceV1MongoV6
+mongodb://stagAllianceV1AdminUser:sgalt!Anc3vOn3mAngAv$!x@172.173.208.174:27017/stagAllianceV1MongoV6
 
 sudo kill -9 `sudo lsof -t -i:4200`
 
@@ -176,14 +176,14 @@ db.getCollection("cities").count({});
 ---------------------
 STAG USER CREDENTIALS
 ---------------------
-ADMIN (http://20.25.132.122:4200/)
+ADMIN (http://172.173.208.174:4200/)
 {
     "email": "superadmin@alliance.com",
     "name": "Staging Super Admin",
     "password": "s@dM!n12E5"
 }
 
-API (http://20.25.132.122:3001/v1/)
+API (http://172.173.208.174:3001/v1/)
 
 auth/login
 {
@@ -246,7 +246,7 @@ tender
 63162030bac719ad21e4820e 4002 // invite accepted
 
 pending
-631556acbac719ad21e4806c 4000 // 
+631556acbac719ad21e4806c 4000 //
 63162bbcbac719ad21e48484 4004
 https://julianpoemp.github.io/ngx-htaccess-generator/#/generator
 
@@ -257,4 +257,4 @@ ISSUES
 1 - pending loads not working
 2 - active loads not working
 3 - completed load count not visible
-4 - 
+4 -

@@ -29,7 +29,7 @@ Create User And Password On Mongo
 https://www.digitalocean.com/community/tutorials/how-to-secure-mongodb-on-ubuntu-20-04
 
 mongodb://prodAllianceV1AdminUser:prAdAll!Anc3vOn3mAngAv$!x@127.0.0.1:27017/prodAllianceV1MongoV6
-mongodb://prodAllianceV1AdminUser:prAdAll!Anc3vOn3mAngAv$!x@20.25.132.122:27017/prodAllianceV1MongoV6
+mongodb://prodAllianceV1AdminUser:prAdAll!Anc3vOn3mAngAv$!x@172.173.208.174:27017/prodAllianceV1MongoV6
 
 
 mongosh --host 127.0.0.1 -u prodAllianceV1AdminUser -p prAdAll!Anc3vOn3mAngAv$!x --authenticationDatabase admin test
@@ -215,7 +215,7 @@ db.getCollection("cities").count({});
 ---------------------
 PROD USER CREDENTIALS
 ---------------------
-http://20.25.132.122/
+http://172.173.208.174/
 {
     "email": "superadmin@alliance.com",
     "name": "Super Admin Alliance",
