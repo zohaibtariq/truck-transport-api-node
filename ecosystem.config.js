@@ -12,7 +12,7 @@ if (SUFFIX === 'development') {
   NODE_ENV = 'development';
   APP_NAME = 'AllianceApiLocal';
   PORT = 3001;
-  CWD = '/home/zohaib/Projects/Awais/Backend';
+  CWD = '/Volumes/Projects/alliancedriveaway.com/api';
   MAX_MEMORY = '2048M';
   INSTANCES = 1;
   WATCH = true;
@@ -20,16 +20,16 @@ if (SUFFIX === 'development') {
   NODE_ENV = 'production';
   APP_NAME = 'AllianceApiStaging';
   PORT = 3001;
-  CWD = '/var/www/alliance/staging/api';
+  CWD = '/var/www/staging/api';
   MAX_MEMORY = '2048M';
   INSTANCES = 1;
 } else if (SUFFIX === 'production') {
   NODE_ENV = 'production';
   APP_NAME = 'AllianceApiProduction';
   PORT = 3000;
-  CWD = '/var/www/alliance/production/api';
-  MAX_MEMORY = '2048M';
-  INSTANCES = 1;
+  CWD = '/var/www/production/api';
+  MAX_MEMORY = '4096';
+  INSTANCES = 4;
   AUTO_RESTART = true;
 }
 console.log(`SUFFIX : ${SUFFIX}`);

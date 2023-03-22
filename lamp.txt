@@ -36,7 +36,7 @@ sudo nano /etc/apache2/sites-available/production_admin.conf
     ServerName 172.173.208.174
     ServerAlias 172.173.208.174
     ServerAdmin webmaster@172.173.208.174
-    DocumentRoot /var/www/production/admin
+    DocumentRoot /var/www/production/admin/dist/alliance
     ErrorLog /var/www/production/admin-logs/error.log
     CustomLog /var/www/production/admin-logs/access.log combined
 </VirtualHost>
@@ -46,7 +46,7 @@ sudo nano /etc/apache2/sites-available/production_customer.conf
     ServerName 172.173.208.174
     ServerAlias 172.173.208.174
     ServerAdmin webmaster@172.173.208.174
-    DocumentRoot /var/www/production/customer
+    DocumentRoot /var/www/production/customer/dist/alliance
     ErrorLog /var/www/production/customer-logs/error.log
     CustomLog /var/www/production/customer-logs/access.log combined
 </VirtualHost>
@@ -56,7 +56,7 @@ sudo nano /etc/apache2/sites-available/staging_admin.conf
     ServerName 172.173.208.174
     ServerAlias 172.173.208.174
     ServerAdmin webmaster@172.173.208.174
-    DocumentRoot /var/www/staging/admin
+    DocumentRoot /var/www/staging/admin/dist/alliance
     ErrorLog /var/www/staging/admin-logs/error.log
     CustomLog /var/www/staging/admin-logs/access.log combined
 </VirtualHost>
@@ -66,7 +66,7 @@ sudo nano /etc/apache2/sites-available/staging_customer.conf
     ServerName 172.173.208.174
     ServerAlias 172.173.208.174
     ServerAdmin webmaster@172.173.208.174
-    DocumentRoot /var/www/staging/customer
+    DocumentRoot /var/www/staging/customer/dist/alliance
     ErrorLog /var/www/staging/customer-logs/error.log
     CustomLog /var/www/staging/customer-logs/access.log combined
 </VirtualHost>
@@ -133,7 +133,6 @@ Listen 3000
 Listen 3001
 
 # MAIN APACHE2 CONFIG DONE
-
 
 sudo cp -r /git/api-repo  /var/www/production/api
 sudo cp -r /git/admin-repo  /var/www/production/admin

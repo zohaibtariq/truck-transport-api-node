@@ -26,9 +26,7 @@ prAdAll!Anc3vOn3mAngAv$!x
 mongodb://prodAllianceV1AdminUser:prAdAll!Anc3vOn3mAngAv$!x@127.0.0.1:27017/prodAllianceV1MongoV6
 mongodb://prodAllianceV1AdminUser:prAdAll!Anc3vOn3mAngAv$!x@172.173.208.174:27017/prodAllianceV1MongoV6
 
-
 172.173.208.174:27017
-
 
 telnet 172.173.208.174 80
 telnet 172.173.208.174 27017
@@ -46,7 +44,6 @@ https://www.npmjs.com/package/easysoap
 https://www.npmjs.com/package/strong-soap
 https://www.npmjs.com/package/@fastify/soap-client
 https://www.npmjs.com/package/easy-soap-request
-
 
 http://www.zameenlelo.com/karachi/housing-societies-karachi/
 http://www.zameenlelo.com/falaknaz-wonder-city-karachi/
@@ -68,10 +65,7 @@ http://www.zameenlelo.com/the-dream-villas/
 http://www.zameenlelo.com/al-syed-residency-karachi/
 http://www.zameenlelo.com/scheme-33-illegal-housing-societies/
 
-
 JT002#27
-
-
 
 <soapenv:Header/>
 
@@ -92,8 +86,6 @@ JT002#27
 	    </wsse:UsernameToken>
 	</wsse:Security>
 </S:Header>
-
-
 
 <?xml version="1.0" encoding="iso-8859-1"?>
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
