@@ -2,48 +2,45 @@
                    PRODUCTION
 ----------------------------------------------------
 
-
 ADMIN
 -----
-cd /var/www/production/alliance-admin/
+cd /var/www/production/admin
 git checkout master
 git pull
 npm run build --configuration=production
-
+cp .htaccess_dist dist/alliance/.htaccess
 
 CUSTOMER
 --------
-cd /var/www/production/alliance-customer/
+cd /var/www/production/customer
 git checkout master
 git pull
 npm run build --configuration=production
-
+cp .htaccess_dist dist/alliance/.htaccess
 
 ----------------------------------------------------
                    STAGING
 ----------------------------------------------------
 
-
 ADMIN
 -----
-cd /var/www/staging/alliance-admin/
+cd /var/www/staging/admin
 git checkout development
 git pull
 npm run build --configuration=staging
-
+cp .htaccess_dist dist/alliance/.htaccess
 
 CUSTOMER
 --------
-cd /var/www/staging/alliance-customer
+cd /var/www/staging/customer
 git checkout development
 git pull
 npm run build --configuration=staging
-
+cp .htaccess_dist dist/alliance/.htaccess
 
 -----
 EXTRA
 -----
-
 
 npm run build --configuration=development
 npm run build --configuration=staging
@@ -51,7 +48,6 @@ npm run build --configuration=production
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  
   # Redirection of requests to index.html
   RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -f [OR]
   RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -d
@@ -59,7 +55,6 @@ npm run build --configuration=production
   # Redirect all non-file routes to index.html
   RewriteRule ^(?!.*\.).*$ index.html [NC,L]
 </IfModule>
-
 
 pm2 start app.json
 pm2 start app.json --env staging

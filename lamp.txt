@@ -9,6 +9,16 @@ sudo mkdir /var/www/staging/api
 sudo mkdir /var/www/staging/admin
 sudo mkdir /var/www/staging/customer
 
+sudo mkdir /var/www/production/admin/dist
+sudo mkdir /var/www/production/customer/dist
+sudo mkdir /var/www/staging/admin/dist
+sudo mkdir /var/www/staging/customer/dist
+
+sudo mkdir /var/www/production/admin/dist/alliance
+sudo mkdir /var/www/production/customer/dist/alliance
+sudo mkdir /var/www/staging/admin/dist/alliance
+sudo mkdir /var/www/staging/customer/dist/alliance
+
 sudo mkdir /var/www/production/admin-logs
 sudo mkdir /var/www/production/customer-logs
 sudo mkdir /var/www/staging/admin-logs
