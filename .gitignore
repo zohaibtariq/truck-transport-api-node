@@ -15,3 +15,7 @@ coverage
 .idea
 .husky
 .DS_Store
+build.sh
+deploy.sh
+build_backup.sh
+deploy_backup.sh
