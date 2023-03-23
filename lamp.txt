@@ -39,6 +39,12 @@ sudo nano /etc/apache2/sites-available/production_admin.conf
     DocumentRoot /var/www/production/admin/dist/alliance
     ErrorLog /var/www/production/admin-logs/error.log
     CustomLog /var/www/production/admin-logs/access.log combined
+    <Directory /var/www/production/admin/dist/alliance>
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride All
+    #       Order allow,deny
+        Require all granted
+    </Directory>
 </VirtualHost>
 
 sudo nano /etc/apache2/sites-available/production_customer.conf
@@ -49,6 +55,12 @@ sudo nano /etc/apache2/sites-available/production_customer.conf
     DocumentRoot /var/www/production/customer/dist/alliance
     ErrorLog /var/www/production/customer-logs/error.log
     CustomLog /var/www/production/customer-logs/access.log combined
+    <Directory /var/www/production/customer/dist/alliance>
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride All
+    #       Order allow,deny
+        Require all granted
+    </Directory>
 </VirtualHost>
 
 sudo nano /etc/apache2/sites-available/staging_admin.conf
@@ -59,6 +71,12 @@ sudo nano /etc/apache2/sites-available/staging_admin.conf
     DocumentRoot /var/www/staging/admin/dist/alliance
     ErrorLog /var/www/staging/admin-logs/error.log
     CustomLog /var/www/staging/admin-logs/access.log combined
+    <Directory /var/www/staging/admin/dist/alliance>
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride All
+    #       Order allow,deny
+        Require all granted
+    </Directory>
 </VirtualHost>
 
 sudo nano /etc/apache2/sites-available/staging_customer.conf
@@ -69,6 +87,12 @@ sudo nano /etc/apache2/sites-available/staging_customer.conf
     DocumentRoot /var/www/staging/customer/dist/alliance
     ErrorLog /var/www/staging/customer-logs/error.log
     CustomLog /var/www/staging/customer-logs/access.log combined
+    <Directory /var/www/staging/customer/dist/alliance>
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride All
+    #       Order allow,deny
+        Require all granted
+    </Directory>
 </VirtualHost>
 
 sudo a2ensite production_admin
@@ -129,8 +153,10 @@ Listen 8080
 Listen 8000
 Listen 4200
 Listen 4201
-Listen 3000
-Listen 3001
+
+# should be directly listened from pm2
+#Listen 3000
+#Listen 3001
 
 # MAIN APACHE2 CONFIG DONE
 
@@ -167,3 +193,5 @@ sudo service apache2 status
 sudo service apache2 start
 sudo service apache2 stop
 sudo service apache2 restart
+
+sudo a2enmod rewrite

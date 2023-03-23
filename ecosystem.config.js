@@ -28,8 +28,8 @@ if (SUFFIX === 'development') {
   APP_NAME = 'AllianceApiProduction';
   PORT = 3000;
   CWD = '/var/www/production/api';
-  MAX_MEMORY = '4096';
-  INSTANCES = 4;
+  MAX_MEMORY = '8192';
+  INSTANCES = 3;
   AUTO_RESTART = true;
 }
 console.log(`SUFFIX : ${SUFFIX}`);
