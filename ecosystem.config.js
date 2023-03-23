@@ -28,7 +28,7 @@ if (SUFFIX === 'development') {
   APP_NAME = 'AllianceApiProduction';
   PORT = 3000;
   CWD = '/var/www/production/api';
-  MAX_MEMORY = '8192';
+  MAX_MEMORY = '8192M';
   INSTANCES = 3;
   AUTO_RESTART = true;
 }
