@@ -343,3 +343,52 @@ pm2 kill
   # Redirect all non-file routes to index.html
   RewriteRule ^(?!.*\.).*$ index.html [NC,L]
 </IfModule>
+
+
+VERSIONS
+--------
+
+ng --version
+Your global Angular CLI version (14.2.11) is greater than your local version (13.3.11). The local Angular CLI version is used.
+
+To disable this warning use "ng config -g cli.warnings.versionMismatch false".
+
+     _                      _                 ____ _     ___
+    / \   _ __   __ _ _   _| | __ _ _ __     / ___| |   |_ _|
+   / △ \ | '_ \ / _` | | | | |/ _` | '__|   | |   | |    | |
+  / ___ \| | | | (_| | |_| | | (_| | |      | |___| |___ | |
+ /_/   \_\_| |_|\__, |\__,_|_|\__,_|_|       \____|_____|___|
+                |___/
+
+
+Angular CLI: 13.3.11
+Node: 16.19.1
+Package Manager: npm 8.19.3
+OS: linux x64
+
+Angular: 13.3.12
+... animations, common, compiler, compiler-cli, core, forms
+... localize, platform-browser, platform-browser-dynamic, router
+
+Package                         Version
+---------------------------------------------------------
+@angular-devkit/architect       0.1303.11
+@angular-devkit/build-angular   13.3.11
+@angular-devkit/core            13.3.11
+@angular-devkit/schematics      13.3.11
+@angular/cdk                    13.3.9
+@angular/cli                    13.3.11
+@angular/material               13.3.9
+@schematics/angular             13.3.11
+rxjs                            7.5.0
+typescript                      4.5.2
+webpack                         5.76.2
+
+node -v
+v16.19.1
+
+mongo 6
+
+ISSUES
+======
+imask package causing issues we must require imask pkg as of defined in package.json (6.4.2) but node modules always download higher 6.4.3 version which is not compatible so we need a copy of 6.4.2 version its must have

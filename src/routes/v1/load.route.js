@@ -21,6 +21,12 @@ router.get('/drivers/:status', driverAuth(), loadController.getLoadsByStatusForD
 //   loadController.updateLoadByDriver // 98
 // );
 router.get('/drivers/:loadId/load', driverAuth(), validate(loadValidation.loadQueryParam), loadController.getLoadByDriver);
+router.get(
+  '/drivers/:loadId/payments',
+  driverAuth(),
+  validate(loadValidation.loadQueryParam),
+  loadController.paymentTransactionsByLoadAndDriver
+);
 router.post(
   '/:loadId/accept-invite-by-driver',
   driverAuth(),

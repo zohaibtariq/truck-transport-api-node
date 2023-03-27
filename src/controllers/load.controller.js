@@ -140,6 +140,11 @@ const paymentTransactions = catchAsync(async (req, res) => {
   res.send(await loadService.getPaymentTransactions(req.params.loadId));
 });
 
+const paymentTransactionsByLoadAndDriver = catchAsync(async (req, res) => {
+  const driverId = req.driver._id
+  res.send(await loadService.getPaymentTransactions(req.params.loadId, driverId));
+});
+
 // const updateLoadByDriver = catchAsync(async (req, res) => {
 //   const loadBodyForUpdateByDriver = pick(req.body, ['onTheWayToDelivery', 'deliveredToCustomer']); // in case of driver update add allowed keys for update here.
 //   const load = await loadService.updateDriverLoadById(req, loadBodyForUpdateByDriver);
@@ -990,5 +995,6 @@ module.exports = {
   loadInviteRejectedByDriver,
   deleteEnroutedLoadImages,
   payment,
-  paymentTransactions
+  paymentTransactions,
+  paymentTransactionsByLoadAndDriver
 };

@@ -405,14 +405,14 @@ const createLoadPaymentLog = async (loadPaymentLogBody) => {
   return PaymentLoad.create(loadPaymentLogBody);
 };
 
-const getPaymentTransactions = async (loadId = ''/*, driverId = ''*/) => {
+const getPaymentTransactions = async (loadId = '', driverId = '') => {
   const match = {};
   if(loadId !== '')
     match.loadId = mongoose.Types.ObjectId(loadId);
-  // if(driverId !== '')
-  //   match.driverId = mongoose.Types.ObjectId(driverId);
-  console.log('match');
-  console.log(match);
+  if(driverId !== '')
+    match.driverId = mongoose.Types.ObjectId(driverId);
+  // console.log('match');
+  // console.log(match);
   if(Object.keys(match).length > 0){
     return PaymentLoad.aggregate([
       { "$match": match }
