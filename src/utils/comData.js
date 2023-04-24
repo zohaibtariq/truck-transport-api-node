@@ -9,12 +9,16 @@ const url = `https://w8cert.iconnectdata.com:443/cows/services/RealTimeOnline010
 module.exports = class ComData {
   static async loadMoney(paymentRequestBody, loadData, driverData) {
     const validationErrorCode = '422';
-    const validationErrorMsg = ', to load more amount, create more charge by turning switch on of payable to driver over charge tab of load (active, enroute, completed) detail screen.';
-    let check = [loadStatusTypes.ACTIVE, loadStatusTypes.ASSIGNED, loadStatusTypes.ENROUTE].indexOf(loadData.status) >= 0;
-    if(!check){
+    const validationErrorMsg =
+      ', to load more amount, create more charge by turning switch on of payable to driver over charge tab of load (active, enroute, completed) detail screen.';
+    let check =
+      [loadStatusTypes.ACTIVE, loadStatusTypes.ASSIGNED, loadStatusTypes.ENROUTE, loadStatusTypes.COMPLETED].indexOf(
+        loadData.status
+      ) >= 0;
+    if (!check) {
       return {
-        "responseCode": validationErrorCode,
-        "responseMessage": `this action is allowed only on load with following status (${loadStatusTypes.ACTIVE}, ${loadStatusTypes.ASSIGNED}, ${loadStatusTypes.ENROUTE})`,
+        responseCode: validationErrorCode,
+        responseMessage: `this action is allowed only on load with following status (${loadStatusTypes.ACTIVE}, ${loadStatusTypes.ASSIGNED}, ${loadStatusTypes.ENROUTE})`,
       };
     }
     const driverId = loadData.inviteAcceptedByDriver;
@@ -22,29 +26,32 @@ module.exports = class ComData {
     const distanceMiles = loadData.distanceMiles;
     const driverRatePerMile = loadData.driverRatePerMile;
     let driverAdditionalCharges = 0;
-    if(loadData && Object.keys(loadData).length > 0 && loadData?.charges.length > 0){
+    if (loadData && Object.keys(loadData).length > 0 && loadData?.charges.length > 0) {
       loadData?.charges.forEach((charge, index) => {
-        if(charge.payableToDriver === true)
-          driverAdditionalCharges = parseFloat(parseFloat(driverAdditionalCharges) + (parseFloat(charge.rate) * parseFloat(charge.quantity))).toFixed(2)
+        if (charge.payableToDriver === true)
+          driverAdditionalCharges = parseFloat(
+            parseFloat(driverAdditionalCharges) + parseFloat(charge.rate) * parseFloat(charge.quantity)
+          ).toFixed(2);
       });
     }
-    const totalPayableToDriver = parseFloat(parseFloat(driverAdditionalCharges)+(parseFloat(distanceMiles) * parseFloat(driverRatePerMile))).toFixed(2)
+    const totalPayableToDriver = parseFloat(
+      parseFloat(driverAdditionalCharges) + parseFloat(distanceMiles) * parseFloat(driverRatePerMile)
+    ).toFixed(2);
     const paidAmount = loadData.paidAmount;
     // const balanceAmount = loadData.balanceAmount;
     let pendingToBePaid = totalPayableToDriver - paidAmount;
     const loadAmount = paymentRequestBody.loadAmount;
-    if(pendingToBePaid === 0){
+    if (pendingToBePaid === 0) {
       return {
-        "responseCode": validationErrorCode,
-        "responseMessage": `Payable amount to driver has been already completely paid ${validationErrorMsg}`,
+        responseCode: validationErrorCode,
+        responseMessage: `Payable amount to driver has been already completely paid ${validationErrorMsg}`,
       };
-    }
-    else if(parseFloat(loadAmount) > parseFloat(pendingToBePaid)){
+    } else if (parseFloat(loadAmount) > parseFloat(pendingToBePaid)) {
       return {
-        "responseCode": validationErrorCode,
-        "responseMessage": `Max amount which can be loaded is ${pendingToBePaid} ${validationErrorMsg}`,
+        responseCode: validationErrorCode,
+        responseMessage: `Max amount which can be loaded is ${pendingToBePaid} ${validationErrorMsg}`,
       };
-    }else{
+    } else {
       try {
         const payload = {
           'cow:loadMoney': {
