@@ -33,6 +33,7 @@ const goods = Schema({
   palletes: Number,
   frClass: Number,
   notes: String,
+  vin: String,
   good: {
     // this will map to goods
     type: mongoose.SchemaTypes.ObjectId,
@@ -116,27 +117,27 @@ const loadSchema = Schema(
       trim: true,
     },
     bolHash: {
-      type: String,
+      type: Number,
       default: '',
-      required: true,
+      required: false,
       trim: true,
     },
     shipperRef: {
       type: String,
       default: '',
-      required: true,
+      required: false,
       trim: true,
     },
     poHash: {
       type: String,
       default: '',
-      required: true,
+      required: false,
       trim: true,
     },
     proCode: {
       type: String,
       default: '',
-      required: true,
+      required: false,
       trim: true,
     },
     status: {

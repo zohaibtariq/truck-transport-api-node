@@ -2,8 +2,8 @@ const loadStatusTypes = {
   PENDING: 'pending',
   TENDER: 'tender',
   // INVITED: 'invited',
-  ASSIGNED: 'assigned',
-  ACTIVE: 'active',
+  ASSIGNED: 'assigned', // this is treated as invited by admin
+  ACTIVE: 'active', // this is treated as invite accepted by driver
   ENROUTE: 'enroute',
   COMPLETED: 'completed',
   CANCELLED: 'cancelled',
