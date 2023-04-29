@@ -100,7 +100,7 @@ const updateDriver = catchAsync(async (req, res) => {
 });
 
 const updateDriverFromApp = catchAsync(async (req, res) => {
-  const driverRequestBody = pick(req.body, ['first_name', 'last_name', 'phone', 'gender', 'cardNumber']); // in case of driver update add allowed keys for update here.
+  const driverRequestBody = pick(req.body, ['first_name', 'last_name', 'phone', 'gender', 'cardNumber', 'fcmToken']); // in case of driver update add allowed keys for update here.
   // console.log(req.driver._id);
   const driver = await driverService.updateDriverById(req.driver._id, driverRequestBody);
   res.send(driver);

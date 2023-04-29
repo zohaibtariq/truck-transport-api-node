@@ -29,6 +29,7 @@ const createDriverInvite = async (loadId, driverId, adminId) => {
     {
       new: true,
       upsert: true,
+      useFindAndModify: false,
     }
   );
 };

@@ -215,6 +215,7 @@ const driverSchema = mongoose.Schema(
       default: false,
     },
     cardNumber: String,
+    fcmToken: String,
   },
   {
     timestamps: true,

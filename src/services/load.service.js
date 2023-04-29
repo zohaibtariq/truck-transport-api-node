@@ -10,7 +10,9 @@ const {
   onlyGoodsProjectionString,
   onlyChargesProjectionString,
 } = require('../config/countryStateCityProjections');
-const inviteDriverService = require('../../src/services/inviteDriver.service');
+// const inviteDriverService = require('../../src/services/inviteDriver.service');
+const inviteDriverService = require('./inviteDriver.service');
+const fcmService = require('./fcm.service');
 const { loadStatusTypes } = require('../config/loads');
 const { inviteActionTypes } = require('../config/inviteActions');
 const mongoose = require('mongoose');
@@ -149,7 +151,11 @@ const updateLoadById = async (loadId, updateBody, checkTenderedStatus = false, u
   //   }
   // }
   if (updateBody?.invitationSentToDriverId && updateBody?.invitationSentToDriverId.length > 0) {
-    if (load.status !== loadStatusTypes.TENDER && load.status !== loadStatusTypes.PENDING)
+    if (
+      load.status !== loadStatusTypes.TENDER &&
+      load.status !== loadStatusTypes.PENDING &&
+      load.status !== loadStatusTypes.ASSIGNED
+    )
       throw new ApiError(
         httpStatus.NOT_FOUND,
         'Driver invite can only be sent on loads with status (' +
@@ -160,6 +166,7 @@ const updateLoadById = async (loadId, updateBody, checkTenderedStatus = false, u
       );
     updateBody.lastInvitedDriver = updateBody?.invitationSentToDriverId;
     updateBody.status = loadStatusTypes.ASSIGNED; // TODO:: set load to invited, ASK FROM AWAIS
+    await fcmService.sendInviteDriverNotificationToDriver(updateBody?.invitationSentToDriverId);
     await inviteDriverService.createDriverInvite(loadId, updateBody?.invitationSentToDriverId, userId);
     delete updateBody.invitationSentToDriverId; // bcz we don't want to create this key in db model
   }
@@ -211,6 +218,7 @@ const storeDriverInterestsOnLoad = async (loadId, driverId) => {
     {
       new: true,
       upsert: true,
+      useFindAndModify: false,
     }
   );
 };
@@ -393,6 +401,7 @@ const updateLoadInResponseOfComDataPayment = async (loadId, updateBody) => {
     {
       new: false,
       upsert: false,
+      useFindAndModify: false,
     }
   );
   // const load = await getLoadById(loadId)

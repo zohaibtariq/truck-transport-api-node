@@ -145,6 +145,7 @@ const updateDriver = {
     password: Joi.string().optional().custom(password),
     ratePerMile: Joi.number().optional(),
     cardNumber: String,
+    fcmToken: Joi.string().optional(),
   }),
 };
 
