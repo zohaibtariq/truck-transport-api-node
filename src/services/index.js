@@ -11,3 +11,4 @@ module.exports.chargeService = require('./charge.service');
 module.exports.countryService = require('./country.service');
 module.exports.inviteDriverService = require('./inviteDriver.service');
 module.exports.fcmService = require('./fcm.service');
+module.exports.settingService = require('./setting.service');

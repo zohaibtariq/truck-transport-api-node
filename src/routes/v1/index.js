@@ -7,6 +7,7 @@ const profileRoute = require('./profile.route');
 const driverRoute = require('./driver.route');
 const loadRoute = require('./load.route');
 const countryRoute = require('./country.route');
+const settingRoute = require('./setting.route');
 const docsRoute = require('./docs.route');
 const config = require('../../config/config');
 
@@ -44,6 +45,10 @@ const defaultRoutes = [
   {
     path: '/countries',
     route: countryRoute,
+  },
+  {
+    path: '/settings',
+    route: settingRoute,
   },
 ];
 

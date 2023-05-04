@@ -53,4 +53,7 @@ module.exports = [
   'getAllCountries',
   'getAllStates',
   'getAllCities',
+  // settings
+  'getSettings',
+  'updateSettings',
 ];

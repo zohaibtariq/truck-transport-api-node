@@ -1,7 +1,7 @@
 const httpStatus = require('http-status');
-const { Driver, User} = require('../models');
+const { Driver, User } = require('../models');
 const ApiError = require('../utils/ApiError');
-const fs = require('fs')
+const fs = require('fs');
 const path = require('path');
 const {
   onlyCountryNameProjectionString,
@@ -99,9 +99,9 @@ const updateDriverPasswordById = async (driverId, updateBody) => {
   const driver = await getDriverById(driverId);
   if (!driver) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Driver not found');
-  }else if(!(await driver.isPasswordMatch(updateBody.old_password))){
+  } else if (!(await driver.isPasswordMatch(updateBody.old_password))) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Driver old password is wrong');
-  }else if(updateBody.old_password === updateBody.password){
+  } else if (updateBody.old_password === updateBody.password) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Driver old password must not be same as new password.');
   }
   // console.log(updateBody.old_password)
@@ -109,7 +109,7 @@ const updateDriverPasswordById = async (driverId, updateBody) => {
   // console.log(updateBody.password)
   // console.log(typeof updateBody.password)
   // return false;
-  Object.assign(driver, {password: updateBody.password});
+  Object.assign(driver, { password: updateBody.password });
   await driver.save();
   return driver;
 };
@@ -125,15 +125,21 @@ const updateDriverImageById = async (driverId, updateBody) => {
   if (!driver) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Driver not found');
   }
-  if(updateBody?.image && updateBody.image !== null && updateBody.image !== undefined && updateBody.image !== '' && updateBody.image != driver.image) {
-    const fileFullPath = path.join(__dirname, '../../uploads/'+driver.image);
+  if (
+    updateBody?.image &&
+    updateBody.image !== null &&
+    updateBody.image !== undefined &&
+    updateBody.image !== '' &&
+    updateBody.image != driver.image
+  ) {
+    const fileFullPath = path.join(__dirname, '../../uploads/' + driver.image);
     fs.unlink(fileFullPath, (err) => {
       if (err) {
-        console.error('Error in deleting old driver profile image...')
-        console.error(err)
-        return
+        console.error('Error in deleting old driver profile image...');
+        console.error(err);
+        return;
       }
-    })
+    });
   }
   // console.log(updateBody)
   Object.assign(driver, updateBody);
@@ -155,19 +161,23 @@ const deleteDriverById = async (driverId) => {
   if (!driver) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Driver not found');
   }
-  const fileFullPath = path.join(__dirname, '../../uploads/'+driver.image);
+  const fileFullPath = path.join(__dirname, '../../uploads/' + driver.image);
   fs.unlink(fileFullPath, (err) => {
     if (err) {
-      console.error(err)
-      return
+      console.error(err);
+      return;
     }
-  })
+  });
   await driver.remove();
   return driver;
 };
 
 const queryAllDrivers = async (filter) => {
   return Driver.find(filter).lean();
+};
+
+const getActiveDrivers = async () => {
+  return Driver.find({ active: true }, { email: 1 }).lean();
 };
 
 module.exports = {
@@ -179,5 +189,6 @@ module.exports = {
   deleteDriverById,
   updateDriverImageById,
   queryAllDrivers,
-  updateDriverPasswordById
+  updateDriverPasswordById,
+  getActiveDrivers,
 };
