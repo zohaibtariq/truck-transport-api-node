@@ -50,3 +50,26 @@ http://localhost:3000/v1/
 ````
 http://localhost:3000/v1/docs/
 ````
+
+### NOTE
+#### you need to create an admin user first from mentioned below endpoint of this REPO
+````
+Register
+
+POST /v1/auth/register
+````
+#### after registering update its role to "superuser" and set different flags to true like active, emailVerified etc than use this user for admin login then hit below endpoint to populate countries data.
+
+````
+Create Countries
+
+POST /v1/countries
+````
+
+above endpoint only works with "superadmin" role of registered user
+
+### POST MAN COLLECTION
+
+[POSTMAN COLLECTION FILE OF API'S]()
+
+[POSTMAN ENVIRONMENT FILE OF API'S]()
