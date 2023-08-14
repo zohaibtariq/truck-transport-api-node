@@ -70,6 +70,6 @@ above endpoint only works with "superadmin" role of registered user
 
 ### POST MAN COLLECTION
 
-[POSTMAN COLLECTION FILE OF API'S]()
+[POSTMAN COLLECTION FILE OF API'S](https://github.com/zohaibtariq/truck-transport-api-node/blob/development/postman/TruckTransport.postman_collection.json)
 
-[POSTMAN ENVIRONMENT FILE OF API'S]()
+[POSTMAN ENVIRONMENT FILE OF API'S](https://github.com/zohaibtariq/truck-transport-api-node/blob/development/postman/TruckTransportLocalAPI.postman_environment.json)
