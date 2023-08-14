@@ -10,7 +10,7 @@ branches:
 env:
   global:
     - PORT=3000
-    - MONGODB_URL=mongodb://localhost:27017/trucktransport
+    - MONGODB_URL=mongodb://127.0.0.1:27017/trucktransport
     - JWT_SECRET=@!*&^(%+_)($
     - JWT_ACCESS_EXPIRATION_MINUTES=30
     - JWT_REFRESH_EXPIRATION_DAYS=30
