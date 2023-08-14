@@ -25,8 +25,8 @@ ENV PATH="/usr/local/bin:${PATH}"
 #RUN npm install -g yarn
 
 # Install dependencies using Yarn
-#RUN yarn install
-RUN npm install --legacy-peer-deps
+RUN yarn install
+#RUN npm install --legacy-peer-deps
 
 #RUN yarn install --pure-lockfile
 

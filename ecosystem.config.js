@@ -12,7 +12,8 @@ if (SUFFIX === 'development') {
   NODE_ENV = 'development';
   APP_NAME = 'TruckTransportApiLocal';
   PORT = 3000;
-  CWD = '/usr/src/node-app';
+  CWD = '.';
+  // CWD = '/usr/src/node-app';
   MAX_MEMORY = '2048M';
   INSTANCES = 1;
   WATCH = true;
