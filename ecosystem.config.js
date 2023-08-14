@@ -11,8 +11,8 @@ let WATCH = false;
 if (SUFFIX === 'development') {
   NODE_ENV = 'development';
   APP_NAME = 'TruckTransportApiLocal';
-  PORT = 3001;
-  CWD = '/Volumes/Projects/trucktransportdriveaway.com/api';
+  PORT = 3000;
+  CWD = '/usr/src/node-app';
   MAX_MEMORY = '2048M';
   INSTANCES = 1;
   WATCH = true;

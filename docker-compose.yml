@@ -5,7 +5,7 @@ services:
     build: .
     image: node-app
     environment:
-      - MONGODB_URL=mongodb://mongodb:27017/node-boilerplate
+      - MONGODB_URL=mongodb://mongodb:27017/truck-transport
     ports:
       - '3000:3000'
     depends_on:
@@ -16,7 +16,7 @@ services:
       - node-network
 
   mongodb:
-    image: mongo:4.2.1-bionic
+    image: mongo:latest
     ports:
       - '27017:27017'
     volumes:
