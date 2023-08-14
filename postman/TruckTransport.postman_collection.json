@@ -1310,7 +1310,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\r\n    \"isCustomer\": true,\r\n    \"isBillTo\": true,\r\n    \"isShipper\": true,\r\n    \"isConsignee\": true,\r\n    \"isBroker\": true,\r\n    \"isForwarder\": true,\r\n    \"isTerminal\": true,\r\n    \"active\": true,\r\n    \"email\": \"username@company.com\",\r\n    \"userId\": \"626a0b85be137a05b4ecc12c\"\r\n}",
+											"raw": "{\r\n    \"isCustomer\": true,\r\n    \"isBillTo\": true,\r\n    \"isShipper\": true,\r\n    \"isConsignee\": true,\r\n    \"isBroker\": true,\r\n    \"isForwarder\": true,\r\n    \"isTerminal\": true,\r\n    \"active\": true,\r\n    \"email\": \"customernew@customer.com\",\r\n    \"userId\": \"626a0b85be137a05b4ecc12c\",\r\n    \"password\": \"password1\"\r\n}",
 											"options": {
 												"raw": {
 													"language": "json"
