@@ -1,5 +1,9 @@
 # Truck Transport API
 
+[Truck Transport Admin Repo](https://github.com/zohaibtariq/truck-transport-admin-angular)
+
+[Truck Transport Customer Repo](https://github.com/zohaibtariq/truck-transport-customer-angular)
+
 ### DOCKER COMMANDS
 
 #### to build docker container
