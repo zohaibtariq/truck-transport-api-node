@@ -18,21 +18,21 @@ https://citizix.com/how-to-install-and-configure-mongodb-6-on-ubuntu-22-04/
 Create User And Password On Mongo
 https://www.digitalocean.com/community/tutorials/how-to-secure-mongodb-on-ubuntu-20-04
 
-use prodAllianceV1MongoV6
+use prodTruckTransportV1MongoV6
 
-db.createUser({user:"prodAllianceV1AdminUser",pwd:passwordPrompt(),roles:[{role:"readWrite",db:"prodAllianceV1MongoV6"}]})
+db.createUser({user:"prodTruckTransportV1AdminUser",pwd:passwordPrompt(),roles:[{role:"readWrite",db:"prodTruckTransportV1MongoV6"}]})
 prAdAll!Anc3vOn3mAngAv$!x
 
-mongodb://prodAllianceV1AdminUser:prAdAll!Anc3vOn3mAngAv$!x@127.0.0.1:27017/prodAllianceV1MongoV6
-mongodb://prodAllianceV1AdminUser:prAdAll!Anc3vOn3mAngAv$!x@172.173.208.174:27017/prodAllianceV1MongoV6
+mongodb://prodTruckTransportV1AdminUser:prAdAll!Anc3vOn3mAngAv$!x@127.0.0.1:27017/prodTruckTransportV1MongoV6
+mongodb://prodTruckTransportV1AdminUser:prAdAll!Anc3vOn3mAngAv$!x@127.0.0.1:27017/prodTruckTransportV1MongoV6
 
-172.173.208.174:27017
+127.0.0.1:27017
 
-telnet 172.173.208.174 80
-telnet 172.173.208.174 27017
+telnet 127.0.0.1 80
+telnet 127.0.0.1 27017
 
-nmap -p 80 172.173.208.174
-nmap -p 27017 172.173.208.174
+nmap -p 80 127.0.0.1
+nmap -p 27017 127.0.0.1
 
 https://w6cert.iconnectdata.com/cows/services/RealTimeOnline/wsdl/RealTimeOnline.wsdl
 
@@ -209,10 +209,10 @@ mongo --port 27017 -u "dbSuperAdminDo" -p "db$up3r@dm!nD@" \
 
 sudo mkdir /var/www/production
 sudo mkdir /var/www/staging
-sudo mkdir /var/www/production/alliance-admin
-sudo mkdir /var/www/production/alliance-customer
-sudo mkdir /var/www/staging/alliance-admin
-sudo mkdir /var/www/staging/alliance-customer
+sudo mkdir /var/www/production/trucktransport-admin
+sudo mkdir /var/www/production/trucktransport-customer
+sudo mkdir /var/www/staging/trucktransport-admin
+sudo mkdir /var/www/staging/trucktransport-customer
 
 
 
@@ -307,16 +307,16 @@ Server is not responding to external requests 27017 port for database (AWAIS END
 
 ADMIN LIVE
 ----------
-http://172.173.208.174/auth/login
+http://127.0.0.1/auth/login
 
 ADMIN STAGING
 -------------
-http://172.173.208.174:4200/auth/login
+http://127.0.0.1:4200/auth/login
 
 CUSTOMER LIVE
 -------------
-http://172.173.208.174:8080/auth/login
+http://127.0.0.1:8080/auth/login
 
 CUSTOMER STAGING
 ----------------
-http://172.173.208.174:4201/auth/login
+http://127.0.0.1:4201/auth/login

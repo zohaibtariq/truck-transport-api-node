@@ -10,22 +10,23 @@ let AUTO_RESTART = true;
 let WATCH = false;
 if (SUFFIX === 'development') {
   NODE_ENV = 'development';
-  APP_NAME = 'AllianceApiLocal';
-  PORT = 3001;
-  CWD = '/Volumes/Projects/alliancedriveaway.com/api';
+  APP_NAME = 'TruckTransportApiLocal';
+  PORT = 3000;
+  CWD = '.';
+  // CWD = '/usr/src/node-app';
   MAX_MEMORY = '2048M';
   INSTANCES = 1;
   WATCH = true;
 } else if (SUFFIX === 'staging') {
   NODE_ENV = 'production';
-  APP_NAME = 'AllianceApiStaging';
+  APP_NAME = 'TruckTransportApiStaging';
   PORT = 3001;
   CWD = '/var/www/staging/api';
   MAX_MEMORY = '2048M';
   INSTANCES = 1;
 } else if (SUFFIX === 'production') {
   NODE_ENV = 'production';
-  APP_NAME = 'AllianceApiProduction';
+  APP_NAME = 'TruckTransportApiProduction';
   PORT = 3000;
   CWD = '/var/www/production/api';
   MAX_MEMORY = '8192M';
@@ -58,8 +59,8 @@ module.exports = {
       },
     },
     /* {
-      name: 'AllianceApiProduction',
-      cwd: '/var/www/alliance/production/api',
+      name: 'TruckTransportApiProduction',
+      cwd: '/var/www/trucktransport/production/api',
       script: 'src/index.js',
       instances: 1,
       autorestart: true,
@@ -71,8 +72,8 @@ module.exports = {
       },
     },
     {
-      name: 'AllianceApiStaging',
-      cwd: '/var/www/alliance/staging/api',
+      name: 'TruckTransportApiStaging',
+      cwd: '/var/www/trucktransport/staging/api',
       script: 'src/index.js',
       instances: 1,
       autorestart: true,
@@ -84,7 +85,7 @@ module.exports = {
       },
     },
     {
-      name: 'AllianceApiLocal',
+      name: 'TruckTransportApiLocal',
       cwd: './',
       script: 'src/index.js',
       instances: 1,

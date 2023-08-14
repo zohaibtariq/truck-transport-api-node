@@ -1,6 +1,6 @@
 var admin = require('firebase-admin');
 
-var serviceAccount = require('./alliance-a8557-firebase-adminsdk-xq2uk-531a1546a7.json');
+var serviceAccount = require('./trucktransport-a8557-firebase-adminsdk-xq2uk-531a1546a7.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),

@@ -1,0 +1,28 @@
+# TRUCKTRANSPORT NEW SV LINKS
+http://127.0.0.1/profiles/customers
+http://127.0.0.1:4200/auth/login
+http://127.0.0.1:4201/auth/login
+http://127.0.0.1:8080/auth/login
+
+# TRUCKTRANSPORT OLD SV LINKS
+
+Admin Prod => Api Prod
+http://127.0.0.1/ => http://127.0.0.1:3000/v1/auth/login
+
+Admin Stag => Api Stag
+http://127.0.0.1:4200/ => http://127.0.0.1:3001/v1/auth/login
+
+Customer Prod => Api Prod
+http://127.0.0.1:8080 => http://127.0.0.1:3000/v1/profiles/login
+
+Customer Stag => Api Stag
+http://127.0.0.1:4201 => http://127.0.0.1:3001/v1/profiles/login
+
+Admin Prod => http://127.0.0.1
+Api Prod => http://127.0.0.1:3000
+Customer Prod => http://127.0.0.1:8080
+
+Admin Stag => http://127.0.0.1:4200
+Api Stag => http://127.0.0.1:3001
+Customer Stag => http://127.0.0.1:4201
+

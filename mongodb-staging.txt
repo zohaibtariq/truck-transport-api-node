@@ -1,12 +1,12 @@
-use stagAllianceV1MongoV6
+use stagTruckTransportV1MongoV6
 
-db.createUser({user:"stagAllianceV1AdminUser",pwd:passwordPrompt(),roles:[{role:"readWrite",db:"stagAllianceV1MongoV6"}]})
+db.createUser({user:"stagTruckTransportV1AdminUser",pwd:passwordPrompt(),roles:[{role:"readWrite",db:"stagTruckTransportV1MongoV6"}]})
 sgalt!Anc3vOn3mAngAv$!x
 
-db.dropUser("stagAllianceV1AdminUser", {w: "majority", wtimeout: 4000})
+db.dropUser("stagTruckTransportV1AdminUser", {w: "majority", wtimeout: 4000})
 
 # MENTIONED BELOW COMMAND WORKS
-mongosh stagAllianceV1MongoV6 -u stagAllianceV1AdminUser -p 'sgalt!Anc3vOn3mAngAv$!x'
+mongosh stagTruckTransportV1MongoV6 -u stagTruckTransportV1AdminUser -p 'sgalt!Anc3vOn3mAngAv$!x'
 
 https://whyboobo.com/devops/autorestart-mongodb-systemctl-service/
 
@@ -57,8 +57,8 @@ https://citizix.com/how-to-install-and-configure-mongodb-6-on-ubuntu-22-04/
 Create User And Password On Mongo
 https://www.digitalocean.com/community/tutorials/how-to-secure-mongodb-on-ubuntu-20-04
 
-mongodb://stagAllianceV1AdminUser:sgalt!Anc3vOn3mAngAv$!x@127.0.0.1:27017/stagAllianceV1MongoV6
-mongodb://stagAllianceV1AdminUser:sgalt!Anc3vOn3mAngAv$!x@172.173.208.174:27017/stagAllianceV1MongoV6
+mongodb://stagTruckTransportV1AdminUser:sgalt!Anc3vOn3mAngAv$!x@127.0.0.1:27017/stagTruckTransportV1MongoV6
+mongodb://stagTruckTransportV1AdminUser:sgalt!Anc3vOn3mAngAv$!x@127.0.0.1:27017/stagTruckTransportV1MongoV6
 
 sudo kill -9 `sudo lsof -t -i:4200`
 
@@ -163,7 +163,7 @@ mongoDbUserWithRoleOFclusterManager
 db.getCollection("users").find({});
 db.getCollection("users").remove({});
 // reg user from api on staging env postman
-db.getCollection("users").updateOne({  "email": "admin@admin.com" }, { $set: { role: "superadmin", active: true, isEmailVerified: true, email: "superadmin@alliance.com" }}, {});
+db.getCollection("users").updateOne({  "email": "admin@admin.com" }, { $set: { role: "superadmin", active: true, isEmailVerified: true, email: "superadmin@trucktransport.com" }}, {});
 
 db.getCollection("countries").remove({});
 db.getCollection("states").remove({});
@@ -176,18 +176,18 @@ db.getCollection("cities").count({});
 ---------------------
 STAG USER CREDENTIALS
 ---------------------
-ADMIN (http://172.173.208.174:4200/)
+ADMIN (http://127.0.0.1:4200/)
 {
-    "email": "superadmin@alliance.com",
+    "email": "superadmin@trucktransport.com",
     "name": "Staging Super Admin",
     "password": "s@dM!n12E5"
 }
 
-API (http://172.173.208.174:3001/v1/)
+API (http://127.0.0.1:3001/v1/)
 
 auth/login
 {
-    "email": "superadmin@alliance.com",
+    "email": "superadmin@trucktransport.com",
     "password": "s@dM!n12E5"
 }
 
@@ -228,11 +228,11 @@ http://127.0.0.1:4201/auth/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX
 
 
 
-git@github.com:zohaibtariq/awais-alliance-customer.git
+git@github.com:zohaibtariq/awais-trucktransport-customer.git
 
 
 
-mongosh stagAllianceV1MongoV6 -u stagAllianceV1AdminUser -p 'sgalt!Anc3vOn3mAngAv$!x'
+mongosh stagTruckTransportV1MongoV6 -u stagTruckTransportV1AdminUser -p 'sgalt!Anc3vOn3mAngAv$!x'
 db.getCollection("products").remove({});
 db.getCollection("profiles").remove({});
 db.getCollection("loads").remove({});

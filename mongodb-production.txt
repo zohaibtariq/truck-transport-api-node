@@ -1,10 +1,10 @@
-use prodAllianceV1MongoV6
+use prodTruckTransportV1MongoV6
 
-db.createUser({user:"prodAllianceV1AdminUser",pwd:passwordPrompt(),roles:[{role:"readWrite",db:"prodAllianceV1MongoV6"}]})
+db.createUser({user:"prodTruckTransportV1AdminUser",pwd:passwordPrompt(),roles:[{role:"readWrite",db:"prodTruckTransportV1MongoV6"}]})
 prAdAll!Anc3vOn3mAngAv$!x
 
 # MENTIONED BELOW COMMAND WORKS
-mongosh prodAllianceV1MongoV6 -u prodAllianceV1AdminUser -p 'prAdAll!Anc3vOn3mAngAv$!x'
+mongosh prodTruckTransportV1MongoV6 -u prodTruckTransportV1AdminUser -p 'prAdAll!Anc3vOn3mAngAv$!x'
 
 https://whyboobo.com/devops/autorestart-mongodb-systemctl-service/
 
@@ -28,16 +28,16 @@ https://citizix.com/how-to-install-and-configure-mongodb-6-on-ubuntu-22-04/
 Create User And Password On Mongo
 https://www.digitalocean.com/community/tutorials/how-to-secure-mongodb-on-ubuntu-20-04
 
-mongodb://prodAllianceV1AdminUser:prAdAll!Anc3vOn3mAngAv$!x@127.0.0.1:27017/prodAllianceV1MongoV6
-mongodb://prodAllianceV1AdminUser:prAdAll!Anc3vOn3mAngAv$!x@172.173.208.174:27017/prodAllianceV1MongoV6
+mongodb://prodTruckTransportV1AdminUser:prAdAll!Anc3vOn3mAngAv$!x@127.0.0.1:27017/prodTruckTransportV1MongoV6
+mongodb://prodTruckTransportV1AdminUser:prAdAll!Anc3vOn3mAngAv$!x@127.0.0.1:27017/prodTruckTransportV1MongoV6
 
 
-mongosh --host 127.0.0.1 -u prodAllianceV1AdminUser -p prAdAll!Anc3vOn3mAngAv$!x --authenticationDatabase admin test
+mongosh --host 127.0.0.1 -u prodTruckTransportV1AdminUser -p prAdAll!Anc3vOn3mAngAv$!x --authenticationDatabase admin test
 
-mongosh --host "127.0.0.1:27017" -u prodAllianceV1AdminUser -p prAdAll!Anc3vOn3mAngAv$!x --authenticationDatabase admin test
+mongosh --host "127.0.0.1:27017" -u prodTruckTransportV1AdminUser -p prAdAll!Anc3vOn3mAngAv$!x --authenticationDatabase admin test
 
 # need to test this command replace local ip with host ip
-mongodump --host "127.0.0.1:27017" --user=prodAllianceV1AdminUser --db=prodAllianceV1MongoV6 --password=prAdAll!Anc3vOn3mAngAv$!x --authenticationDatabase=admin
+mongodump --host "127.0.0.1:27017" --user=prodTruckTransportV1AdminUser --db=prodTruckTransportV1MongoV6 --password=prAdAll!Anc3vOn3mAngAv$!x --authenticationDatabase=admin
 
 
 
@@ -130,7 +130,7 @@ https://www.digitalocean.com/community/tutorials/how-to-secure-mongodb-on-ubuntu
 roles: [ { role: "userAdminAnyDatabase", db: "admin" }, "readWriteAnyDatabase" ]
 
 
-mongosh prodAllianceV1MongoV6 -u mongoDbUserWithRoleOFdbOwner -p 'Anc3vOnmongoDbUserWithRoleOFdbOwner3mAngAvx'
+mongosh prodTruckTransportV1MongoV6 -u mongoDbUserWithRoleOFdbOwner -p 'Anc3vOnmongoDbUserWithRoleOFdbOwner3mAngAvx'
 
 
 db.createUser({user: "mongoDbUserWithRoleOFdbOwner",pwd:passwordPrompt(),roles:[{role:"dbOwner",db:"admin"}]})
@@ -188,21 +188,21 @@ const query = ;
 const update = ;
 const options = {};
 
-users.updateOne({  "email": "admin@admin.com" }, { $set: { role: "superadmin", active: true, isEmailVerified: true, email: "superadmin@alliance.com" }}, {});
+users.updateOne({  "email": "admin@admin.com" }, { $set: { role: "superadmin", active: true, isEmailVerified: true, email: "superadmin@trucktransport.com" }}, {});
 
-users.updateOne({  "email": "superadmin@alliance.com" }, { $set: { role: "superadmin", active: true, isEmailVerified: true }}, {});
+users.updateOne({  "email": "superadmin@trucktransport.com" }, { $set: { role: "superadmin", active: true, isEmailVerified: true }}, {});
 
 
 
-db.getCollection("users").updateOne({  "email": "admin@admin.com" }, { $set: { role: "superadmin", active: true, isEmailVerified: true, email: "superadmin@alliance.com" }}, {});
+db.getCollection("users").updateOne({  "email": "admin@admin.com" }, { $set: { role: "superadmin", active: true, isEmailVerified: true, email: "superadmin@trucktransport.com" }}, {});
 
-db.getCollection("users").updateOne({  "email": "superadmin@alliance.com" }, { $set: { role: "superadmin", active: true, isEmailVerified: true, email: "superadmin@alliance.com" }}, {});
+db.getCollection("users").updateOne({  "email": "superadmin@trucktransport.com" }, { $set: { role: "superadmin", active: true, isEmailVerified: true, email: "superadmin@trucktransport.com" }}, {});
 
 
 db.getCollection("users").find({});
 db.getCollection("users").remove({});
 // reg user from api on production env postman
-db.getCollection("users").updateOne({  "email": "superadmin@alliance.com" }, { $set: { role: "superadmin", active: true, isEmailVerified: true, email: "superadmin@alliance.com" }}, {});
+db.getCollection("users").updateOne({  "email": "superadmin@trucktransport.com" }, { $set: { role: "superadmin", active: true, isEmailVerified: true, email: "superadmin@trucktransport.com" }}, {});
 
 db.getCollection("countries").remove({});
 db.getCollection("states").remove({});
@@ -215,15 +215,15 @@ db.getCollection("cities").count({});
 ---------------------
 PROD USER CREDENTIALS
 ---------------------
-http://172.173.208.174/
+http://127.0.0.1/
 {
-    "email": "superadmin@alliance.com",
-    "name": "Super Admin Alliance",
+    "email": "superadmin@trucktransport.com",
+    "name": "Super Admin TruckTransport",
     "password": "@ll!3SAdm!N"
 }
 
 
-mongosh prodAllianceV1MongoV6 -u prodAllianceV1AdminUser -p 'prAdAll!Anc3vOn3mAngAv$!x'
+mongosh prodTruckTransportV1MongoV6 -u prodTruckTransportV1AdminUser -p 'prAdAll!Anc3vOn3mAngAv$!x'
 db.getCollection("products").remove({});
 db.getCollection("profiles").remove({});
 db.getCollection("loads").remove({});

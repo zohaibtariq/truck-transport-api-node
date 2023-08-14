@@ -9,13 +9,13 @@ kill -9 204544
 cd /var/www/production/api
 git checkout master
 git pull
-pm2 reload ecosystem.config.js AllianceApiProduction --env production --update-env --max-memory-restart 8192M
-#pm2 reload ecosystem.config.js AllianceApiProduction --env production --update-env --no-autorestart --max-memory-restart 8192M
+pm2 reload ecosystem.config.js TruckTransportApiProduction --env production --update-env --max-memory-restart 8192M
+#pm2 reload ecosystem.config.js TruckTransportApiProduction --env production --update-env --no-autorestart --max-memory-restart 8192M
 
 cd /var/www/staging/api
 git checkout development
 git pull
-pm2 reload ecosystem.config.js AllianceApiStaging --env staging --update-env --max-memory-restart 2048M
+pm2 reload ecosystem.config.js TruckTransportApiStaging --env staging --update-env --max-memory-restart 2048M
 
 EXTRA
 -----
