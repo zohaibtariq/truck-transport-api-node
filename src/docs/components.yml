@@ -19,6 +19,24 @@ components:
         name: fake name
         role: user
 
+    Charge:
+      type: object
+      properties:
+        name:
+          type: string
+        active:
+          type: boolean
+        rate:
+          type: number
+        createdAtDateTime:
+          type: string
+          format: date-time
+        updatedAtDateTime:
+          type: string
+          format: date-time
+        id:
+          type: string
+
     Token:
       type: object
       properties:
