@@ -9,16 +9,16 @@ cd /var/www/production/admin
 git checkout master
 git pull
 ng build --configuration production
-cp .htaccess_dist dist/alliance/.htaccess
+cp .htaccess_dist dist/trucktransport/.htaccess
 
 <VirtualHost *:80>
-    ServerName 172.173.208.174
-    ServerAlias 172.173.208.174
-    ServerAdmin webmaster@172.173.208.174
-    DocumentRoot /var/www/production/admin/dist/alliance
+    ServerName 127.0.0.1
+    ServerAlias 127.0.0.1
+    ServerAdmin webmaster@127.0.0.1
+    DocumentRoot /var/www/production/admin/dist/trucktransport
     ErrorLog /var/www/production/admin-logs/error.log
     CustomLog /var/www/production/admin-logs/access.log combined
-    <Directory /var/www/production/admin/dist/alliance>
+    <Directory /var/www/production/admin/dist/trucktransport>
         Options Indexes FollowSymLinks MultiViews
         AllowOverride All
     #       Order allow,deny
@@ -33,16 +33,16 @@ cd /var/www/production/customer
 git checkout master
 git pull
 ng build --configuration production
-cp .htaccess_dist dist/alliance/.htaccess
+cp .htaccess_dist dist/trucktransport/.htaccess
 
 <VirtualHost *:8080>
-    ServerName 172.173.208.174
-    ServerAlias 172.173.208.174
-    ServerAdmin webmaster@172.173.208.174
-    DocumentRoot /var/www/production/customer/dist/alliance
+    ServerName 127.0.0.1
+    ServerAlias 127.0.0.1
+    ServerAdmin webmaster@127.0.0.1
+    DocumentRoot /var/www/production/customer/dist/trucktransport
     ErrorLog /var/www/production/customer-logs/error.log
     CustomLog /var/www/production/customer-logs/access.log combined
-    <Directory /var/www/production/customer/dist/alliance>
+    <Directory /var/www/production/customer/dist/trucktransport>
         Options Indexes FollowSymLinks MultiViews
         AllowOverride All
     #       Order allow,deny
@@ -65,22 +65,22 @@ let AUTO_RESTART = true;
 let WATCH = false;
 if (SUFFIX === 'development') {
   NODE_ENV = 'development';
-  APP_NAME = 'AllianceApiLocal';
+  APP_NAME = 'TruckTransportApiLocal';
   PORT = 3001;
-  CWD = '/Volumes/Projects/alliancedriveaway.com/api';
+  CWD = '/Volumes/Projects/trucktransportdriveaway.com/api';
   MAX_MEMORY = '2048M';
   INSTANCES = 1;
   WATCH = true;
 } else if (SUFFIX === 'staging') {
   NODE_ENV = 'production';
-  APP_NAME = 'AllianceApiStaging';
+  APP_NAME = 'TruckTransportApiStaging';
   PORT = 3001;
   CWD = '/var/www/staging/api';
   MAX_MEMORY = '2048M';
   INSTANCES = 1;
 } else if (SUFFIX === 'production') {
   NODE_ENV = 'production';
-  APP_NAME = 'AllianceApiProduction';
+  APP_NAME = 'TruckTransportApiProduction';
   PORT = 3000;
   CWD = '/var/www/production/api';
   MAX_MEMORY = '8192M';
@@ -113,8 +113,8 @@ module.exports = {
       },
     },
     /* {
-      name: 'AllianceApiProduction',
-      cwd: '/var/www/alliance/production/api',
+      name: 'TruckTransportApiProduction',
+      cwd: '/var/www/trucktransport/production/api',
       script: 'src/index.js',
       instances: 1,
       autorestart: true,
@@ -126,8 +126,8 @@ module.exports = {
       },
     },
     {
-      name: 'AllianceApiStaging',
-      cwd: '/var/www/alliance/staging/api',
+      name: 'TruckTransportApiStaging',
+      cwd: '/var/www/trucktransport/staging/api',
       script: 'src/index.js',
       instances: 1,
       autorestart: true,
@@ -139,7 +139,7 @@ module.exports = {
       },
     },
     {
-      name: 'AllianceApiLocal',
+      name: 'TruckTransportApiLocal',
       cwd: './',
       script: 'src/index.js',
       instances: 1,
@@ -155,8 +155,8 @@ module.exports = {
 };
 
 pm2 start ecosystem.config.js
-pm2 reload ecosystem.config.js AllianceApiProduction --env production --update-env --max-memory-restart 8192M
-#pm2 reload ecosystem.config.js AllianceApiProduction --env production --update-env --no-autorestart --max-memory-restart 8192M
+pm2 reload ecosystem.config.js TruckTransportApiProduction --env production --update-env --max-memory-restart 8192M
+#pm2 reload ecosystem.config.js TruckTransportApiProduction --env production --update-env --no-autorestart --max-memory-restart 8192M
 
 ----------------------------------------------------
                    STAGING
@@ -168,16 +168,16 @@ cd /var/www/staging/admin
 git checkout development
 git pull
 ng build --configuration staging
-cp .htaccess_dist dist/alliance/.htaccess
+cp .htaccess_dist dist/trucktransport/.htaccess
 
 <VirtualHost *:4200>
-    ServerName 172.173.208.174
-    ServerAlias 172.173.208.174
-    ServerAdmin webmaster@172.173.208.174
-    DocumentRoot /var/www/staging/admin/dist/alliance
+    ServerName 127.0.0.1
+    ServerAlias 127.0.0.1
+    ServerAdmin webmaster@127.0.0.1
+    DocumentRoot /var/www/staging/admin/dist/trucktransport
     ErrorLog /var/www/staging/admin-logs/error.log
     CustomLog /var/www/staging/admin-logs/access.log combined
-    <Directory /var/www/staging/admin/dist/alliance>
+    <Directory /var/www/staging/admin/dist/trucktransport>
         Options Indexes FollowSymLinks MultiViews
         AllowOverride All
     #       Order allow,deny
@@ -191,16 +191,16 @@ cd /var/www/staging/customer
 git checkout development
 git pull
 ng build --configuration staging
-cp .htaccess_dist dist/alliance/.htaccess
+cp .htaccess_dist dist/trucktransport/.htaccess
 
 <VirtualHost *:4201>
-    ServerName 172.173.208.174
-    ServerAlias 172.173.208.174
-    ServerAdmin webmaster@172.173.208.174
-    DocumentRoot /var/www/staging/customer/dist/alliance
+    ServerName 127.0.0.1
+    ServerAlias 127.0.0.1
+    ServerAdmin webmaster@127.0.0.1
+    DocumentRoot /var/www/staging/customer/dist/trucktransport
     ErrorLog /var/www/staging/customer-logs/error.log
     CustomLog /var/www/staging/customer-logs/access.log combined
-    <Directory /var/www/staging/customer/dist/alliance>
+    <Directory /var/www/staging/customer/dist/trucktransport>
         Options Indexes FollowSymLinks MultiViews
         AllowOverride All
     #       Order allow,deny
@@ -225,7 +225,7 @@ let AUTO_RESTART = true;
 let WATCH = false;
 if (SUFFIX === 'development') {
   NODE_ENV = 'development';
-  APP_NAME = 'AllianceApiLocal';
+  APP_NAME = 'TruckTransportApiLocal';
   PORT = 3001;
   CWD = '/home/zohaib/Projects/Awais/Backend';
   MAX_MEMORY = '2048M';
@@ -233,16 +233,16 @@ if (SUFFIX === 'development') {
   WATCH = true;
 } else if (SUFFIX === 'staging') {
   NODE_ENV = 'production';
-  APP_NAME = 'AllianceApiStaging';
+  APP_NAME = 'TruckTransportApiStaging';
   PORT = 3001;
-  CWD = '/var/www/alliance/staging/api';
+  CWD = '/var/www/trucktransport/staging/api';
   MAX_MEMORY = '2048M';
   INSTANCES = 1;
 } else if (SUFFIX === 'production') {
   NODE_ENV = 'production';
-  APP_NAME = 'AllianceApiProduction';
+  APP_NAME = 'TruckTransportApiProduction';
   PORT = 3000;
-  CWD = '/var/www/alliance/production/api';
+  CWD = '/var/www/trucktransport/production/api';
   MAX_MEMORY = '2048M';
   INSTANCES = 1;
   AUTO_RESTART = true;
@@ -273,8 +273,8 @@ module.exports = {
       },
     },
     /* {
-      name: 'AllianceApiProduction',
-      cwd: '/var/www/alliance/production/api',
+      name: 'TruckTransportApiProduction',
+      cwd: '/var/www/trucktransport/production/api',
       script: 'src/index.js',
       instances: 1,
       autorestart: true,
@@ -286,8 +286,8 @@ module.exports = {
       },
     },
     {
-      name: 'AllianceApiStaging',
-      cwd: '/var/www/alliance/staging/api',
+      name: 'TruckTransportApiStaging',
+      cwd: '/var/www/trucktransport/staging/api',
       script: 'src/index.js',
       instances: 1,
       autorestart: true,
@@ -299,7 +299,7 @@ module.exports = {
       },
     },
     {
-      name: 'AllianceApiLocal',
+      name: 'TruckTransportApiLocal',
       cwd: './',
       script: 'src/index.js',
       instances: 1,
@@ -314,7 +314,7 @@ module.exports = {
   ],
 };
 
-pm2 reload ecosystem.config.js AllianceApiStaging --env staging --update-env --max-memory-restart 2048M
+pm2 reload ecosystem.config.js TruckTransportApiStaging --env staging --update-env --max-memory-restart 2048M
 
 -----
 EXTRA

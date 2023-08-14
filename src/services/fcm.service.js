@@ -5,7 +5,7 @@ const driverService = require('./driver.service');
 // const { admin } = require('../firebase-config');
 
 var admin = require('firebase-admin');
-var serviceAccount = require('./../alliance-a8557-firebase-adminsdk-xq2uk-531a1546a7.json');
+var serviceAccount = require('./../trucktransport-a8557-firebase-adminsdk-xq2uk-531a1546a7.json');
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
@@ -47,9 +47,9 @@ const sendInviteDriverNotificationToDriver = async (driverId = null, load = null
   // // For Firebase JS SDK v7.20.0 and later, measurementId is optional
   // const firebaseConfig = {
   //   apiKey: "AIzaSyCAb94lb128XfhSDpQoak7C3gvzVnHbsGI",
-  //   authDomain: "alliance-a8557.firebaseapp.com",
-  //   projectId: "alliance-a8557",
-  //   storageBucket: "alliance-a8557.appspot.com",
+  //   authDomain: "trucktransport-a8557.firebaseapp.com",
+  //   projectId: "trucktransport-a8557",
+  //   storageBucket: "trucktransport-a8557.appspot.com",
   //   messagingSenderId: "190503020447",
   //   appId: "1:190503020447:web:cb6268bc4662c72539ffaa",
   //   measurementId: "G-SSL2FKRB8T"
@@ -69,9 +69,9 @@ const sendInviteDriverNotificationToDriver = async (driverId = null, load = null
   // (you can find such code in the Console)
   // const firebaseConfig = {
   //   apiKey: 'AIzaSyCAb94lb128XfhSDpQoak7C3gvzVnHbsGI',
-  //   authDomain: 'alliance-a8557.firebaseapp.com',
-  //   projectId: 'alliance-a8557',
-  //   storageBucket: 'alliance-a8557.appspot.com',
+  //   authDomain: 'trucktransport-a8557.firebaseapp.com',
+  //   projectId: 'trucktransport-a8557',
+  //   storageBucket: 'trucktransport-a8557.appspot.com',
   //   messagingSenderId: '190503020447',
   //   appId: '1:190503020447:web:cb6268bc4662c72539ffaa',
   //   measurementId: 'G-SSL2FKRB8T',
@@ -125,7 +125,7 @@ const sendInviteDriverNotificationToDriver = async (driverId = null, load = null
 //   });
 // let admin = require('firebase-admin');
 // let fcm = require('fcm-notification');
-// let serviceAccount = require('../../alliance-a8557-firebase-adminsdk-xq2uk-531a1546a7.json'); // android
+// let serviceAccount = require('../../trucktransport-a8557-firebase-adminsdk-xq2uk-531a1546a7.json'); // android
 // const certPath = admin.credential.cert(serviceAccount);
 // let FCM = new fcm(certPath);
 // try {

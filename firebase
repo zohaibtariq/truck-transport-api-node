@@ -10,9 +10,9 @@ import { getAnalytics } from 'firebase/analytics';
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: 'AIzaSyAYVH4Zcl0ujKYa9neobkKlcHZ1P_r3zPk',
-  authDomain: 'alliance-web-6a313.firebaseapp.com',
-  projectId: 'alliance-web-6a313',
-  storageBucket: 'alliance-web-6a313.appspot.com',
+  authDomain: 'trucktransport-web-6a313.firebaseapp.com',
+  projectId: 'trucktransport-web-6a313',
+  storageBucket: 'trucktransport-web-6a313.appspot.com',
   messagingSenderId: '961404129226',
   appId: '1:961404129226:web:9708811abb56ede8e00933',
   measurementId: 'G-7HGPBTSD6E',
@@ -22,7 +22,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
-// https://console.firebase.google.com/u/0/project/alliance-web-6a313/settings/cloudmessaging/web:ZmIwOGEyZWEtMGFiMy00ZmFiLThjNGYtNjJmNGZjZmNiZGVi
+// https://console.firebase.google.com/u/0/project/trucktransport-web-6a313/settings/cloudmessaging/web:ZmIwOGEyZWEtMGFiMy00ZmFiLThjNGYtNjJmNGZjZmNiZGVi
 const serverKey =
   'AAAA39gmz8o:APA91bEOkivSF-XyjXY4EFpMtTLRcU_iSzpPEFbAEED49zJQiqeZH3Ql-0j262so1m4UBTNlbK1dDpgmJoZOg7DZCkJg_E3Qn0WHAsLqmlndynIXEn6e8nwc5oAXeyK8zwGKs_pJEtFJ';
 const senderId = '961404129226';
@@ -33,7 +33,7 @@ const senderId = '961404129226';
 // Verify that the OneSignal App ID is correct in your app or site.
 // ac9d4617-be92-4802-a08f-6c380d0a392f
 
-// https://console.firebase.google.com/u/0/project/alliance-web-6a313/settings/cloudmessaging/web:ZmIwOGEyZWEtMGFiMy00ZmFiLThjNGYtNjJmNGZjZmNiZGVi
+// https://console.firebase.google.com/u/0/project/trucktransport-web-6a313/settings/cloudmessaging/web:ZmIwOGEyZWEtMGFiMy00ZmFiLThjNGYtNjJmNGZjZmNiZGVi
 // web push certificate key pair
 // BN-D0pFKDX3tcn3beO22zztC7dAXOBdGiIfTEy25xSn8BCeDJ4PhAPZRTCsIGaDdlvksANCxpFkTn4t8IjOv7yg
 
@@ -47,7 +47,7 @@ admin.initializeApp({
 });
 
 // Firebase service account
-// firebase-adminsdk-zkgrm@alliance-web-6a313.iam.gserviceaccount.com
+// firebase-adminsdk-zkgrm@trucktransport-web-6a313.iam.gserviceaccount.com
 
 // ---------------------
 
