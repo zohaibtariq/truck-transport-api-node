@@ -33,7 +33,7 @@ docker ps
 
 #### to see all active/inactive docker containers
 ````
-docker psa
+docker ps -a
 ````
 
 #### to check logs of a docker container
