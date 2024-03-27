@@ -227,7 +227,7 @@ if (SUFFIX === 'development') {
   NODE_ENV = 'development';
   APP_NAME = 'TruckTransportApiLocal';
   PORT = 3001;
-  CWD = '/home/zohaib/Projects/Awais/Backend';
+  CWD = '/home/zohaib/Projects/Backend';
   MAX_MEMORY = '2048M';
   INSTANCES = 1;
   WATCH = true;

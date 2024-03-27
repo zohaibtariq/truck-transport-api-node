@@ -165,7 +165,7 @@ const updateLoadById = async (loadId, updateBody, checkTenderedStatus = false, u
           ')'
       );
     updateBody.lastInvitedDriver = updateBody?.invitationSentToDriverId;
-    updateBody.status = loadStatusTypes.ASSIGNED; // TODO:: set load to invited, ASK FROM AWAIS
+    updateBody.status = loadStatusTypes.ASSIGNED; // TODO:: set load to invited
     await fcmService.sendInviteDriverNotificationToDriver(updateBody?.invitationSentToDriverId, load);
     await inviteDriverService.createDriverInvite(loadId, updateBody?.invitationSentToDriverId, userId);
     delete updateBody.invitationSentToDriverId; // bcz we don't want to create this key in db model

@@ -228,10 +228,6 @@ http://127.0.0.1:4201/auth/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX
 
 
 
-git@github.com:zohaibtariq/awais-trucktransport-customer.git
-
-
-
 mongosh stagTruckTransportV1MongoV6 -u stagTruckTransportV1AdminUser -p 'sgalt!Anc3vOn3mAngAv$!x'
 db.getCollection("products").remove({});
 db.getCollection("profiles").remove({});

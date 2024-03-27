@@ -574,7 +574,7 @@ const getLoadsByStatusForDriver = catchAsync(async (req, res) => {
     // customer: 0,
     // goods: 0, // bcz goods will be visible on load detail page
     // charges: 0, // TODO:: payment details are required but i need to do calculation on backend and store new keys and share that keys in response
-    driverInterests: 0, // TODO:: need to make it same as invited driver but after awais approval
+    driverInterests: 0, // TODO:: need to make it same as invited driver but after approval
     createdAtDateTime: 0,
     updatedAtDateTime: 0,
     lastInvitedDriver: 0,
