@@ -227,7 +227,7 @@ PENDING
     load status -> pending, tender.
     driver invite accept -> load status update active
 
-02 - I came up with a new case k agar driver ne intrest show kiya and admin ne usay invite send kiya if it is a tendered load tow kiya yeh load tendered k count or listing me ayega k nai we need to confirm this with Awais over tomorrow meeting. (discussed)
+02 - I came up with a new case k agar driver ne intrest show kiya and admin ne usay invite send kiya if it is a tendered load tow kiya yeh load tendered k count or listing me ayega k nai we need to confirm this over tomorrow meeting. (discussed)
 
 03 - FAQ crude module and apis (NOTHING NEED TO DONE HERE)
 04 - Payment history module
@@ -238,21 +238,21 @@ PENDING
 09 - db backup script daily... or need to discuss if we can store in service which do backup so in case of any data lose we have that. (Nothing to do)
 10 - create database indexes at LAST STEP AFTER CLIENT QA (pending from my end)
 
-11 - Push notifications to driver/customer app (PENDING AT AWAIS END) (Need to pair up with manzar over this)
+11 - Push notifications to driver/customer app (Need to pair up with manzar over this)
         - at the time of invite sent to driver
 
 12 - globally log updated by created by everywhere where we can (last updatedby, createdby, updatedat, createdat)
 13 - data import to our system (data they sent to us must be according to our sample files, skip load2)
 14 - optimized pm2 for production ready (my end)
-15 - smtp details for email (AWAIS END)
+15 - smtp details for email
 16 - what happens when shipper login which load he can see ? (hide email password field, remain it as it is for customer portal)
 17 - need to disable import export untill we are going to import data from 3rd party (NEED TO REMOVE)
 
 BLOCKERS
 --------
 1 - SOAP payment apis (Meeting) (Monday 10 PM to 12 PM)
-2 - Google traffic api we can save this cost but distance will not be accuate enough (distance will be of straight line in between two lat longs points) (PENDING AT AWAIS END) (we must required latitude longitude and it must be calculated thorough mongodb, it is a distance between two straight points...)
-3 - Server is not responding to external requests 27017 port for database (AWAIS END)
+2 - Google traffic api we can save this cost but distance will not be accuate enough (distance will be of straight line in between two lat longs points) (we must required latitude longitude and it must be calculated thorough mongodb, it is a distance between two straight points...)
+3 - Server is not responding to external requests 27017 port for database
 
 TODO
 ----
@@ -291,7 +291,7 @@ TO   -> /:loadId/delete/:imgId
 
 create database indexes at LAST STEP AFTER CLIENT QA
 
-Push notifications to driver/customer app (PENDING AT AWAIS END) (Need to pair up with manzar over this)
+Push notifications to driver/customer app (Need to pair up over this)
         - at the time of invite sent to driver
 
 smtp details for email
@@ -300,9 +300,9 @@ what happens when shipper login which load he can see ? (hide email password fie
 
 SOAP payment apis (Meeting) (Monday 10 PM to 12 PM)
 
-Google traffic api we can save this cost but distance will not be accuate enough (distance will be of straight line in between two lat longs points) (PENDING AT AWAIS END) (we must required latitude longitude and it must be calculated thorough mongodb, it is a distance between two straight points...)
+Google traffic api we can save this cost but distance will not be accuate enough (distance will be of straight line in between two lat longs points) (we must required latitude longitude and it must be calculated thorough mongodb, it is a distance between two straight points...)
 
-Server is not responding to external requests 27017 port for database (AWAIS END)
+Server is not responding to external requests 27017 port for database
 
 
 ADMIN LIVE

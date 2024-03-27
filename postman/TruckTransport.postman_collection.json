@@ -4,7 +4,7 @@
 		"name": "Truck Transport",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "7973098",
-		"_collection_link": "https://restless-crescent-348583.postman.co/workspace/Awais-Alliance-Drive-Way-Work-S~318e1f44-d844-48ed-ae2a-fabcf3198efb/collection/22688133-e2ad9456-c28f-4493-accb-0222db5a159f?action=share&creator=7973098&source=collection_link"
+		"_collection_link": "https://restless-crescent-348583.postman.co/workspace/Truck-Transport-API-Work-Space~318e1f44-d844-48ed-ae2a-fabcf3198efb/collection/22688133-e2ad9456-c28f-4493-accb-0222db5a159f?action=share&creator=7973098&source=collection_link"
 	},
 	"item": [
 		{
@@ -1847,7 +1847,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\r\n    \"email\": \"superadmin@alliance.com\",\r\n    \"name\": \"Staging Super Admin\",\r\n    \"password\": \"s@dM!n12E5\"\r\n}",
+											"raw": "{\r\n    \"email\": \"superadmin@gmail.com\",\r\n    \"name\": \"Staging Super Admin\",\r\n    \"password\": \"s@dM!n12E5\"\r\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -1885,7 +1885,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\r\n    \"email\": \"superadmin@alliance.com\",\r\n    \"password\": \"s@dM!n12E5\"\r\n}",
+											"raw": "{\r\n    \"email\": \"superadmin@gmail.com\",\r\n    \"password\": \"s@dM!n12E5\"\r\n}",
 											"options": {
 												"raw": {
 													"language": "json"
