@@ -3,21 +3,74 @@ const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const loadValidation = require('../../validations/load.validation');
 const loadController = require('../../controllers/load.controller');
-const driverAuth = require("../../middlewares/driverAuth");
+const driverAuth = require('../../middlewares/driverAuth');
+// const driverOrUser = require('../../middlewares/driverOrUser');
 
 const router = express.Router();
+
+/*
+ APP API'S START
+*/
+router.get('/counts', driverAuth(), loadController.getLoadCounts);
+router.get('/tendered', driverAuth(), loadController.getTenderedLoads);
+router.get('/drivers/:status', driverAuth(), loadController.getLoadsByStatusForDriver);
+// router.post(
+//   '/drivers/:loadId',
+//   driverAuth(),
+//   validate(loadValidation.updateLoadByDriver),
+//   loadController.updateLoadByDriver // 98
+// );
+router.get('/drivers/:loadId/load', driverAuth(), validate(loadValidation.loadQueryParam), loadController.getLoadByDriver);
+router.get(
+  '/drivers/:loadId/payments',
+  driverAuth(),
+  validate(loadValidation.loadQueryParam),
+  loadController.paymentTransactionsByLoadAndDriver
+);
+router.post(
+  '/:loadId/accept-invite-by-driver',
+  driverAuth(),
+  validate(loadValidation.loadQueryParam),
+  loadController.loadInviteAcceptedByDriver
+);
+router.post(
+  '/:loadId/reject-invite-by-driver',
+  driverAuth(),
+  validate(loadValidation.loadQueryParam),
+  loadController.loadInviteRejectedByDriver
+);
+router.post(
+  '/:loadId/interest',
+  driverAuth(),
+  validate(loadValidation.loadQueryParam),
+  loadController.loadStoreDriverInterests
+);
+
+router.post('/upload/enroute/:loadId', driverAuth(), loadController.uploadLoadEnroutedImages);
+router.post('/delete/:loadId/enroute/:imgId', driverAuth(), loadController.deleteEnroutedLoadImages);
+
+router.post('/upload/completed/:loadId', driverAuth(), loadController.uploadLoadDeliveredImages);
+router.post('/delete/:loadId/completed/:imgId', driverAuth(), loadController.deleteCompletedLoadImages);
+
+/*
+ APP API'S END
+*/
 
 router.post('/import/loads', auth('importLoads'), loadController.importLoads);
 router.post('/export/loads', auth('exportLoads'), loadController.exportLoads);
 router.post('/export/load/:loadId', auth('exportLoad'), validate(loadValidation.loadQueryParam), loadController.exportLoad);
 router.get('/', auth('getLoads'), loadController.getLoads);
 router.post('/create', auth('createLoad'), validate(loadValidation.createLoad), loadController.createLoad);
-router.get('/:loadId', auth('getLoad'), validate(loadValidation.loadQueryParam), loadController.getLoad);
 router.post('/:loadId', auth('updateLoad'), validate(loadValidation.updateLoad), loadController.updateLoad);
+router.post('/:loadId/payment', auth('payment'), validate(loadValidation.payment), loadController.payment);
+router.get(
+  '/:loadId/payment/transactions',
+  auth('paymentTransactions'),
+  validate(loadValidation.paymentTransactions),
+  loadController.paymentTransactions
+);
+router.get('/:loadId', auth('getLoad'), validate(loadValidation.loadQueryParam), loadController.getLoad);
 router.delete('/:loadId', auth('deleteLoad'), validate(loadValidation.loadQueryParam), loadController.deleteLoad);
-
-router.post('/:loadId/invite', driverAuth(), validate(loadValidation.loadQueryParam), loadController.loadInviteAcceptedByDriver);
-router.post('/:loadId/interest', driverAuth(), validate(loadValidation.loadQueryParam), loadController.loadDriverInterests);
 
 module.exports = router;
 

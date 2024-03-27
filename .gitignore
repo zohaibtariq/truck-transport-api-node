@@ -4,16 +4,15 @@ uploads
 
 # yarn error logs
 yarn-error.log
-
 # Environment varibales
 .env*
 .env*.example
-
 # Code coverage
 coverage
-
 .idea
-
 .husky
-
-uploads
+.DS_Store
+build.sh
+deploy.sh
+build_backup.sh
+deploy_backup.sh

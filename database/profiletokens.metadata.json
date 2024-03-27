@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"token":{"$numberInt":"1"}},"name":"token_1","background":true}],"uuid":"b3ebb890aee24f82b508a2a2e3cb8662","collectionName":"profiletokens","type":"collection"}

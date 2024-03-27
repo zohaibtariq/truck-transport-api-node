@@ -1,0 +1,322 @@
+Mongod is daemon
+----------------
+sudo systemctl status mongod
+sudo systemctl start mongod
+sudo systemctl enable mongod
+
+Mongodb is database
+-------------------
+sudo systemctl start mongodb
+sudo systemctl stop mongodb
+sudo systemctl enable mongodb
+sudo systemctl disable mongodb
+sudo systemctl restart mongodb
+
+mongosh
+https://citizix.com/how-to-install-and-configure-mongodb-6-on-ubuntu-22-04/
+
+Create User And Password On Mongo
+https://www.digitalocean.com/community/tutorials/how-to-secure-mongodb-on-ubuntu-20-04
+
+use prodTruckTransportV1MongoV6
+
+db.createUser({user:"prodTruckTransportV1AdminUser",pwd:passwordPrompt(),roles:[{role:"readWrite",db:"prodTruckTransportV1MongoV6"}]})
+prAdAll!Anc3vOn3mAngAv$!x
+
+mongodb://prodTruckTransportV1AdminUser:prAdAll!Anc3vOn3mAngAv$!x@127.0.0.1:27017/prodTruckTransportV1MongoV6
+mongodb://prodTruckTransportV1AdminUser:prAdAll!Anc3vOn3mAngAv$!x@127.0.0.1:27017/prodTruckTransportV1MongoV6
+
+127.0.0.1:27017
+
+telnet 127.0.0.1 80
+telnet 127.0.0.1 27017
+
+nmap -p 80 127.0.0.1
+nmap -p 27017 127.0.0.1
+
+https://w6cert.iconnectdata.com/cows/services/RealTimeOnline/wsdl/RealTimeOnline.wsdl
+
+https://w6cert.iconnectdata.com/cows/services/RealTimeOnline/wsdl/RealTimeOnline.wsdl
+
+https://www.npmjs.com/package/soap
+https://www.npmjs.com/package/soap-as-promised
+https://www.npmjs.com/package/easysoap
+https://www.npmjs.com/package/strong-soap
+https://www.npmjs.com/package/@fastify/soap-client
+https://www.npmjs.com/package/easy-soap-request
+
+http://www.zameenlelo.com/karachi/housing-societies-karachi/
+http://www.zameenlelo.com/falaknaz-wonder-city-karachi/
+http://www.zameenlelo.com/north-town-residency-phase-4/
+http://www.zameenlelo.com/metropolis-signature-apartments-karachi/
+http://www.zameenlelo.com/north-town-residency/
+http://www.zameenlelo.com/murad-up-town-karachi/
+http://www.zameenlelo.com/north-town-residency-phase-1/
+http://www.zameenlelo.com/shahmir-residency-karachi/
+http://www.zameenlelo.com/oasis-park-residencia-karachi/
+http://www.zameenlelo.com/sbca-approved-housing-societies/
+http://www.zameenlelo.com/chapal-courtyard-2-karachi/
+http://www.zameenlelo.com/malir-town-residency/
+http://www.zameenlelo.com/mbv-housing-society-karachi/
+http://www.zameenlelo.com/surjani-dream-city-karachi/
+http://www.zameenlelo.com/residencia-by-ary/
+http://www.zameenlelo.com/marwa-hill-view-karachi/
+http://www.zameenlelo.com/the-dream-villas/
+http://www.zameenlelo.com/al-syed-residency-karachi/
+http://www.zameenlelo.com/scheme-33-illegal-housing-societies/
+
+JT002#27
+
+<soapenv:Header/>
+
+<soapenv:Header>
+	<wsse:Security>
+	    <wsse:UsernameToken>
+	        <wsse:Username>JT002</wsse:Username>
+	        <wsse:Password>JT002#27</wsse:Password>
+	    </wsse:UsernameToken>
+	</wsse:Security>
+</soapenv:Header>
+
+<S:Header>
+	<wsse:Security>
+	    <wsse:UsernameToken>
+	        <wsse:Username>JT002</wsse:Username>
+	        <wsse:Password>JT002#27</wsse:Password>
+	    </wsse:UsernameToken>
+	</wsse:Security>
+</S:Header>
+
+<?xml version="1.0" encoding="iso-8859-1"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+ <soap:Header>
+  <wsse:Security xmlns:wsse="http://schemas.xmlsoap.org/ws/2003/06/secext">
+   <wsse:UsernameToken wsu:Id="sample"
+       xmlns:wsu="http://schemas.xmlsoap.org/ws/2003/06/utility">
+    <wsse:Username>sample</wsse:Username>
+    <wsse:Password Type="wsse:PasswordText">oracle</wsse:Password>
+    <wsu:Created>2004-05-19T08:44:51Z</wsu:Created>
+   </wsse:UsernameToken>
+  </wsse:Security>
+  <wsse:Security soap:actor="oracle"
+      xmlns:wsse="http://schemas.xmlsoap.org/ws/2003/06/secext">
+   <wsse:UsernameToken wsu:Id="oracle"
+       xmlns:wsu="http://schemas.xmlsoap.org/ws/2003/06/utility">
+    <wsse:Username>oracle</wsse:Username>
+    <wsse:Password Type="wsse:PasswordText">oracle</wsse:Password>
+    <wsu:Created>2004-05-19T08:46:04Z</wsu:Created>
+   </wsse:UsernameToken>
+  </wsse:Security>
+ </soap:Header>
+  <soap:Body>
+   <getHello xmlns="http://www.oracle.com"/>
+  </soap:Body>
+</soap:Envelope>
+
+load status with date and who update it and on which time complete logs
+check country dd applied every where
+global search select apply at remaining areas (areas include load create/edit dd)
+customer signature
+
+TODOS
+=====
+faq crude module
+payment history
+good color
+google trafic api
+fix driver status (DONT KNOW WHAT WORK IT ASKS)
+write db backup script daily... or need to discuss if we can store in service which do backup so in case of any lose we have that.
+
+DONE - If driver cancelled a load it must not be visible in tender listing and in count as well
+DONE - do not allow multiple reject attempts over same load
+PENDING - Tendered list must not show loads that are marked (cancelled, dormant, accepted) by driver
+PENDING - apply sort by des on all listings
+
+-----------------------------------------------
+                                              |
+customer portal complete work pending as well |
+                                              |
+-----------------------------------------------
+
+PK62BAHL1190098100057601
+
+Gaditech 2020 Dec
+
+-----------------------------------------------
+Admin Panel and API'S for app and web SAVYOUR |
+-----------------------------------------------
+laravel
+lumen
+angular
+vuejs (webviews)
+spin wheel (try again)
+passport (jwt)
+socialite (fb auth)
+headless chrome (to test affiliate partners plugin)
+mongo db aggregates, 2dsphere, index
+facebook graph sdk
+img processing
+mixpanel to store events
+google analytics
+airship
+twilio
+aws sdk
+redis
+telenore API
+que jobs
+crons
+invitationSentToDriverId
+lastInvitedDriver
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+sudo kill -9 `sudo lsof -t -i:4200`
+
+PRODUCTION		PORT
+----------		----
+Admin 			80
+Customer 		8080
+API 			3000
+
+DEVELOPMENT		PORT
+-----------		----
+Admin 			4200
+Customer 		4201
+API 			3001
+
+
+
+3000 to 3005
+4200 to 4205
+80
+8080
+443
+
+{}
+
+
+---------------------------------------
+mongod --port 27017 --dbpath /data/db1
+mongo --port 27017
+use admin
+db.createUser({user: "dbSuperAdminDo",pwd: "db$up3r@dm!nD@",roles: [ { role: "dbOwner", db: "admin" } ]})
+mongod --auth --port 27017 --dbpath /data/db1
+mongo --port 27017 -u "dbSuperAdminDo" -p "db$up3r@dm!nD@" \
+  --authenticationDatabase "admin"
+
+---------------------------------------
+
+
+sudo mkdir /var/www/production
+sudo mkdir /var/www/staging
+sudo mkdir /var/www/production/trucktransport-admin
+sudo mkdir /var/www/production/trucktransport-customer
+sudo mkdir /var/www/staging/trucktransport-admin
+sudo mkdir /var/www/staging/trucktransport-customer
+
+
+
+
+
+PENDING
+-------
+
+01 - Need to revisit complete journey of statuses of load and document it. (Mentioned at TODO)
+    pending -> tender (admin sent invite)
+    tender (driver intrest)
+    load status -> pending, tender.
+    driver invite accept -> load status update active
+
+02 - I came up with a new case k agar driver ne intrest show kiya and admin ne usay invite send kiya if it is a tendered load tow kiya yeh load tendered k count or listing me ayega k nai we need to confirm this over tomorrow meeting. (discussed)
+
+03 - FAQ crude module and apis (NOTHING NEED TO DONE HERE)
+04 - Payment history module
+05 - Customer portal (mobile friendly) (TODO)
+06 - SSL (NO NEED TO DONE)
+07 - Driver intrest logs (if they have too many drivers then its better to log it) (need to do it same as driver invite one)
+08 - Good color field (NOTHING TO DO)
+09 - db backup script daily... or need to discuss if we can store in service which do backup so in case of any data lose we have that. (Nothing to do)
+10 - create database indexes at LAST STEP AFTER CLIENT QA (pending from my end)
+
+11 - Push notifications to driver/customer app (Need to pair up with manzar over this)
+        - at the time of invite sent to driver
+
+12 - globally log updated by created by everywhere where we can (last updatedby, createdby, updatedat, createdat)
+13 - data import to our system (data they sent to us must be according to our sample files, skip load2)
+14 - optimized pm2 for production ready (my end)
+15 - smtp details for email
+16 - what happens when shipper login which load he can see ? (hide email password field, remain it as it is for customer portal)
+17 - need to disable import export untill we are going to import data from 3rd party (NEED TO REMOVE)
+
+BLOCKERS
+--------
+1 - SOAP payment apis (Meeting) (Monday 10 PM to 12 PM)
+2 - Google traffic api we can save this cost but distance will not be accuate enough (distance will be of straight line in between two lat longs points) (we must required latitude longitude and it must be calculated thorough mongodb, it is a distance between two straight points...)
+3 - Server is not responding to external requests 27017 port for database
+
+TODO
+----
+> assigned once sent invite tender/pending load status must be updated to tendered
+> after accept it will move to active
+> after reject it will move to tendered status (regardless of previous state)
+> enroute api must take pic same as colmplete
+> in count driver load api must add the counter of assigned load as well as this is a pending ivite and will ad to pendign as well
+
+sudo kill -9 `sudo lsof -t -i:9001`
+
+REMAINING TASKS
+---------------
+
+Driver intrest logs (if they have too many drivers then its better to log it) (need to do it same as driver invite one)
+
+test import export functionality globally
+
+----
+
+globally log updated by created by everywhere where we can (last updatedby, createdby, updatedat, createdat)
+
+Customer portal (mobile friendly)
+
+remove email pass for everyone other then customer and only they can login.
+
+enroute api must take pic same as colmplete
+
+NEW API -> /upload/enroute/:loadId
+
+FROM -> /:loadId/img-upload
+TO   -> /upload/completed/:loadId
+
+FROM -> /:loadId/img-delete/:imgId
+TO   -> /:loadId/delete/:imgId
+
+create database indexes at LAST STEP AFTER CLIENT QA
+
+Push notifications to driver/customer app (Need to pair up over this)
+        - at the time of invite sent to driver
+
+smtp details for email
+
+what happens when shipper login which load he can see ? (hide email password field, remain it as it is for customer portal)
+
+SOAP payment apis (Meeting) (Monday 10 PM to 12 PM)
+
+Google traffic api we can save this cost but distance will not be accuate enough (distance will be of straight line in between two lat longs points) (we must required latitude longitude and it must be calculated thorough mongodb, it is a distance between two straight points...)
+
+Server is not responding to external requests 27017 port for database
+
+
+ADMIN LIVE
+----------
+http://127.0.0.1/auth/login
+
+ADMIN STAGING
+-------------
+http://127.0.0.1:4200/auth/login
+
+CUSTOMER LIVE
+-------------
+http://127.0.0.1:8080/auth/login
+
+CUSTOMER STAGING
+----------------
+http://127.0.0.1:4201/auth/login

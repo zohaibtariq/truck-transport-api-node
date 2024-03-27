@@ -1,0 +1,230 @@
+use prodTruckTransportV1MongoV6
+
+db.createUser({user:"prodTruckTransportV1AdminUser",pwd:passwordPrompt(),roles:[{role:"readWrite",db:"prodTruckTransportV1MongoV6"}]})
+prAdAll!Anc3vOn3mAngAv$!x
+
+# MENTIONED BELOW COMMAND WORKS
+mongosh prodTruckTransportV1MongoV6 -u prodTruckTransportV1AdminUser -p 'prAdAll!Anc3vOn3mAngAv$!x'
+
+https://whyboobo.com/devops/autorestart-mongodb-systemctl-service/
+
+Mongod is daemon
+----------------
+sudo systemctl status mongod
+sudo systemctl start mongod
+sudo systemctl enable mongod
+
+Mongodb is database
+-------------------
+sudo systemctl start mongodb
+sudo systemctl stop mongodb
+sudo systemctl enable mongodb
+sudo systemctl disable mongodb
+sudo systemctl restart mongodb
+
+mongosh
+https://citizix.com/how-to-install-and-configure-mongodb-6-on-ubuntu-22-04/
+
+Create User And Password On Mongo
+https://www.digitalocean.com/community/tutorials/how-to-secure-mongodb-on-ubuntu-20-04
+
+mongodb://prodTruckTransportV1AdminUser:prAdAll!Anc3vOn3mAngAv$!x@127.0.0.1:27017/prodTruckTransportV1MongoV6
+mongodb://prodTruckTransportV1AdminUser:prAdAll!Anc3vOn3mAngAv$!x@127.0.0.1:27017/prodTruckTransportV1MongoV6
+
+
+mongosh --host 127.0.0.1 -u prodTruckTransportV1AdminUser -p prAdAll!Anc3vOn3mAngAv$!x --authenticationDatabase admin test
+
+mongosh --host "127.0.0.1:27017" -u prodTruckTransportV1AdminUser -p prAdAll!Anc3vOn3mAngAv$!x --authenticationDatabase admin test
+
+# need to test this command replace local ip with host ip
+mongodump --host "127.0.0.1:27017" --user=prodTruckTransportV1AdminUser --db=prodTruckTransportV1MongoV6 --password=prAdAll!Anc3vOn3mAngAv$!x --authenticationDatabase=admin
+
+
+
+sudo kill -9 `sudo lsof -t -i:4200`
+
+PRODUCTION		PORT
+----------		----
+Admin 			80
+Customer 		8080
+API 			3000
+
+DEVELOPMENT		PORT
+-----------		----
+Admin 			4200
+Customer 		4201
+API 			3001
+
+
+OPEN PORTS
+----------
+3000 to 3005
+4200 to 4205
+80
+8080
+443
+
+https://www.digitalocean.com/community/tutorials/angular-environment-variables
+ng serve --configuration=development --port 4200
+ng serve --configuration=staging	 --port 4201
+ng serve --configuration=production  --port 80
+
+ng build --configuration=development
+ng build --configuration=staging
+ng build --configuration=production
+
+
+
+*************************** UNINSTALL MONGODB COMPLETLY STARTED *************************************
+sudo service mongod stop
+sudo apt-get purge mongodb-org*
+sudo rm -r /var/log/mongodb
+sudo rm -r /var/lib/mongodb
+sudo apt-get purge mongodb mongodb-clients mongodb-server mongodb-dev
+sudo apt-get purge mongodb-10gen
+sudo apt-get autoremove
+sudo apt-get autoremove --purge mongodb
+sudo apt-get remove mongodb* --purge
+*************************** UNINSTALL MONGODB COMPLETLY FINISHED *************************************
+
+
+************** INSTALLING MONGO START (https://www.digitalocean.com/community/tutorials/how-to-install-mongodb-on-ubuntu-20-04) ****************
+
+curl -fsSL https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+
+sudo apt update
+
+sudo apt install mongodb-org
+
+sudo systemctl start mongod.service
+
+sudo systemctl status mongod
+
+sudo systemctl enable mongod
+
+mongo --eval 'db.runCommand({ connectionStatus: 1 })'
+
+**** MANAGE MONGO ******
+
+sudo systemctl status mongod
+
+sudo systemctl stop mongod
+
+sudo systemctl start mongod
+
+sudo systemctl restart mongod
+
+sudo systemctl disable mongod
+
+sudo systemctl enable mongod
+
+************** INSTALLING MONGO END (https://www.digitalocean.com/community/tutorials/how-to-install-mongodb-on-ubuntu-20-04) ****************
+
+
+************** SECURING MONGO START ***************
+
+https://www.digitalocean.com/community/tutorials/how-to-secure-mongodb-on-ubuntu-20-04
+
+roles: [ { role: "userAdminAnyDatabase", db: "admin" }, "readWriteAnyDatabase" ]
+
+
+mongosh prodTruckTransportV1MongoV6 -u mongoDbUserWithRoleOFdbOwner -p 'Anc3vOnmongoDbUserWithRoleOFdbOwner3mAngAvx'
+
+
+db.createUser({user: "mongoDbUserWithRoleOFdbOwner",pwd:passwordPrompt(),roles:[{role:"dbOwner",db:"admin"}]})
+Anc3vOnmongoDbUserWithRoleOFdbOwner3mAngAvx
+
+mongodb://mongoDbUserWithRoleOFdbOwner:Anc3vOnmongoDbUserWithRoleOFdbOwner3mAngAvx@127.0.0.1:27017/localQasaresheereen
+
+db.createUser({user: "mongoDbUserWithRoleOFuserAdminAnyDatabase",pwd:passwordPrompt(),roles:[{role:"userAdminAnyDatabase",db:"admin"},"readWriteAnyDatabase"]})
+Anc3vOnmongoDbUserWithRoleOfuserAdminAnyDatabase3mAngAvx
+
+mongodb://mongoDbUserWithRoleOFuserAdminAnyDatabase:Anc3vOnmongoDbUserWithRoleOfuserAdminAnyDatabase3mAngAvx@127.0.0.1:27017/localQasaresheereen
+
+mongosh -u mongoDbUserWithRoleOFdbOwner -p --authenticationDatabase admin
+
+
+************** SECURING MONGO ENDED ***************
+
+mongoDbUserWithRoleOFdbOwner
+Anc3vOnmongoDbUserWithRoleOFdbOwner3mAngAvx
+
+mongoDbUserWithRoleOFuserAdminAnyDatabase
+Anc3vOnmongoDbUserWithRoleOfuserAdminAnyDatabase3mAngAvx
+
+mongoDbUserWithRoleOFread
+
+
+mongoDbUserWithRoleOFreadWrite
+
+
+mongoDbUserWithRoleOFdbAdmin
+
+
+mongoDbUserWithRoleOFdbOwner
+
+
+mongoDbUserWithRoleOFuserAdmin
+
+
+mongoDbUserWithRoleOFclusterAdmin
+
+
+mongoDbUserWithRoleOFclusterAdmin
+
+
+mongoDbUserWithRoleOFclusterManager
+
+
+******************************************************************************************************
+
+
+
+
+
+const query = ;
+const update = ;
+const options = {};
+
+users.updateOne({  "email": "admin@admin.com" }, { $set: { role: "superadmin", active: true, isEmailVerified: true, email: "superadmin@trucktransport.com" }}, {});
+
+users.updateOne({  "email": "superadmin@trucktransport.com" }, { $set: { role: "superadmin", active: true, isEmailVerified: true }}, {});
+
+
+
+db.getCollection("users").updateOne({  "email": "admin@admin.com" }, { $set: { role: "superadmin", active: true, isEmailVerified: true, email: "superadmin@trucktransport.com" }}, {});
+
+db.getCollection("users").updateOne({  "email": "superadmin@trucktransport.com" }, { $set: { role: "superadmin", active: true, isEmailVerified: true, email: "superadmin@trucktransport.com" }}, {});
+
+
+db.getCollection("users").find({});
+db.getCollection("users").remove({});
+// reg user from api on production env postman
+db.getCollection("users").updateOne({  "email": "superadmin@trucktransport.com" }, { $set: { role: "superadmin", active: true, isEmailVerified: true, email: "superadmin@trucktransport.com" }}, {});
+
+db.getCollection("countries").remove({});
+db.getCollection("states").remove({});
+db.getCollection("cities").remove({});
+
+db.getCollection("countries").count({});
+db.getCollection("states").count({});
+db.getCollection("cities").count({});
+
+---------------------
+PROD USER CREDENTIALS
+---------------------
+http://127.0.0.1/
+{
+    "email": "superadmin@trucktransport.com",
+    "name": "Super Admin TruckTransport",
+    "password": "@ll!3SAdm!N"
+}
+
+
+mongosh prodTruckTransportV1MongoV6 -u prodTruckTransportV1AdminUser -p 'prAdAll!Anc3vOn3mAngAv$!x'
+db.getCollection("products").remove({});
+db.getCollection("profiles").remove({});
+db.getCollection("loads").remove({});
+https://julianpoemp.github.io/ngx-htaccess-generator/#/generator

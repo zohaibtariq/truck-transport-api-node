@@ -4,6 +4,7 @@ const { password, objectId } = require('./custom.validation');
 const createCharge = {
   body: Joi.object().keys({
     name: Joi.string().required(),
+    rate: Joi.number().allow(null, '', 0).optional(),
     // active: Joi.boolean().required(),
   }),
 };
@@ -24,6 +25,7 @@ const updateCharge = {
   body: Joi.object()
     .keys({
       name: Joi.string().optional(),
+      rate: Joi.number().allow(null, '', 0).optional(),
       active: Joi.boolean().optional(),
     })
     .min(1),

@@ -9,10 +9,10 @@ const router = express.Router();
 router.post('/unique/email', auth('isEmailsUnique'), userController.isEmailsUnique);
 router.post('/import/users', auth('importUsers'), userController.importUsers);
 router.post('/export/users', auth('exportUsers'), userController.exportUsers);
-router.post('/', auth('createUser'), validate(userValidation.createUser), userController.createUser);
+router.post('/', validate(userValidation.createUser), userController.createUser);
 router.get('/', auth('getUsers'), userController.getUsers);
-router.get('/:userId', auth('getUser'), validate(userValidation.getUser), userController.getUser)
-router.post('/:userId', auth('updateUser'), validate(userValidation.updateUser), userController.updateUser)
+router.get('/:userId', auth('getUser'), validate(userValidation.getUser), userController.getUser);
+router.post('/:userId', auth('updateUser'), validate(userValidation.updateUser), userController.updateUser);
 router.delete('/:userId', auth('deleteUser'), validate(userValidation.deleteUser), userController.deleteUser);
 
 module.exports = router;

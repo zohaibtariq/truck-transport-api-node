@@ -29,15 +29,17 @@ module.exports = [
   'getLoad',
   'updateLoad',
   'deleteLoad',
-  // product
+  'payment',
+  'paymentTransactions',
+  // profile
   'importProfiles',
   'exportProfiles',
   'exportProfile',
-  'getProducts',
-  'createProduct',
-  'getProduct',
-  'updateProduct',
-  'deleteProduct',
+  'getProfiles',
+  'createProfile',
+  'getProfile',
+  'updateProfile',
+  'deleteProfile',
   // users
   'isEmailsUnique',
   'importUsers',
@@ -51,4 +53,7 @@ module.exports = [
   'getAllCountries',
   'getAllStates',
   'getAllCities',
+  // settings
+  'getSettings',
+  'updateSettings',
 ];

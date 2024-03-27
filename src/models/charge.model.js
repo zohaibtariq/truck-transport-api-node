@@ -4,8 +4,8 @@ const Schema = mongoose.Schema;
 const opts = {
   timestamps: {
     createdAt: 'createdAtDateTime',
-    updatedAt: 'updatedAtDateTime'
-  }
+    updatedAt: 'updatedAtDateTime',
+  },
 };
 const loadSchema = Schema(
   {
@@ -21,6 +21,11 @@ const loadSchema = Schema(
       default: true,
       required: true,
       trim: true,
+    },
+    rate: {
+      type: Number,
+      default: 0,
+      required: true,
     },
   },
   opts

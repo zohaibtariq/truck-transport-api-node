@@ -39,29 +39,32 @@ const driverVerifyCallback = (req, resolve, reject) => async (err, driver, info)
   resolve();
 };
 
-/*
-const promise1 = Promise.reject(0);
-const promise2 = new Promise((resolve) => setTimeout(resolve, 100, 'quick'));
-const promise3 = new Promise((resolve) => setTimeout(resolve, 500, 'slow'));
-const promises = [promise1, promise2, promise3];
-Promise.any(promises).then((value) => console.log(value));
-*/
-
-const driverOrUser = (...requiredRights) => async (req, res, next) => {
-  const userPromise = new Promise((resolve, reject) => {
-    passport.authenticate('jwt', { session: false }, userVerifyCallback(req, resolve, reject, requiredRights))(req, res, next);
-  })
+const driverOrUser =
+  (...requiredRights) =>
+  async (req, res, next) => {
+    const userPromise = new Promise((resolve, reject) => {
+      passport.authenticate('jwt', { session: false }, userVerifyCallback(req, resolve, reject, requiredRights))(
+        req,
+        res,
+        next
+      );
+    });
     // .then(() => next())
     // .catch((err) => next(err));
-  const driverPromise = new Promise((resolve, reject) => {
-    passport.authenticate('jwtDriver', { session: false }, driverVerifyCallback(req, resolve, reject))(req, res, next);
-  })
+    // .catch((err) => console.log('jwt', err));
+    const driverPromise = new Promise((resolve, reject) => {
+      passport.authenticate('jwtDriver', { session: false }, driverVerifyCallback(req, resolve, reject))(req, res, next);
+    });
     // .then(() => next())
     // .catch((err) => next(err));
-  const promises = [userPromise, driverPromise];
-  return Promise.any(promises)
-    .then(() => next())
-    .catch((err) => next(err));
-};
-
+    // .catch((err) => console.log('jwtDriver', err));
+    const promises = [userPromise, driverPromise];
+    return Promise.any(promises)
+      .then(() => next())
+      .catch((err) => {
+        console.log('JWT driverOrUser both promises failed');
+        console.log(err);
+        return next(err);
+      });
+  };
 module.exports = driverOrUser;

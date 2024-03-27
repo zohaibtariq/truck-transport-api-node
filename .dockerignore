@@ -1,3 +1,10 @@
 node_modules
 .git
 .gitignore
+.prettier*
+lamp.txt
+mongo*
+pm2_api.txt
+deployment.txt
+details.txt
+trucktransport-links.txt

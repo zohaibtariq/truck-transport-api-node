@@ -1,8 +1,13 @@
 const httpStatus = require('http-status');
-const { Driver, User} = require('../models');
+const { Driver, User } = require('../models');
 const ApiError = require('../utils/ApiError');
-const fs = require('fs')
+const fs = require('fs');
 const path = require('path');
+const {
+  onlyCountryNameProjectionString,
+  onlyStateNameProjectionString,
+  onlyCityNameProjectionString,
+} = require('../config/countryStateCityProjections');
 
 /**
  * Create a driver
@@ -14,7 +19,7 @@ const createDriver = async (driverBody) => {
   // console.log(driverBody)
   if (await Driver.isEmailTaken(driverBody.email)) {
     // console.log('throw new error')
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+    throw new ApiError(httpStatus.BAD_REQUEST, 'provided driver email already taken');
   }
   // console.log('driver created call')
   return Driver.create(driverBody);
@@ -41,7 +46,15 @@ const queryDrivers = async (filter, options) => {
  * @returns {Promise<Driver>}
  */
 const getDriverById = async (id) => {
-  return Driver.findById(id).populate(['country', 'state', 'city', 'certifications.country', 'certifications.state', 'certifications.city']);
+  return Driver.findById(id).populate([
+    // 'country', 'state', 'city', 'certifications.country', 'certifications.state', 'certifications.city'
+    { path: 'country', select: onlyCountryNameProjectionString },
+    { path: 'state', select: onlyStateNameProjectionString },
+    { path: 'city', select: onlyCityNameProjectionString },
+    { path: 'certifications.country', select: onlyCountryNameProjectionString },
+    { path: 'certifications.state', select: onlyStateNameProjectionString },
+    { path: 'certifications.city', select: onlyCityNameProjectionString },
+  ]);
 };
 
 /**
@@ -65,9 +78,38 @@ const updateDriverById = async (driverId, updateBody) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Driver not found');
   }
   if (updateBody.email && (await Driver.isEmailTaken(updateBody.email, driverId))) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Driver email already taken');
   }
+  // console.log('updateBody');
+  // console.log({ ...updateBody });
   Object.assign(driver, updateBody);
+  // console.log('driver');
+  // console.log({ ...driver });
+  await driver.save();
+  return driver;
+};
+
+/**
+ * Update driver password by id
+ * @param {ObjectId} driverId
+ * @param {Object} updateBody
+ * @returns {Promise<Driver>}
+ */
+const updateDriverPasswordById = async (driverId, updateBody) => {
+  const driver = await getDriverById(driverId);
+  if (!driver) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Driver not found');
+  } else if (!(await driver.isPasswordMatch(updateBody.old_password))) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Driver old password is wrong');
+  } else if (updateBody.old_password === updateBody.password) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Driver old password must not be same as new password.');
+  }
+  // console.log(updateBody.old_password)
+  // console.log(typeof updateBody.old_password)
+  // console.log(updateBody.password)
+  // console.log(typeof updateBody.password)
+  // return false;
+  Object.assign(driver, { password: updateBody.password });
   await driver.save();
   return driver;
 };
@@ -83,14 +125,21 @@ const updateDriverImageById = async (driverId, updateBody) => {
   if (!driver) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Driver not found');
   }
-  if(updateBody?.image && updateBody.image !== null && updateBody.image !== undefined && updateBody.image !== '' && updateBody.image != driver.image) {
-    const fileFullPath = path.join(__dirname, '../../uploads/'+driver.image);
+  if (
+    updateBody?.image &&
+    updateBody.image !== null &&
+    updateBody.image !== undefined &&
+    updateBody.image !== '' &&
+    updateBody.image != driver.image
+  ) {
+    const fileFullPath = path.join(__dirname, '../../uploads/' + driver.image);
     fs.unlink(fileFullPath, (err) => {
       if (err) {
-        console.error(err)
-        return
+        console.error('Error in deleting old driver profile image...');
+        console.error(err);
+        return;
       }
-    })
+    });
   }
   // console.log(updateBody)
   Object.assign(driver, updateBody);
@@ -112,19 +161,23 @@ const deleteDriverById = async (driverId) => {
   if (!driver) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Driver not found');
   }
-  const fileFullPath = path.join(__dirname, '../../uploads/'+driver.image);
+  const fileFullPath = path.join(__dirname, '../../uploads/' + driver.image);
   fs.unlink(fileFullPath, (err) => {
     if (err) {
-      console.error(err)
-      return
+      console.error(err);
+      return;
     }
-  })
+  });
   await driver.remove();
   return driver;
 };
 
 const queryAllDrivers = async (filter) => {
   return Driver.find(filter).lean();
+};
+
+const getActiveDrivers = async () => {
+  return Driver.find({ active: true }, { email: 1 }).lean();
 };
 
 module.exports = {
@@ -135,5 +188,7 @@ module.exports = {
   updateDriverById,
   deleteDriverById,
   updateDriverImageById,
-  queryAllDrivers
+  queryAllDrivers,
+  updateDriverPasswordById,
+  getActiveDrivers,
 };

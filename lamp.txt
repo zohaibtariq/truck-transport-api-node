@@ -1,0 +1,197 @@
+# MAIN APACHE2 CONFIG START
+
+sudo mkdir /var/www/production
+sudo mkdir /var/www/staging
+sudo mkdir /var/www/production/api
+sudo mkdir /var/www/production/admin
+sudo mkdir /var/www/production/customer
+sudo mkdir /var/www/staging/api
+sudo mkdir /var/www/staging/admin
+sudo mkdir /var/www/staging/customer
+
+sudo mkdir /var/www/production/admin/dist
+sudo mkdir /var/www/production/customer/dist
+sudo mkdir /var/www/staging/admin/dist
+sudo mkdir /var/www/staging/customer/dist
+
+sudo mkdir /var/www/production/admin/dist/trucktransport
+sudo mkdir /var/www/production/customer/dist/trucktransport
+sudo mkdir /var/www/staging/admin/dist/trucktransport
+sudo mkdir /var/www/staging/customer/dist/trucktransport
+
+sudo mkdir /var/www/production/admin-logs
+sudo mkdir /var/www/production/customer-logs
+sudo mkdir /var/www/staging/admin-logs
+sudo mkdir /var/www/staging/customer-logs
+
+sudo chown -R $USER:$USER /var/www/production/api
+sudo chown -R $USER:$USER /var/www/production/admin
+sudo chown -R $USER:$USER /var/www/production/customer
+sudo chown -R $USER:$USER /var/www/staging/api
+sudo chown -R $USER:$USER /var/www/staging/admin
+sudo chown -R $USER:$USER /var/www/staging/customer
+
+sudo nano /etc/apache2/sites-available/production_admin.conf
+<VirtualHost *:80>
+    ServerName 127.0.0.1
+    ServerAlias 127.0.0.1
+    ServerAdmin webmaster@127.0.0.1
+    DocumentRoot /var/www/production/admin/dist/trucktransport
+    ErrorLog /var/www/production/admin-logs/error.log
+    CustomLog /var/www/production/admin-logs/access.log combined
+    <Directory /var/www/production/admin/dist/trucktransport>
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride All
+    #       Order allow,deny
+        Require all granted
+    </Directory>
+</VirtualHost>
+
+sudo nano /etc/apache2/sites-available/production_customer.conf
+<VirtualHost *:8080>
+    ServerName 127.0.0.1
+    ServerAlias 127.0.0.1
+    ServerAdmin webmaster@127.0.0.1
+    DocumentRoot /var/www/production/customer/dist/trucktransport
+    ErrorLog /var/www/production/customer-logs/error.log
+    CustomLog /var/www/production/customer-logs/access.log combined
+    <Directory /var/www/production/customer/dist/trucktransport>
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride All
+    #       Order allow,deny
+        Require all granted
+    </Directory>
+</VirtualHost>
+
+sudo nano /etc/apache2/sites-available/staging_admin.conf
+<VirtualHost *:4200>
+    ServerName 127.0.0.1
+    ServerAlias 127.0.0.1
+    ServerAdmin webmaster@127.0.0.1
+    DocumentRoot /var/www/staging/admin/dist/trucktransport
+    ErrorLog /var/www/staging/admin-logs/error.log
+    CustomLog /var/www/staging/admin-logs/access.log combined
+    <Directory /var/www/staging/admin/dist/trucktransport>
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride All
+    #       Order allow,deny
+        Require all granted
+    </Directory>
+</VirtualHost>
+
+sudo nano /etc/apache2/sites-available/staging_customer.conf
+<VirtualHost *:4201>
+    ServerName 127.0.0.1
+    ServerAlias 127.0.0.1
+    ServerAdmin webmaster@127.0.0.1
+    DocumentRoot /var/www/staging/customer/dist/trucktransport
+    ErrorLog /var/www/staging/customer-logs/error.log
+    CustomLog /var/www/staging/customer-logs/access.log combined
+    <Directory /var/www/staging/customer/dist/trucktransport>
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride All
+    #       Order allow,deny
+        Require all granted
+    </Directory>
+</VirtualHost>
+
+sudo a2ensite production_admin
+sudo a2ensite production_customer
+sudo a2ensite staging_admin
+sudo a2ensite staging_customer
+sudo a2dissite 000-default
+
+sudo apache2ctl configtest
+
+sudo systemctl reload apache2
+
+sudo nano /var/www/production/admin/index.html
+<html>
+  <head>
+    <title>production_admin</title>
+  </head>
+  <body>
+    <h1>production_admin</h1>
+  </body>
+</html>
+
+sudo nano /var/www/production/customer/index.html
+<html>
+  <head>
+    <title>production_customer</title>
+  </head>
+  <body>
+    <h1>production_customer</h1>
+  </body>
+</html>
+
+sudo nano /var/www/staging/admin/index.html
+<html>
+  <head>
+    <title>staging_admin</title>
+  </head>
+  <body>
+    <h1>staging_admin</h1>
+  </body>
+</html>
+
+sudo nano /var/www/staging/customer/index.html
+<html>
+  <head>
+    <title>staging_customer</title>
+  </head>
+  <body>
+    <h1>staging_customer</h1>
+  </body>
+</html>
+
+sudo systemctl reload apache2
+
+sudo nano /etc/apache2/ports.conf
+
+Listen 8080
+Listen 8000
+Listen 4200
+Listen 4201
+
+# should be directly listened from pm2
+#Listen 3000
+#Listen 3001
+
+# MAIN APACHE2 CONFIG DONE
+
+sudo cp -r /git/api-repo  /var/www/production/api
+sudo cp -r /git/admin-repo  /var/www/production/admin
+sudo cp -r /git/customer-repo  /var/www/production/customer
+
+sudo cp -r /git/api-repo  /var/www/staging/api
+sudo cp -r /git/admin-repo  /var/www/staging/admin
+sudo cp -r /git/customer-repo  /var/www/staging/customer
+
+mv /var/www/from /var/www/to
+
+ng build --configuration=development
+ng build --configuration=staging
+ng build --configuration=production
+
+npm run build --configuration=development
+npm run build --configuration=staging
+npm run build --configuration=production
+
+https://julianpoemp.github.io/ngx-htaccess-generator/#/generator
+
+sudo nano /var/www/production/admin/build.sh
+
+https://julianpoemp.github.io/ngx-htaccess-generator/#/generator
+
+sudo systemctl status lighttpd
+sudo systemctl start lighttpd
+sudo systemctl stop lighttpd
+sudo systemctl restart lighttpd
+
+sudo service apache2 status
+sudo service apache2 start
+sudo service apache2 stop
+sudo service apache2 restart
+
+sudo a2enmod rewrite

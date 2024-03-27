@@ -82,5 +82,5 @@ module.exports = {
   updateChargeById,
   deleteChargeById,
   queryAllCharges,
-  insert
+  insert,
 };

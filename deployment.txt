@@ -1,0 +1,394 @@
+----------------------------------------------------
+                   PRODUCTION
+----------------------------------------------------
+
+ADMIN
+-----
+
+cd /var/www/production/admin
+git checkout master
+git pull
+ng build --configuration production
+cp .htaccess_dist dist/trucktransport/.htaccess
+
+<VirtualHost *:80>
+    ServerName 127.0.0.1
+    ServerAlias 127.0.0.1
+    ServerAdmin webmaster@127.0.0.1
+    DocumentRoot /var/www/production/admin/dist/trucktransport
+    ErrorLog /var/www/production/admin-logs/error.log
+    CustomLog /var/www/production/admin-logs/access.log combined
+    <Directory /var/www/production/admin/dist/trucktransport>
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride All
+    #       Order allow,deny
+        Require all granted
+    </Directory>
+</VirtualHost>
+
+CUSTOMER
+--------
+
+cd /var/www/production/customer
+git checkout master
+git pull
+ng build --configuration production
+cp .htaccess_dist dist/trucktransport/.htaccess
+
+<VirtualHost *:8080>
+    ServerName 127.0.0.1
+    ServerAlias 127.0.0.1
+    ServerAdmin webmaster@127.0.0.1
+    DocumentRoot /var/www/production/customer/dist/trucktransport
+    ErrorLog /var/www/production/customer-logs/error.log
+    CustomLog /var/www/production/customer-logs/access.log combined
+    <Directory /var/www/production/customer/dist/trucktransport>
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride All
+    #       Order allow,deny
+        Require all granted
+    </Directory>
+</VirtualHost>
+
+API
+---
+
+const SUFFIX = process.argv.indexOf('--env') === -1 ? '' : `${process.argv[process.argv.indexOf('--env') + 1]}`;
+let NODE_ENV = '';
+let APP_NAME = '';
+let PORT = 0;
+let CWD = '';
+let MAX_MEMORY = '2048M';
+let INSTANCES = 1;
+const SCRIPT = 'src/index.js';
+let AUTO_RESTART = true;
+let WATCH = false;
+if (SUFFIX === 'development') {
+  NODE_ENV = 'development';
+  APP_NAME = 'TruckTransportApiLocal';
+  PORT = 3001;
+  CWD = '/Volumes/Projects/trucktransportdriveaway.com/api';
+  MAX_MEMORY = '2048M';
+  INSTANCES = 1;
+  WATCH = true;
+} else if (SUFFIX === 'staging') {
+  NODE_ENV = 'production';
+  APP_NAME = 'TruckTransportApiStaging';
+  PORT = 3001;
+  CWD = '/var/www/staging/api';
+  MAX_MEMORY = '2048M';
+  INSTANCES = 1;
+} else if (SUFFIX === 'production') {
+  NODE_ENV = 'production';
+  APP_NAME = 'TruckTransportApiProduction';
+  PORT = 3000;
+  CWD = '/var/www/production/api';
+  MAX_MEMORY = '8192M';
+  INSTANCES = 3;
+  AUTO_RESTART = true;
+}
+console.log(`SUFFIX : ${SUFFIX}`);
+console.log(`APP NAME : ${APP_NAME}`);
+console.log(`PORT : ${PORT}`);
+console.log(`CWD : ${CWD}`);
+console.log(`NODE_ENV : ${NODE_ENV}`);
+console.log(`MAX_MEMORY : ${MAX_MEMORY}`);
+console.log(`INSTANCES : ${INSTANCES}`);
+console.log(`SCRIPT : ${SCRIPT}`);
+console.log(`AUTO_RESTART : ${AUTO_RESTART}`);
+console.log(`WATCH : ${WATCH}`);
+module.exports = {
+  apps: [
+    {
+      name: APP_NAME,
+      cwd: CWD,
+      script: SCRIPT,
+      instances: INSTANCES,
+      autorestart: AUTO_RESTART,
+      watch: WATCH,
+      max_memory_restart: MAX_MEMORY,
+      env: {
+        NODE_ENV,
+        PORT,
+      },
+    },
+    /* {
+      name: 'TruckTransportApiProduction',
+      cwd: '/var/www/trucktransport/production/api',
+      script: 'src/index.js',
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '256M',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3000,
+      },
+    },
+    {
+      name: 'TruckTransportApiStaging',
+      cwd: '/var/www/trucktransport/staging/api',
+      script: 'src/index.js',
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '256M',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3001,
+      },
+    },
+    {
+      name: 'TruckTransportApiLocal',
+      cwd: './',
+      script: 'src/index.js',
+      instances: 1,
+      autorestart: true,
+      watch: true,
+      max_memory_restart: '256M',
+      env: {
+        NODE_ENV: 'development',
+        PORT: 3001,
+      },
+    }, */
+  ],
+};
+
+pm2 start ecosystem.config.js
+pm2 reload ecosystem.config.js TruckTransportApiProduction --env production --update-env --max-memory-restart 8192M
+#pm2 reload ecosystem.config.js TruckTransportApiProduction --env production --update-env --no-autorestart --max-memory-restart 8192M
+
+----------------------------------------------------
+                   STAGING
+----------------------------------------------------
+
+ADMIN
+-----
+cd /var/www/staging/admin
+git checkout development
+git pull
+ng build --configuration staging
+cp .htaccess_dist dist/trucktransport/.htaccess
+
+<VirtualHost *:4200>
+    ServerName 127.0.0.1
+    ServerAlias 127.0.0.1
+    ServerAdmin webmaster@127.0.0.1
+    DocumentRoot /var/www/staging/admin/dist/trucktransport
+    ErrorLog /var/www/staging/admin-logs/error.log
+    CustomLog /var/www/staging/admin-logs/access.log combined
+    <Directory /var/www/staging/admin/dist/trucktransport>
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride All
+    #       Order allow,deny
+        Require all granted
+    </Directory>
+</VirtualHost>
+
+CUSTOMER
+--------
+cd /var/www/staging/customer
+git checkout development
+git pull
+ng build --configuration staging
+cp .htaccess_dist dist/trucktransport/.htaccess
+
+<VirtualHost *:4201>
+    ServerName 127.0.0.1
+    ServerAlias 127.0.0.1
+    ServerAdmin webmaster@127.0.0.1
+    DocumentRoot /var/www/staging/customer/dist/trucktransport
+    ErrorLog /var/www/staging/customer-logs/error.log
+    CustomLog /var/www/staging/customer-logs/access.log combined
+    <Directory /var/www/staging/customer/dist/trucktransport>
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride All
+    #       Order allow,deny
+        Require all granted
+    </Directory>
+</VirtualHost>
+
+
+
+API
+---
+
+const SUFFIX = process.argv.indexOf('--env') === -1 ? '' : `${process.argv[process.argv.indexOf('--env') + 1]}`;
+let NODE_ENV = '';
+let APP_NAME = '';
+let PORT = 0;
+let CWD = '';
+let MAX_MEMORY = '2048M';
+let INSTANCES = 1;
+const SCRIPT = 'src/index.js';
+let AUTO_RESTART = true;
+let WATCH = false;
+if (SUFFIX === 'development') {
+  NODE_ENV = 'development';
+  APP_NAME = 'TruckTransportApiLocal';
+  PORT = 3001;
+  CWD = '/home/zohaib/Projects/Backend';
+  MAX_MEMORY = '2048M';
+  INSTANCES = 1;
+  WATCH = true;
+} else if (SUFFIX === 'staging') {
+  NODE_ENV = 'production';
+  APP_NAME = 'TruckTransportApiStaging';
+  PORT = 3001;
+  CWD = '/var/www/trucktransport/staging/api';
+  MAX_MEMORY = '2048M';
+  INSTANCES = 1;
+} else if (SUFFIX === 'production') {
+  NODE_ENV = 'production';
+  APP_NAME = 'TruckTransportApiProduction';
+  PORT = 3000;
+  CWD = '/var/www/trucktransport/production/api';
+  MAX_MEMORY = '2048M';
+  INSTANCES = 1;
+  AUTO_RESTART = true;
+}
+console.log(`SUFFIX : ${SUFFIX}`);
+console.log(`APP NAME : ${APP_NAME}`);
+console.log(`PORT : ${PORT}`);
+console.log(`CWD : ${CWD}`);
+console.log(`NODE_ENV : ${NODE_ENV}`);
+console.log(`MAX_MEMORY : ${MAX_MEMORY}`);
+console.log(`INSTANCES : ${INSTANCES}`);
+console.log(`SCRIPT : ${SCRIPT}`);
+console.log(`AUTO_RESTART : ${AUTO_RESTART}`);
+console.log(`WATCH : ${WATCH}`);
+module.exports = {
+  apps: [
+    {
+      name: APP_NAME,
+      cwd: CWD,
+      script: SCRIPT,
+      instances: INSTANCES,
+      autorestart: AUTO_RESTART,
+      watch: WATCH,
+      max_memory_restart: MAX_MEMORY,
+      env: {
+        NODE_ENV,
+        PORT,
+      },
+    },
+    /* {
+      name: 'TruckTransportApiProduction',
+      cwd: '/var/www/trucktransport/production/api',
+      script: 'src/index.js',
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '256M',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3000,
+      },
+    },
+    {
+      name: 'TruckTransportApiStaging',
+      cwd: '/var/www/trucktransport/staging/api',
+      script: 'src/index.js',
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '256M',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3001,
+      },
+    },
+    {
+      name: 'TruckTransportApiLocal',
+      cwd: './',
+      script: 'src/index.js',
+      instances: 1,
+      autorestart: true,
+      watch: true,
+      max_memory_restart: '256M',
+      env: {
+        NODE_ENV: 'development',
+        PORT: 3001,
+      },
+    }, */
+  ],
+};
+
+pm2 reload ecosystem.config.js TruckTransportApiStaging --env staging --update-env --max-memory-restart 2048M
+
+-----
+EXTRA
+-----
+https://devhints.io/pm2
+https://pm2.io/docs/runtime/guide/installation/
+https://pm2.keymetrics.io/docs/usage/quick-start/
+https://programmer.group/61a05b4430e7f.html
+
+sudo nano deploy.sh
+sudo chmod +x ./deploy.sh
+
+sudo netstat -nltp | grep 3000
+sudo lsof -i -P | grep 3000
+
+kill <pid>
+pm2 kill
+
+.htaccess_dist
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Redirection of requests to index.html
+  RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -f [OR]
+  RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -d
+  RewriteRule ^.*$ - [NC,L]
+  # Redirect all non-file routes to index.html
+  RewriteRule ^(?!.*\.).*$ index.html [NC,L]
+</IfModule>
+
+
+VERSIONS
+--------
+
+ng --version
+Your global Angular CLI version (14.2.11) is greater than your local version (13.3.11). The local Angular CLI version is used.
+
+To disable this warning use "ng config -g cli.warnings.versionMismatch false".
+
+     _                      _                 ____ _     ___
+    / \   _ __   __ _ _   _| | __ _ _ __     / ___| |   |_ _|
+   / △ \ | '_ \ / _` | | | | |/ _` | '__|   | |   | |    | |
+  / ___ \| | | | (_| | |_| | | (_| | |      | |___| |___ | |
+ /_/   \_\_| |_|\__, |\__,_|_|\__,_|_|       \____|_____|___|
+                |___/
+
+
+Angular CLI: 13.3.11
+Node: 16.19.1
+Package Manager: npm 8.19.3
+OS: linux x64
+
+Angular: 13.3.12
+... animations, common, compiler, compiler-cli, core, forms
+... localize, platform-browser, platform-browser-dynamic, router
+
+Package                         Version
+---------------------------------------------------------
+@angular-devkit/architect       0.1303.11
+@angular-devkit/build-angular   13.3.11
+@angular-devkit/core            13.3.11
+@angular-devkit/schematics      13.3.11
+@angular/cdk                    13.3.9
+@angular/cli                    13.3.11
+@angular/material               13.3.9
+@schematics/angular             13.3.11
+rxjs                            7.5.0
+typescript                      4.5.2
+webpack                         5.76.2
+
+node -v
+v16.19.1
+
+mongo 6
+
+ISSUES
+======
+imask package causing issues we must require imask pkg as of defined in package.json (6.4.2) but node modules always download higher 6.4.3 version which is not compatible so we need a copy of 6.4.2 version its must have

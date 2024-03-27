@@ -1,25 +1,20 @@
 const mongoose = require('mongoose');
+const uniqueValidator = require('mongoose-unique-validator');
 const { toJSON, paginate } = require('./plugins');
-const {loadStatuses, chargesTypes} = require("../config/loads");
-var uniqueValidator = require('mongoose-unique-validator');
-const Schema = mongoose.Schema;
+const { loadStatuses } = require('../config/loads');
+
+const { Schema } = mongoose;
 const opts = {
   timestamps: {
     createdAt: 'createdAtDateTime',
-    updatedAt: 'updatedAtDateTime'
-  }
+    updatedAt: 'updatedAtDateTime',
+  },
 };
-const invitationSentToDrivers = Schema({
-  id: {
-    type: mongoose.SchemaTypes.ObjectId,
-    ref: "Driver",
-  }
-});
 const driverInterests = Schema({
   id: {
     type: mongoose.SchemaTypes.ObjectId,
-    ref: "Driver",
-  }
+    ref: 'Driver',
+  },
 });
 const goods = Schema({
   id: {
@@ -38,9 +33,11 @@ const goods = Schema({
   palletes: Number,
   frClass: Number,
   notes: String,
-  good: { // this will map to goods
+  vin: String,
+  good: {
+    // this will map to goods
     type: mongoose.SchemaTypes.ObjectId,
-    ref: "Good",
+    ref: 'Good',
   },
 });
 const charges = Schema({
@@ -49,7 +46,7 @@ const charges = Schema({
   },
   type: {
     type: mongoose.SchemaTypes.ObjectId,
-    ref: "Charge",
+    ref: 'Charge',
   },
   rate: Number,
   quantity: Number,
@@ -61,22 +58,37 @@ const charges = Schema({
     type: Boolean,
     default: false,
   },
-  notes: String
+  notes: String,
+});
+const deliveredImages = Schema({
+  id: {
+    type: mongoose.SchemaTypes.ObjectId,
+  },
+  image: {
+    type: String,
+    default: null,
+  },
+  year: Number,
+  month: Number,
+});
+const enroutedImages = Schema({
+  id: {
+    type: mongoose.SchemaTypes.ObjectId,
+  },
+  image: {
+    type: String,
+    default: null,
+  },
+  year: Number,
+  month: Number,
 });
 const loadSchema = Schema(
   {
-    goods: [
-      goods
-    ],
-    charges: [
-      charges
-    ],
-    invitationSentToDrivers: [
-      invitationSentToDrivers
-    ],
-    driverInterests: [
-      driverInterests
-    ],
+    goods: [goods],
+    charges: [charges],
+    deliveredImages: [deliveredImages],
+    enroutedImages: [enroutedImages],
+    driverInterests: [driverInterests],
     code: {
       type: String,
       default: '',
@@ -105,27 +117,27 @@ const loadSchema = Schema(
       trim: true,
     },
     bolHash: {
-      type: String,
+      type: Number,
       default: '',
-      required: true,
+      required: false,
       trim: true,
     },
     shipperRef: {
       type: String,
       default: '',
-      required: true,
+      required: false,
       trim: true,
     },
     poHash: {
       type: String,
       default: '',
-      required: true,
+      required: false,
       trim: true,
     },
     proCode: {
       type: String,
       default: '',
-      required: true,
+      required: false,
       trim: true,
     },
     status: {
@@ -134,7 +146,7 @@ const loadSchema = Schema(
       default: 'pending',
       required: true,
       trim: true,
-      index: true
+      index: true,
     },
     notes: {
       type: String,
@@ -166,31 +178,73 @@ const loadSchema = Schema(
     },
     inviteAcceptedByDriverTime: {
       type: Date,
+      default: null,
       required: false,
     },
     isInviteAcceptedByDriver: {
       type: Boolean,
       default: false,
     },
-    inviteAcceptedByDriver: { // this will map to drivers
-      type: mongoose.SchemaTypes.ObjectId,
-      ref: "Driver",
+    signatureImage: {
+      image: {
+        type: String,
+        default: null,
+      },
+      year: Number,
+      month: Number,
     },
-    lastInvitedDriver: { // this will map to drivers
-      type: mongoose.SchemaTypes.ObjectId,
-      ref: "Driver",
+    loadEnroutedDateTime: {
+      type: Date,
+      default: null,
     },
-    customer: { // this will map to isCustomer key of (profile, type, product)
-      type: mongoose.SchemaTypes.ObjectId,
-      ref: "Product",
+    loadDeliveredDateTime: {
+      type: Date,
+      default: null,
     },
-    destination: { // this will map to isCustomer key of (profile, type, product)
+    inviteAcceptedByDriver: {
+      // this will map to drivers
       type: mongoose.SchemaTypes.ObjectId,
-      ref: "Product",
+      ref: 'Driver',
     },
-    origin: { // this will map to isShipper key of (profile, type, product)
+    updatedByDriver: {
       type: mongoose.SchemaTypes.ObjectId,
-      ref: "Product",
+      ref: 'Driver',
+    },
+    updatedByDriverDateTime: {
+      type: Date,
+      default: null,
+    },
+    updatedByUser: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'User',
+    },
+    updatedByUserDateTime: {
+      type: Date,
+      default: null,
+    },
+    createdByUser: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'User',
+    },
+    lastInvitedDriver: {
+      // this will map to drivers
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'Driver',
+    },
+    customer: {
+      // this will map to isCustomer key of (profile, type, profile)
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'Profile',
+    },
+    destination: {
+      // this will map to isCustomer key of (profile, type, profile)
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'Profile',
+    },
+    origin: {
+      // this will map to isShipper key of (profile, type, profile)
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'Profile',
     },
   },
   opts

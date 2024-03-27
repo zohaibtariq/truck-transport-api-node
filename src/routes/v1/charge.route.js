@@ -7,10 +7,15 @@ const { chargeValidation } = require('../../validations');
 const router = express.Router();
 
 router.post('/', auth('createCharge'), validate(chargeValidation.createCharge), chargeController.createCharge);
-router.get('/' , auth('getCharges'), chargeController.getCharges);
-router.get('/:chargeId', auth('getCharge'), validate(chargeValidation.chargeQueryParam), chargeController.getCharge)
-router.post('/:chargeId', auth('updateCharge'), validate(chargeValidation.updateCharge), chargeController.updateCharge)
-router.delete('/:chargeId', auth('deleteCharge'), validate(chargeValidation.chargeQueryParam), chargeController.deleteCharge);
+router.get('/', auth('getCharges'), chargeController.getCharges);
+router.get('/:chargeId', auth('getCharge'), validate(chargeValidation.chargeQueryParam), chargeController.getCharge);
+router.post('/:chargeId', auth('updateCharge'), validate(chargeValidation.updateCharge), chargeController.updateCharge);
+router.delete(
+  '/:chargeId',
+  auth('deleteCharge'),
+  validate(chargeValidation.chargeQueryParam),
+  chargeController.deleteCharge
+);
 
 module.exports = router;
 
@@ -77,25 +82,22 @@ module.exports = router;
  *
  *   get:
  *     summary: Get all charges
- *     description: Only admins can retrieve all charges.
+ *     description: all charges in a paginated response.
  *     tags: [Charges]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
- *         name: name
+ *         name: active
  *         schema:
  *           type: string
- *         description: Charge name
- *       - in: query
- *         name: role
- *         schema:
- *           type: string
- *         description: Charge role
+ *         default: true
+ *         description: active/inactive charge
  *       - in: query
  *         name: sortBy
  *         schema:
  *           type: string
+ *         default: createdAtDateTime:desc
  *         description: sort by query in the form of field:desc/asc (ex. name:asc)
  *       - in: query
  *         name: limit

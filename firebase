@@ -1,0 +1,82 @@
+// https://documentation.onesignal.com/docs/generate-a-google-server-api-key
+
+// Import the functions you need from the SDKs you need
+import { initializeApp } from 'firebase/app';
+import { getAnalytics } from 'firebase/analytics';
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: 'AIzaSyAYVH4Zcl0ujKYa9neobkKlcHZ1P_r3zPk',
+  authDomain: 'trucktransport-web-6a313.firebaseapp.com',
+  projectId: 'trucktransport-web-6a313',
+  storageBucket: 'trucktransport-web-6a313.appspot.com',
+  messagingSenderId: '961404129226',
+  appId: '1:961404129226:web:9708811abb56ede8e00933',
+  measurementId: 'G-7HGPBTSD6E',
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
+// https://console.firebase.google.com/u/0/project/trucktransport-web-6a313/settings/cloudmessaging/web:ZmIwOGEyZWEtMGFiMy00ZmFiLThjNGYtNjJmNGZjZmNiZGVi
+const serverKey =
+  'AAAA39gmz8o:APA91bEOkivSF-XyjXY4EFpMtTLRcU_iSzpPEFbAEED49zJQiqeZH3Ql-0j262so1m4UBTNlbK1dDpgmJoZOg7DZCkJg_E3Qn0WHAsLqmlndynIXEn6e8nwc5oAXeyK8zwGKs_pJEtFJ';
+const senderId = '961404129226';
+
+// one signal > fcm app id > ac9d4617-be92-4802-a08f-6c380d0a392f
+
+// Run OneSignal.SetLogLevel(OneSignal.LOG_LEVEL.DEBUG, OneSignal.LOG_LEVEL.DEBUG);before OneSignal initialization and check your ADB logcat for errors or warnings.
+// Verify that the OneSignal App ID is correct in your app or site.
+// ac9d4617-be92-4802-a08f-6c380d0a392f
+
+// https://console.firebase.google.com/u/0/project/trucktransport-web-6a313/settings/cloudmessaging/web:ZmIwOGEyZWEtMGFiMy00ZmFiLThjNGYtNjJmNGZjZmNiZGVi
+// web push certificate key pair
+// BN-D0pFKDX3tcn3beO22zztC7dAXOBdGiIfTEy25xSn8BCeDJ4PhAPZRTCsIGaDdlvksANCxpFkTn4t8IjOv7yg
+
+// https://dev.to/dallington256/how-to-send-push-notification-to-an-android-device-using-firebase-and-nodejs-3o4i#:~:text=You%20need%20to%20access%20your,Generate%20new%20private%20key%20button.
+var admin = require('firebase-admin');
+
+var serviceAccount = require('path/to/serviceAccountKey.json');
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
+
+// Firebase service account
+// firebase-adminsdk-zkgrm@trucktransport-web-6a313.iam.gserviceaccount.com
+
+// ---------------------
+
+var admin = require('firebase-admin');
+var fcm = require('fcm-notification');
+var serviceAccount = require('../config/privateKey.json');
+const certPath = admin.credential.cert(serviceAccount);
+var FCM = new fcm(certPath);
+
+sendPushNotification = (fcm_token, title, body) => {
+  try {
+    let message = {
+      android: {
+        notification: {
+          title: title,
+          body: body,
+        },
+      },
+      token: fcm_token,
+    };
+
+    FCM.send(message, function (err, resp) {
+      if (err) {
+        throw err;
+      } else {
+        console.log('Successfully sent notification');
+      }
+    });
+  } catch (err) {
+    throw err;
+  }
+};

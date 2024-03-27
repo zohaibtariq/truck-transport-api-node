@@ -1,26 +1,25 @@
 const mongoose = require('mongoose');
+const uniqueValidator = require('mongoose-unique-validator');
+const validator = require('validator');
+const bcrypt = require('bcryptjs');
 const { toJSON, paginate } = require('./plugins');
-const uniqueValidator = require("mongoose-unique-validator");
-const Joi = require("joi");
-const validator = require("validator");
-const bcrypt = require("bcryptjs");
-// const Schema = mongoose.Schema;
+
 const CertificationSchema = mongoose.Schema({
   drivingSchool: String,
   country: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'Country',
-    required: true
+    required: true,
   },
   state: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'State',
-    required: true
+    required: true,
   },
   city: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'City',
-    required: true
+    required: true,
   },
   contact: String,
   phone: String,
@@ -67,9 +66,7 @@ const driverSchema = mongoose.Schema(
       milesDriven: String,
       yrsExp: String,
     },
-    certifications: [
-      CertificationSchema
-    ],
+    certifications: [CertificationSchema],
     code: {
       type: String,
       default: '',
@@ -127,17 +124,17 @@ const driverSchema = mongoose.Schema(
     country: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'Country',
-      required: true
+      required: true,
     },
     state: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'State',
-      required: true
+      required: true,
     },
     city: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'City',
-      required: true
+      required: true,
     },
     phone: {
       type: String,
@@ -181,7 +178,8 @@ const driverSchema = mongoose.Schema(
     //   default: false,
     //   required: true,
     // },
-    dispatcher:{ // previously userId
+    dispatcher: {
+      // previously userId
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'User',
       required: false,
@@ -212,6 +210,12 @@ const driverSchema = mongoose.Schema(
       },
       private: true, // used by the toJSON plugin
     },
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    cardNumber: String,
+    fcmToken: String,
   },
   {
     timestamps: true,

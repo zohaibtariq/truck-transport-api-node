@@ -1,11 +1,16 @@
 module.exports.Token = require('./token.model');
 module.exports.DriverToken = require('./driverToken.model');
+module.exports.ProfileToken = require('./profileToken.model');
 module.exports.User = require('./user.model');
-module.exports.Product = require('./product.model');
+module.exports.Profile = require('./profile.model');
 module.exports.Driver = require('./driver.model');
 module.exports.Load = require('./load.model');
 module.exports.Good = require('./good.model');
 module.exports.Charge = require('./charge.model');
+module.exports.PaymentLoad = require('./PaymentLoad.model');
 module.exports.Country = require('./country.model');
 module.exports.State = require('./state.model');
 module.exports.City = require('./city.model');
+module.exports.InvitedDriver = require('./invitedDriver.model');
+module.exports.DriverInterest = require('./driverInterest.model');
+module.exports.Setting = require('./setting.model');

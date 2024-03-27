@@ -91,7 +91,6 @@ const uniqueEmails = async (filter) => {
 };
 
 const createCountriesStatesAndCities = async () => {
-
   let countriesCountFromDb = await Country.estimatedDocumentCount();
   let statesCountFromDb = await State.estimatedDocumentCount();
   let citiesCountFromDb = await City.estimatedDocumentCount();
@@ -105,16 +104,16 @@ const createCountriesStatesAndCities = async () => {
    *
    */
   let CountryPlugin = require('country-state-city').Country;
-  const allCountries = CountryPlugin.getAllCountries()
-  if(allCountries.length > 0 && countriesCountFromDb === 0) {
-    console.log('countries insertion started');
+  const allCountries = CountryPlugin.getAllCountries();
+  if (allCountries.length > 0 && countriesCountFromDb === 0) {
+    // console.log('countries insertion started');
     await Country.deleteMany();
     await Country.insertMany(allCountries)
-      .then(function(mongooseDocuments) {
-        console.log('countries insertion ended');
+      .then(function (mongooseDocuments) {
+        // console.log('countries insertion ended');
         countriesCountInsertions = mongooseDocuments.length;
       })
-      .catch(function(err) {
+      .catch(function (err) {
         res.status(httpStatus.UNPROCESSABLE_ENTITY).send(err);
       });
   }
@@ -125,16 +124,16 @@ const createCountriesStatesAndCities = async () => {
    *
    */
   let StatePlugin = require('country-state-city').State;
-  const allStates = StatePlugin.getAllStates()
-  if(allStates.length > 0 && statesCountFromDb === 0) {
-    console.log('states insertion started');
+  const allStates = StatePlugin.getAllStates();
+  if (allStates.length > 0 && statesCountFromDb === 0) {
+    // console.log('states insertion started');
     await State.deleteMany();
     await State.insertMany(allStates)
-      .then(function(mongooseDocuments) {
-        console.log('states insertion ended');
+      .then(function (mongooseDocuments) {
+        // console.log('states insertion ended');
         statesCountInsertions = mongooseDocuments.length;
       })
-      .catch(function(err) {
+      .catch(function (err) {
         res.status(httpStatus.UNPROCESSABLE_ENTITY).send(err);
       });
   }
@@ -146,15 +145,15 @@ const createCountriesStatesAndCities = async () => {
    */
   let CityPlugin = require('country-state-city').City;
   const allCities = CityPlugin.getAllCities();
-  if(allCities.length > 0 && citiesCountFromDb === 0) {
-    console.log('cities insertion started');
+  if (allCities.length > 0 && citiesCountFromDb === 0) {
+    // console.log('cities insertion started');
     await City.deleteMany();
     await City.insertMany(allCities)
-      .then(function(mongooseDocuments) {
-        console.log('cities insertion ended');
+      .then(function (mongooseDocuments) {
+        // console.log('cities insertion ended');
         citiesCountInsertions = mongooseDocuments.length;
       })
-      .catch(function(err) {
+      .catch(function (err) {
         res.status(httpStatus.UNPROCESSABLE_ENTITY).send(err);
       });
   }
@@ -162,20 +161,20 @@ const createCountriesStatesAndCities = async () => {
   return {
     insertedCountriesCount: countriesCountInsertions,
     insertedStatesCount: statesCountInsertions,
-    insertedCitiesCount: citiesCountInsertions
+    insertedCitiesCount: citiesCountInsertions,
   };
-}
+};
 
 const getAllCountries = async () => {
-  return Country.find();
+  return Country.find({ isoCode: { $in: ['US', 'MX', 'CA'] } });
 };
 
 const getAllStatesOfCountry = async (countryIsoCode) => {
-  return State.find({countryCode: countryIsoCode});
+  return State.find({ countryCode: countryIsoCode });
 };
 
 const getAllCitiesOfStateAndCountry = async (countryIsoCode, stateIsoCode) => {
-  return City.find({countryCode: countryIsoCode, stateCode: stateIsoCode});
+  return City.find({ countryCode: countryIsoCode, stateCode: stateIsoCode });
 };
 
 module.exports = {
